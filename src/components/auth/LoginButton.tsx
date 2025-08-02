@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Button } from 'antd';
-import { MicrosoftOutlined } from '@ant-design/icons';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const LoginButton: React.FC = () => {

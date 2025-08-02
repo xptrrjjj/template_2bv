@@ -30,7 +30,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ userName }) => {
             Welcome back, {firstName}! 👋
           </Title>
           <Text style={{ fontSize: '16px', color: '#64748b', marginTop: '8px', display: 'block' }}>
-            Ready to find your next great hire? Let's make it happen.
+            Your application is ready to use. Navigate using the sidebar to access different features.
           </Text>
         </Col>
         <Col>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Typography, Button, Space, Timeline, Tag, Collapse, Empty } from 'antd';
 import { 
   HistoryOutlined, 
@@ -11,7 +11,7 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface TestResult {
   operation: string;
@@ -28,7 +28,6 @@ interface ResponseDisplayProps {
 }
 
 export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ results, onClear }) => {
-  const [expandedPanels, setExpandedPanels] = useState<string[]>([]);
 
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleString();
@@ -108,7 +107,7 @@ export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ results, onCle
     >
       <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
         <Timeline
-          items={results.map((result, index) => ({
+          items={results.map((result) => ({
             dot: getStatusIcon(result.status),
             children: (
               <div style={{ marginBottom: '16px' }}>

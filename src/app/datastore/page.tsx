@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layout, Card, Typography, Row, Col, App } from 'antd';
+import { Layout, Card, Typography, Row, Col } from 'antd';
 import { DatabaseOutlined } from '@ant-design/icons';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { AppSidebar } from '@/components/navigation/AppNavigation';

@@ -6,7 +6,7 @@ import { SearchOutlined, ClearOutlined, ThunderboltOutlined } from '@ant-design/
 import { apiClient } from '@/services/api';
 
 const { TextArea } = Input;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface TestResult {
   operation: string;
@@ -58,7 +58,7 @@ export const DatastoreRetrieveForm: React.FC<DatastoreRetrieveFormProps> = ({ on
   const [loading, setLoading] = useState(false);
   const { notification } = App.useApp();
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: { identifier: string; filters?: string }) => {
     setLoading(true);
     try {
       const requestData = {

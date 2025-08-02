@@ -7,7 +7,7 @@ import { apiClient } from '@/services/api';
 import { DatastoreAction } from '@/types/datastore';
 
 const { TextArea } = Input;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface TestResult {
   operation: string;
@@ -75,7 +75,7 @@ export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ 
   const [loading, setLoading] = useState(false);
   const { notification } = App.useApp();
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: { identifier: string; action: string; data: string }) => {
     setLoading(true);
     try {
       const requestData = {

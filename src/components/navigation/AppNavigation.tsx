@@ -1,18 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Layout, Menu, Typography, Space, Avatar, Button, Dropdown } from 'antd';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Layout, Menu, Typography, Avatar, Dropdown } from 'antd';
 import { 
   HomeOutlined, 
   DatabaseOutlined, 
   UserOutlined, 
   LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  DownOutlined
+  DownOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  SafetyCertificateOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { User } from '@/types/auth';
+import { NavigationItem } from '@/types/rbac';
+import { usePermissionFilter } from '@/hooks/usePermissions';
 
 const { Sider, Header } = Layout;
 const { Text } = Typography;
@@ -23,32 +26,119 @@ interface AppSidebarProps {
   children: React.ReactNode;
 }
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({ user, onLogout, children }) => {
+const AppSidebarComponent: React.FC<AppSidebarProps> = ({ user, onLogout, children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  
+  // Initialize openKeys based on current path and persist in localStorage
+  const getInitialOpenKeys = () => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('nav-openKeys');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch {
+          // Fall back to default
+        }
+      }
+    }
+    
+    if (pathname.startsWith('/admin')) {
+      return ['/admin'];
+    }
+    return [];
+  };
+  
+  const [openKeys, setOpenKeys] = useState<string[]>(getInitialOpenKeys);
 
-  const menuItems = [
+  const allMenuItems: NavigationItem[] = useMemo(() => [
     {
       key: '/dashboard',
       icon: <HomeOutlined />,
       label: 'Dashboard',
+      requiredPermission: {
+        resource: 'dashboard',
+        action: 'read'
+      }
     },
     {
       key: '/datastore',
       icon: <DatabaseOutlined />,
       label: 'Datastore Testing',
+      requiredPermission: {
+        resource: 'data',
+        action: 'read'
+      }
     },
-  ];
+    {
+      key: '/admin',
+      icon: <SettingOutlined />,
+      label: 'Administration',
+      requiredRole: ['super_admin', 'system_admin', 'antd_recruiter_app_admin'],
+      children: [
+        {
+          key: '/admin/users',
+          icon: <TeamOutlined />,
+          label: 'User Management',
+          requiredPermission: {
+            resource: 'admin',
+            action: 'users'
+          }
+        },
+        {
+          key: '/admin/roles',
+          icon: <SafetyCertificateOutlined />,
+          label: 'Role Management',
+          requiredPermission: {
+            resource: 'admin',
+            action: 'users'
+          }
+        },
+        {
+          key: '/admin/system',
+          icon: <SettingOutlined />,
+          label: 'System Settings',
+          requiredRole: ['super_admin']
+        }
+      ]
+    }
+  ], []);
+
+  // Filter menu items based on user permissions
+  const { filteredItems: menuItems } = usePermissionFilter(allMenuItems);
 
   const handleMenuClick = ({ key }: { key: string }) => {
     router.push(key);
   };
 
+  // Convert NavigationItem[] to Ant Design Menu items format
+  const convertToMenuItems = useCallback((items: NavigationItem[]) => {
+    return items.map(item => ({
+      key: item.key,
+      icon: item.icon,
+      label: item.label,
+      children: item.children ? convertToMenuItems(item.children) : undefined
+    }));
+  }, []);
+
+  const antdMenuItems = useMemo(() => convertToMenuItems(menuItems), [menuItems, convertToMenuItems]);
+
   const getSelectedKey = () => {
     if (pathname === '/dashboard' || pathname === '/') return ['/dashboard'];
     if (pathname.startsWith('/datastore')) return ['/datastore'];
+    if (pathname.startsWith('/admin/users')) return ['/admin/users'];
+    if (pathname.startsWith('/admin/roles')) return ['/admin/roles'];
+    if (pathname.startsWith('/admin/system')) return ['/admin/system'];
+    if (pathname.startsWith('/admin')) return ['/admin'];
     return ['/dashboard'];
+  };
+
+  const handleOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nav-openKeys', JSON.stringify(keys));
+    }
   };
 
   const userMenuItems = [
@@ -128,7 +218,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ user, onLogout, children
           <Menu
             mode="inline"
             selectedKeys={getSelectedKey()}
-            items={menuItems}
+            openKeys={openKeys}
+            onOpenChange={handleOpenChange}
+            items={antdMenuItems}
             onClick={handleMenuClick}
             style={{
               border: 'none',
@@ -233,3 +325,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ user, onLogout, children
     </Layout>
   );
 };
+
+AppSidebarComponent.displayName = 'AppSidebar';
+
+export const AppSidebar = React.memo(AppSidebarComponent);
