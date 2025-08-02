@@ -15,6 +15,7 @@ A modern recruitment application built with Next.js 14, featuring comprehensive 
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript
 - **UI Framework**: Ant Design
 - **Authentication**: Microsoft Authentication Library (MSAL)
@@ -22,6 +23,7 @@ A modern recruitment application built with Next.js 14, featuring comprehensive 
 - **Styling**: CSS-in-JS with Ant Design theming
 
 ### Project Structure
+
 ```
 src/
 ├── app/                    # Next.js App Router pages
@@ -44,11 +46,13 @@ src/
 ## 🔧 Setup & Installation
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm, yarn, pnpm, or bun
 - Microsoft Azure AD application (for authentication)
 
 ### Environment Variables
+
 Create a `.env.local` file in the root directory:
 
 ```bash
@@ -71,12 +75,14 @@ NEXT_PUBLIC_REQUIRE_EXPLICIT_ACCESS=false
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone <repository-url>
 cd antd-recruiter
 ```
 
 2. Install dependencies
+
 ```bash
 npm install
 # or
@@ -88,6 +94,7 @@ bun install
 ```
 
 3. Run the development server
+
 ```bash
 npm run dev
 # or
@@ -105,18 +112,22 @@ bun dev
 The application features a comprehensive Role-Based Access Control system with the following components:
 
 ### Core Concepts
+
 - **Users**: Individual accounts with Microsoft authentication
 - **Roles**: Collections of permissions that can be assigned to users
 - **Permissions**: Granular access rights to specific resources and actions
 - **Applications**: Logical groupings for multi-tenant scenarios
 
 ### Permission Structure
+
 Permissions follow the pattern: `{scope}.{resource}.{action}`
+
 - **Scope**: `system` (global) or `{app_id}` (application-specific)
 - **Resource**: The entity being accessed (e.g., `users`, `roles`, `data`)
 - **Action**: The operation being performed (e.g., `read`, `write`, `delete`)
 
 ### Default Roles
+
 - **Super Admin**: Full system access (`system.*`)
 - **Admin**: Application administration (`{app_id}.*`)
 - **User Manager**: User management permissions
@@ -138,17 +149,20 @@ The application includes a built-in datastore API for data operations. See [DATA
 ## 🎨 UI Components
 
 ### Navigation
+
 - Responsive sidebar with role-based menu filtering
 - Smooth transitions between pages
 - User profile management
 
 ### Administration
+
 - User management interface
 - Role creation and assignment
 - System health monitoring
 - Bootstrap utilities
 
 ### Guards & Protection
+
 - `ProtectedRoute`: Requires authentication
 - `PermissionGuard`: Requires specific permissions
 - `AdminOnly`: Restricts to admin users
@@ -157,12 +171,14 @@ The application includes a built-in datastore API for data operations. See [DATA
 ## 🚀 Deployment
 
 ### Build for Production
+
 ```bash
 npm run build
 npm start
 ```
 
 ### Environment-Specific Configuration
+
 Ensure all environment variables are properly configured for your target environment.
 
 ## 📚 Additional Documentation

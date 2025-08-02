@@ -5,24 +5,24 @@
  */
 export interface UserRecord {
   // Identity
-  record_id: string;              // user_{microsoft_oid}
-  microsoft_oid: string;          // Microsoft Object ID (primary key)
-  email: string;                  // Microsoft email
-  name: string;                   // Microsoft display name
-  
+  record_id: string; // user_{microsoft_oid}
+  microsoft_oid: string; // Microsoft Object ID (primary key)
+  email: string; // Microsoft email
+  name: string; // Microsoft display name
+
   // RBAC Data
-  global_roles: string[];         // Global role IDs
+  global_roles: string[]; // Global role IDs
   app_roles: Record<string, string[]>; // App-specific role IDs {app_id: role_ids[]}
-  
+
   // Metadata
-  created_at: string;             // ISO timestamp
-  updated_at: string;             // ISO timestamp
-  last_login: string;             // ISO timestamp
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  last_login: string; // ISO timestamp
   status: UserStatus;
-  
+
   // System
-  is_super_admin: boolean;        // Global super admin flag
-  profile_picture?: string;       // Microsoft Graph profile picture
+  is_super_admin: boolean; // Global super admin flag
+  profile_picture?: string; // Microsoft Graph profile picture
 }
 
 /**
@@ -30,24 +30,24 @@ export interface UserRecord {
  */
 export interface RoleRecord {
   // Identity
-  record_id: string;              // role_{uuid}
-  role_id: string;                // Unique identifier (e.g., 'admin', 'editor')
-  name: string;                   // Display name
-  description: string;            // Human-readable description
-  
+  record_id: string; // role_{uuid}
+  role_id: string; // Unique identifier (e.g., 'admin', 'editor')
+  name: string; // Display name
+  description: string; // Human-readable description
+
   // Scope
-  scope: RoleScope;               // Global or app-specific role
-  app_id?: string;                // Required if scope === 'app'
-  
+  scope: RoleScope; // Global or app-specific role
+  app_id?: string; // Required if scope === 'app'
+
   // Permissions
-  permission_ids: string[];       // Assigned permission IDs
-  
+  permission_ids: string[]; // Assigned permission IDs
+
   // Metadata
-  is_system_role: boolean;        // Protected from deletion
-  created_at: string;             // ISO timestamp
-  created_by: string;             // Creator Microsoft OID
-  updated_at: string;             // ISO timestamp
-  updated_by: string;             // Last modifier Microsoft OID
+  is_system_role: boolean; // Protected from deletion
+  created_at: string; // ISO timestamp
+  created_by: string; // Creator Microsoft OID
+  updated_at: string; // ISO timestamp
+  updated_by: string; // Last modifier Microsoft OID
 }
 
 /**
@@ -55,70 +55,70 @@ export interface RoleRecord {
  */
 export interface PermissionRecord {
   // Identity
-  record_id: string;              // permission_{uuid}
-  permission_id: string;          // Unique identifier
-  name: string;                   // Display name
-  description: string;            // Human-readable description
-  
+  record_id: string; // permission_{uuid}
+  permission_id: string; // Unique identifier
+  name: string; // Display name
+  description: string; // Human-readable description
+
   // Permission Definition
-  resource: string;               // Resource type (e.g., 'users', 'dashboard')
-  action: string;                 // Action type (e.g., 'read', 'write', 'delete')
-  
+  resource: string; // Resource type (e.g., 'users', 'dashboard')
+  action: string; // Action type (e.g., 'read', 'write', 'delete')
+
   // Scope
-  scope: PermissionScope;         // Global or app-specific permission
-  app_id?: string;                // Required if scope === 'app'
-  
+  scope: PermissionScope; // Global or app-specific permission
+  app_id?: string; // Required if scope === 'app'
+
   // Metadata
-  is_system_permission: boolean;  // Protected from deletion
-  created_at: string;             // ISO timestamp
-  created_by: string;             // Creator Microsoft OID
+  is_system_permission: boolean; // Protected from deletion
+  created_at: string; // ISO timestamp
+  created_by: string; // Creator Microsoft OID
 }
 
 /**
  * Application Record - Registered applications in the system
  */
 export interface ApplicationRecord {
-  record_id: string;              // app_{app_id}
-  app_id: string;                 // Unique app identifier
-  name: string;                   // Display name
-  description: string;            // Description
-  url: string;                    // Application URL
-  icon?: string;                  // Application icon
-  
+  record_id: string; // app_{app_id}
+  app_id: string; // Unique app identifier
+  name: string; // Display name
+  description: string; // Description
+  url: string; // Application URL
+  icon?: string; // Application icon
+
   // Configuration
-  default_role_id?: string;       // Default role for new users
+  default_role_id?: string; // Default role for new users
   require_explicit_access: boolean; // Require explicit role assignment
-  
+
   // Metadata
-  created_at: string;             // ISO timestamp
-  created_by: string;             // Creator Microsoft OID
-  is_active: boolean;             // Application status
+  created_at: string; // ISO timestamp
+  created_by: string; // Creator Microsoft OID
+  is_active: boolean; // Application status
 }
 
 // Enums and Constants
 
-export type UserStatus = 'active' | 'inactive' | 'suspended';
-export type RoleScope = 'global' | 'app';
-export type PermissionScope = 'global' | 'app';
+export type UserStatus = "active" | "inactive" | "suspended";
+export type RoleScope = "global" | "app";
+export type PermissionScope = "global" | "app";
 
 /**
  * Built-in system permissions
  */
 export const GLOBAL_PERMISSIONS = {
   // System Administration
-  'system.admin': 'Full system administration',
-  'system.users.read': 'View all users across applications',
-  'system.users.write': 'Manage users across applications',
-  'system.roles.read': 'View all roles',
-  'system.roles.write': 'Manage system roles',
-  'system.permissions.read': 'View all permissions',
-  'system.permissions.write': 'Create custom permissions',
-  'system.applications.read': 'View registered applications',
-  'system.applications.write': 'Register and manage applications',
-  
+  "system.admin": "Full system administration",
+  "system.users.read": "View all users across applications",
+  "system.users.write": "Manage users across applications",
+  "system.roles.read": "View all roles",
+  "system.roles.write": "Manage system roles",
+  "system.permissions.read": "View all permissions",
+  "system.permissions.write": "Create custom permissions",
+  "system.applications.read": "View registered applications",
+  "system.applications.write": "Register and manage applications",
+
   // Audit and Monitoring
-  'system.audit.read': 'View audit logs',
-  'system.monitoring.read': 'View system monitoring data',
+  "system.audit.read": "View audit logs",
+  "system.monitoring.read": "View system monitoring data",
 } as const;
 
 /**
@@ -126,17 +126,17 @@ export const GLOBAL_PERMISSIONS = {
  */
 export const APP_PERMISSION_PATTERNS = {
   // Resource Management
-  'dashboard.read': 'View application dashboard',
-  'dashboard.write': 'Modify application dashboard',
-  
+  "dashboard.read": "View application dashboard",
+  "dashboard.write": "Modify application dashboard",
+
   // Data Operations
-  'data.read': 'Read application data',
-  'data.write': 'Create/update application data',
-  'data.delete': 'Delete application data',
-  
+  "data.read": "Read application data",
+  "data.write": "Create/update application data",
+  "data.delete": "Delete application data",
+
   // Application Administration
-  'admin.users': 'Manage app users',
-  'admin.settings': 'Manage app settings',
+  "admin.users": "Manage app users",
+  "admin.settings": "Manage app settings",
 } as const;
 
 /**
@@ -145,44 +145,40 @@ export const APP_PERMISSION_PATTERNS = {
 export const SYSTEM_ROLES = {
   // Global Roles
   super_admin: {
-    name: 'Super Administrator',
-    scope: 'global' as const,
-    permissions: ['system.*'], // Wildcard for all permissions
-    description: 'Full system access across all applications'
+    name: "Super Administrator",
+    scope: "global" as const,
+    permissions: ["system.*"], // Wildcard for all permissions
+    description: "Full system access across all applications",
   },
-  
+
   system_admin: {
-    name: 'System Administrator', 
-    scope: 'global' as const,
-    permissions: [
-      'system.users.*',
-      'system.roles.*',
-      'system.applications.*'
-    ],
-    description: 'System administration without super admin privileges'
+    name: "System Administrator",
+    scope: "global" as const,
+    permissions: ["system.users.*", "system.roles.*", "system.applications.*"],
+    description: "System administration without super admin privileges",
   },
-  
+
   // Application Roles (template - instantiated per app)
   app_admin: {
-    name: 'Application Administrator',
-    scope: 'app' as const,
-    permissions: ['{app_id}.admin.*', '{app_id}.data.*'],
-    description: 'Full administration within a specific application'
+    name: "Application Administrator",
+    scope: "app" as const,
+    permissions: ["{app_id}.admin.*", "{app_id}.data.*"],
+    description: "Full administration within a specific application",
   },
-  
+
   app_editor: {
-    name: 'Application Editor',
-    scope: 'app' as const, 
-    permissions: ['{app_id}.data.read', '{app_id}.data.write', '{app_id}.dashboard.read'],
-    description: 'Create and edit content within a specific application'
+    name: "Application Editor",
+    scope: "app" as const,
+    permissions: ["{app_id}.data.read", "{app_id}.data.write", "{app_id}.dashboard.read"],
+    description: "Create and edit content within a specific application",
   },
-  
+
   app_viewer: {
-    name: 'Application Viewer',
-    scope: 'app' as const,
-    permissions: ['{app_id}.data.read', '{app_id}.dashboard.read'],
-    description: 'Read-only access to a specific application'
-  }
+    name: "Application Viewer",
+    scope: "app" as const,
+    permissions: ["{app_id}.data.read", "{app_id}.dashboard.read"],
+    description: "Read-only access to a specific application",
+  },
 } as const;
 
 // Service Request/Response Types
@@ -348,21 +344,16 @@ export interface AuditLogEntry {
   user_agent?: string;
 }
 
-export type AuditAction = 
-  | 'create' 
-  | 'update' 
-  | 'delete' 
-  | 'assign' 
-  | 'revoke' 
-  | 'login' 
-  | 'permission_check';
+export type AuditAction =
+  | "create"
+  | "update"
+  | "delete"
+  | "assign"
+  | "revoke"
+  | "login"
+  | "permission_check";
 
-export type AuditResourceType = 
-  | 'user' 
-  | 'role' 
-  | 'permission' 
-  | 'application' 
-  | 'role_assignment';
+export type AuditResourceType = "user" | "role" | "permission" | "application" | "role_assignment";
 
 // Bootstrap Types
 
@@ -400,22 +391,22 @@ export class RBACError extends Error {
     public details?: Record<string, unknown>
   ) {
     super(message);
-    this.name = 'RBACError';
+    this.name = "RBACError";
   }
 }
 
 export enum RBACErrorCode {
-  USER_NOT_FOUND = 'USER_NOT_FOUND',
-  ROLE_NOT_FOUND = 'ROLE_NOT_FOUND',
-  PERMISSION_NOT_FOUND = 'PERMISSION_NOT_FOUND',
-  APPLICATION_NOT_FOUND = 'APPLICATION_NOT_FOUND',
-  PERMISSION_DENIED = 'PERMISSION_DENIED',
-  INVALID_SCOPE = 'INVALID_SCOPE',
-  SYSTEM_ROLE_PROTECTED = 'SYSTEM_ROLE_PROTECTED',
-  CIRCULAR_DEPENDENCY = 'CIRCULAR_DEPENDENCY',
-  DUPLICATE_IDENTIFIER = 'DUPLICATE_IDENTIFIER',
-  INVALID_TOKEN = 'INVALID_TOKEN',
-  BOOTSTRAP_FAILED = 'BOOTSTRAP_FAILED'
+  USER_NOT_FOUND = "USER_NOT_FOUND",
+  ROLE_NOT_FOUND = "ROLE_NOT_FOUND",
+  PERMISSION_NOT_FOUND = "PERMISSION_NOT_FOUND",
+  APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND",
+  PERMISSION_DENIED = "PERMISSION_DENIED",
+  INVALID_SCOPE = "INVALID_SCOPE",
+  SYSTEM_ROLE_PROTECTED = "SYSTEM_ROLE_PROTECTED",
+  CIRCULAR_DEPENDENCY = "CIRCULAR_DEPENDENCY",
+  DUPLICATE_IDENTIFIER = "DUPLICATE_IDENTIFIER",
+  INVALID_TOKEN = "INVALID_TOKEN",
+  BOOTSTRAP_FAILED = "BOOTSTRAP_FAILED",
 }
 
 // Utility Types

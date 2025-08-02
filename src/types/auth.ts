@@ -27,9 +27,9 @@ export interface EnhancedUser extends User {
 }
 
 export interface RBACState {
-  rbacUser: import('./rbac').UserRecord | null;
-  userRoles: import('./rbac').RoleRecord[];
-  userPermissions: import('./rbac').PermissionRecord[];
+  rbacUser: import("./rbac").UserRecord | null;
+  userRoles: import("./rbac").RoleRecord[];
+  userPermissions: import("./rbac").PermissionRecord[];
   currentApp: string;
   rbacLoading: boolean;
 }

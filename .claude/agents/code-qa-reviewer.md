@@ -33,12 +33,14 @@ Your review process follows this systematic approach:
    - LOW: Minor suggestions (style, optimization)
 
 For each issue identified, provide:
+
 - Clear description of the problem
 - Specific location in the code
 - Potential impact on the system
 - Recommended solution or mitigation
 
 Always conclude with:
+
 - Overall risk assessment (SAFE TO DEPLOY / NEEDS FIXES / REQUIRES MAJOR REVISION)
 - Priority-ordered list of required actions
 - Recommended testing strategy

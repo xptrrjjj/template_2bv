@@ -1,18 +1,22 @@
 # Task 03a: TeamTailor Provider Implementation
 
 ## Objective
+
 Implement the complete TeamTailor integration provider including options fetching, job publishing, and data transformation.
 
-## Dependencies  
+## Dependencies
+
 - Task 01: Core Infrastructure Setup (requires BaseIntegration class)
 
 ## Expected Inputs
+
 - BaseIntegration abstract class
 - TeamTailor API documentation and endpoints
 - Integration types and interfaces
 - Encryption service for API key storage
 
 ## Expected Outputs
+
 - Complete TeamTailor provider implementation
 - Options fetching for departments, locations, templates, stages
 - Job publishing functionality
@@ -20,6 +24,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - Error handling and rate limiting
 
 ## Required Tools/Auth
+
 - TeamTailor API key
 - Network access to TeamTailor API endpoints
 - Datastore access for caching options
@@ -27,6 +32,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 ## Implementation Checklist
 
 ### 1. Provider Structure
+
 - [ ] Create `src/services/integrations/providers/teamtailor/` directory
 - [ ] Create `TeamTailorIntegration.ts` main provider class
 - [ ] Create `TeamTailorOptions.ts` for options fetching
@@ -34,6 +40,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Create `TeamTailorMapper.ts` for data transformation
 
 ### 2. Main Integration Class
+
 - [ ] Implement `TeamTailorIntegration extends BaseIntegration`
 - [ ] Add constructor with credential initialization
 - [ ] Implement `fetchOptions()` method
@@ -42,6 +49,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Add health check functionality
 
 ### 3. Options Fetching Service
+
 - [ ] Implement `fetchDepartments()` API call
 - [ ] Add `fetchLocations()` with city/country data
 - [ ] Include `fetchJobTemplates()` functionality
@@ -50,6 +58,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Add cache invalidation logic
 
 ### 4. Job Publishing Service
+
 - [ ] Implement job creation API call
 - [ ] Add job update functionality
 - [ ] Include job archiving/unpublishing
@@ -58,6 +67,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Add error recovery and retry logic
 
 ### 5. Data Transformation
+
 - [ ] Create role-to-TeamTailor job mapping
 - [ ] Implement field validation
 - [ ] Add required field checking
@@ -66,6 +76,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Implement reverse mapping for updates
 
 ### 6. API Communication
+
 - [ ] Implement authenticated API requests
 - [ ] Add proper headers (Authorization, X-Api-Version)
 - [ ] Include request/response logging
@@ -74,6 +85,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Add API error code handling
 
 ### 7. Integration Testing
+
 - [ ] Create mock API responses for testing
 - [ ] Add unit tests for data transformation
 - [ ] Include integration tests with test API
@@ -82,8 +94,9 @@ Implement the complete TeamTailor integration provider including options fetchin
 - [ ] Validate caching mechanisms
 
 ## API Endpoints to Implement
+
 - `GET /v1/departments` - Fetch department options
-- `GET /v1/locations` - Fetch location options  
+- `GET /v1/locations` - Fetch location options
 - `GET /v1/job-templates` - Fetch job templates
 - `GET /v1/stages` - Fetch hiring stages
 - `POST /v1/jobs` - Create/publish job
@@ -91,6 +104,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 - `DELETE /v1/jobs/{id}` - Archive job
 
 ## Validation Steps
+
 1. Options are fetched correctly from TeamTailor API
 2. Jobs can be published successfully
 3. Data transformation preserves all required fields
@@ -99,6 +113,7 @@ Implement the complete TeamTailor integration provider including options fetchin
 6. Caching reduces redundant API calls
 
 ## Files to Create
+
 - `src/services/integrations/providers/teamtailor/TeamTailorIntegration.ts`
 - `src/services/integrations/providers/teamtailor/TeamTailorOptions.ts`
 - `src/services/integrations/providers/teamtailor/TeamTailorPublisher.ts`

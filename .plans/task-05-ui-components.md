@@ -1,20 +1,24 @@
 # Task 05: UI Components for Integration Management
 
 ## Objective
+
 Create React components for managing integrations, workflow states, approvals, and publishing operations within the existing Ant Design UI framework.
 
 ## Dependencies
+
 - Task 01: Core Infrastructure Setup (for types and services)
 - Task 02: Workflow Engine (for state management)
 - Task 03a: TeamTailor Provider (for integration testing)
 
 ## Expected Inputs
+
 - Existing Ant Design component patterns
 - Integration services and workflow managers
 - RBAC permission system
 - Current UI styling and theme
 
 ## Expected Outputs
+
 - Role creation form with integration options
 - Approval workflow dashboard
 - Publishing management interface
@@ -22,6 +26,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - Status monitoring components
 
 ## Required Tools/Auth
+
 - React 19 and Ant Design v5
 - Next.js App Router patterns
 - RBAC permission checking
@@ -30,6 +35,7 @@ Create React components for managing integrations, workflow states, approvals, a
 ## Implementation Checklist
 
 ### 1. Role Creation with Integration
+
 - [ ] Create `src/components/integrations/RoleCreationForm.tsx`
 - [ ] Add integration provider selection
 - [ ] Implement dynamic options loading from providers
@@ -38,6 +44,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Implement form validation and error handling
 
 ### 2. Integration Options Loading
+
 - [ ] Create `src/components/integrations/IntegrationOptionsLoader.tsx`
 - [ ] Implement dynamic options fetching
 - [ ] Add loading states and error handling
@@ -46,6 +53,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Implement multi-select for options
 
 ### 3. Workflow Status Display
+
 - [ ] Create `src/components/integrations/WorkflowStatus.tsx`
 - [ ] Add state visualization (draft, pending, approved, published)
 - [ ] Implement progress indicators
@@ -54,6 +62,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Implement status badges and icons
 
 ### 4. Approval Dashboard
+
 - [ ] Create `src/components/integrations/ApprovalDashboard.tsx`
 - [ ] List pending approvals by role/permission
 - [ ] Add batch approval functionality
@@ -62,6 +71,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Add approval/rejection actions with reasons
 
 ### 5. Publishing Interface
+
 - [ ] Create `src/components/integrations/PublishingInterface.tsx`
 - [ ] Display approved entities ready for publishing
 - [ ] Add individual and batch publishing actions
@@ -70,6 +80,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Add publishing history and logs
 
 ### 6. Integration Configuration
+
 - [ ] Create `src/components/integrations/IntegrationConfig.tsx`
 - [ ] Add provider selection and setup
 - [ ] Implement credential management interface
@@ -78,6 +89,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Implement configuration validation
 
 ### 7. Monitoring and Analytics
+
 - [ ] Create `src/components/integrations/MonitoringDashboard.tsx`
 - [ ] Add sync status overview
 - [ ] Include success/failure metrics
@@ -86,6 +98,7 @@ Create React components for managing integrations, workflow states, approvals, a
 - [ ] Include webhook activity monitoring
 
 ## Component Structure
+
 ```
 src/components/integrations/
 ├── RoleCreationForm.tsx          # Role creation with integration
@@ -105,6 +118,7 @@ src/components/integrations/
 ```
 
 ## Integration with Existing UI
+
 - [ ] Follow existing Ant Design patterns
 - [ ] Use consistent styling with current theme
 - [ ] Integrate with existing navigation structure
@@ -113,6 +127,7 @@ src/components/integrations/
 - [ ] Maintain accessibility standards
 
 ## State Management
+
 - [ ] Use React Context for integration state
 - [ ] Implement optimistic updates for better UX
 - [ ] Add real-time updates for status changes
@@ -121,6 +136,7 @@ src/components/integrations/
 - [ ] Add state persistence where appropriate
 
 ## RBAC Integration
+
 - [ ] Check permissions before rendering components
 - [ ] Hide actions user cannot perform
 - [ ] Add permission-based component variants
@@ -129,6 +145,7 @@ src/components/integrations/
 - [ ] Add permission explanation tooltips
 
 ## Responsive Design
+
 - [ ] Ensure mobile responsiveness
 - [ ] Add tablet-optimized layouts
 - [ ] Include desktop-specific features
@@ -137,6 +154,7 @@ src/components/integrations/
 - [ ] Optimize for different screen sizes
 
 ## Validation Steps
+
 1. Components render correctly with mock data
 2. Integration options load dynamically
 3. Workflow states display accurately
@@ -147,6 +165,7 @@ src/components/integrations/
 8. Error states provide helpful feedback
 
 ## Files to Create
+
 - `src/components/integrations/RoleCreationForm.tsx`
 - `src/components/integrations/IntegrationOptionsLoader.tsx`
 - `src/components/integrations/WorkflowStatus.tsx`

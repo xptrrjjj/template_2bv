@@ -1,4 +1,4 @@
-import { apiClient } from '../api';
+import { apiClient } from "../api";
 import {
   PermissionRecord,
   CreatePermissionRequest,
@@ -7,8 +7,8 @@ import {
   GLOBAL_PERMISSIONS,
   APP_PERMISSION_PATTERNS,
   RBACError,
-  RBACErrorCode
-} from '@/types/rbac';
+  RBACErrorCode,
+} from "@/types/rbac";
 
 /**
  * Permission Service - Handles all permission-related RBAC operations
@@ -24,14 +24,17 @@ export class PermissionService {
   /**
    * Create new permission
    */
-  async createPermission(permissionRequest: CreatePermissionRequest, createdBy: string): Promise<PermissionRecord> {
+  async createPermission(
+    permissionRequest: CreatePermissionRequest,
+    createdBy: string
+  ): Promise<PermissionRecord> {
     const permission = await apiClient.createPermission(permissionRequest, createdBy);
 
     // Create audit log
     await apiClient.createAuditLog({
       user_id: createdBy,
-      action: 'create',
-      resource_type: 'permission',
+      action: "create",
+      resource_type: "permission",
       resource_id: permission.permission_id,
       details: {
         name: permission.name,
@@ -39,8 +42,8 @@ export class PermissionService {
         action: permission.action,
         scope: permission.scope,
         appId: permission.app_id,
-        action_type: 'permission_created'
-      }
+        action_type: "permission_created",
+      },
     });
 
     return permission;
@@ -52,16 +55,16 @@ export class PermissionService {
   async deletePermission(permissionId: string, deletedBy: string): Promise<void> {
     const permission = await this.getPermission(permissionId);
     if (!permission) {
-      throw new RBACError('Permission not found', RBACErrorCode.PERMISSION_NOT_FOUND);
+      throw new RBACError("Permission not found", RBACErrorCode.PERMISSION_NOT_FOUND);
     }
 
     if (permission.is_system_permission) {
-      throw new RBACError('Cannot delete system permission', RBACErrorCode.SYSTEM_ROLE_PROTECTED);
+      throw new RBACError("Cannot delete system permission", RBACErrorCode.SYSTEM_ROLE_PROTECTED);
     }
 
     // Check if any roles use this permission
     const allRoles = await apiClient.getAllRoles();
-    const rolesWithPermission = allRoles.filter(role => 
+    const rolesWithPermission = allRoles.filter((role) =>
       role.permission_ids.includes(permissionId)
     );
 
@@ -69,7 +72,7 @@ export class PermissionService {
       throw new RBACError(
         `Cannot delete permission: ${rolesWithPermission.length} roles still use this permission`,
         RBACErrorCode.PERMISSION_DENIED,
-        { roleCount: rolesWithPermission.length, roles: rolesWithPermission.map(r => r.role_id) }
+        { roleCount: rolesWithPermission.length, roles: rolesWithPermission.map((r) => r.role_id) }
       );
     }
 
@@ -78,15 +81,15 @@ export class PermissionService {
     // Create audit log
     await apiClient.createAuditLog({
       user_id: deletedBy,
-      action: 'delete',
-      resource_type: 'permission',
+      action: "delete",
+      resource_type: "permission",
       resource_id: permissionId,
       details: {
         name: permission.name,
         resource: permission.resource,
         action: permission.action,
-        action_type: 'permission_deleted'
-      }
+        action_type: "permission_deleted",
+      },
     });
   }
 
@@ -100,7 +103,10 @@ export class PermissionService {
   /**
    * Get permissions by scope
    */
-  async getPermissionsByScope(scope: PermissionRecord['scope'], appId?: string): Promise<PermissionRecord[]> {
+  async getPermissionsByScope(
+    scope: PermissionRecord["scope"],
+    appId?: string
+  ): Promise<PermissionRecord[]> {
     return apiClient.getPermissionsByScope(scope, appId);
   }
 
@@ -108,14 +114,14 @@ export class PermissionService {
    * Get global permissions
    */
   async getGlobalPermissions(): Promise<PermissionRecord[]> {
-    return this.getPermissionsByScope('global');
+    return this.getPermissionsByScope("global");
   }
 
   /**
    * Get app-specific permissions
    */
   async getAppPermissions(appId: string): Promise<PermissionRecord[]> {
-    return this.getPermissionsByScope('app', appId);
+    return this.getPermissionsByScope("app", appId);
   }
 
   /**
@@ -123,7 +129,7 @@ export class PermissionService {
    */
   async getSystemPermissions(): Promise<PermissionRecord[]> {
     const allPermissions = await this.getAllPermissions();
-    return allPermissions.filter(permission => permission.is_system_permission);
+    return allPermissions.filter((permission) => permission.is_system_permission);
   }
 
   /**
@@ -131,7 +137,7 @@ export class PermissionService {
    */
   async getCustomPermissions(): Promise<PermissionRecord[]> {
     const allPermissions = await this.getAllPermissions();
-    return allPermissions.filter(permission => !permission.is_system_permission);
+    return allPermissions.filter((permission) => !permission.is_system_permission);
   }
 
   /**
@@ -143,8 +149,8 @@ export class PermissionService {
     // Create audit log for permission check
     await apiClient.createAuditLog({
       user_id: context.userId,
-      action: 'permission_check',
-      resource_type: 'permission',
+      action: "permission_check",
+      resource_type: "permission",
       resource_id: `${context.resource}.${context.action}`,
       details: {
         resource: context.resource,
@@ -152,8 +158,8 @@ export class PermissionService {
         appId: context.appId,
         granted: result.granted,
         reason: result.reason,
-        sourceRole: result.sourceRole
-      }
+        sourceRole: result.sourceRole,
+      },
     });
 
     return result;
@@ -164,9 +170,9 @@ export class PermissionService {
    */
   async getPermissionsByResource(resource: string, appId?: string): Promise<PermissionRecord[]> {
     const allPermissions = await this.getAllPermissions();
-    return allPermissions.filter(permission => {
+    return allPermissions.filter((permission) => {
       if (permission.resource !== resource) return false;
-      if (appId && permission.scope === 'app' && permission.app_id !== appId) return false;
+      if (appId && permission.scope === "app" && permission.app_id !== appId) return false;
       return true;
     });
   }
@@ -176,9 +182,9 @@ export class PermissionService {
    */
   async getPermissionsByAction(action: string, appId?: string): Promise<PermissionRecord[]> {
     const allPermissions = await this.getAllPermissions();
-    return allPermissions.filter(permission => {
+    return allPermissions.filter((permission) => {
       if (permission.action !== action) return false;
-      if (appId && permission.scope === 'app' && permission.app_id !== appId) return false;
+      if (appId && permission.scope === "app" && permission.app_id !== appId) return false;
       return true;
     });
   }
@@ -198,26 +204,26 @@ export class PermissionService {
    * Parse permission ID into components
    */
   parsePermissionId(permissionId: string): {
-    scope: 'global' | 'app';
+    scope: "global" | "app";
     appId?: string;
     resource: string;
     action: string;
   } | null {
-    const parts = permissionId.split('.');
+    const parts = permissionId.split(".");
     if (parts.length < 3) return null;
 
-    if (parts[0] === 'system') {
+    if (parts[0] === "system") {
       return {
-        scope: 'global',
+        scope: "global",
         resource: parts[1],
-        action: parts.slice(2).join('.')
+        action: parts.slice(2).join("."),
       };
     } else {
       return {
-        scope: 'app',
+        scope: "app",
         appId: parts[0],
         resource: parts[1],
-        action: parts.slice(2).join('.')
+        action: parts.slice(2).join("."),
       };
     }
   }
@@ -225,28 +231,34 @@ export class PermissionService {
   /**
    * Get available permission templates
    */
-  getPermissionTemplates(): { [key: string]: Omit<CreatePermissionRequest, 'permission_id'> } {
+  getPermissionTemplates(): { [key: string]: Omit<CreatePermissionRequest, "permission_id"> } {
     const globalTemplates = Object.entries(GLOBAL_PERMISSIONS).map(([id, description]) => {
       const parsed = this.parsePermissionId(id);
-      return [id, {
-        name: description,
-        description,
-        resource: parsed?.resource || 'system',
-        action: parsed?.action || 'admin',
-        scope: 'global' as const
-      }];
+      return [
+        id,
+        {
+          name: description,
+          description,
+          resource: parsed?.resource || "system",
+          action: parsed?.action || "admin",
+          scope: "global" as const,
+        },
+      ];
     });
 
     const appTemplates = Object.entries(APP_PERMISSION_PATTERNS).map(([pattern, description]) => {
-      const cleanPattern = pattern.replace('{app_id}.', '');
-      const parts = cleanPattern.split('.');
-      return [pattern, {
-        name: description,
-        description,
-        resource: parts[0] || 'data',
-        action: parts[1] || 'read',
-        scope: 'app' as const
-      }];
+      const cleanPattern = pattern.replace("{app_id}.", "");
+      const parts = cleanPattern.split(".");
+      return [
+        pattern,
+        {
+          name: description,
+          description,
+          resource: parts[0] || "data",
+          action: parts[1] || "read",
+          scope: "app" as const,
+        },
+      ];
     });
 
     return Object.fromEntries([...globalTemplates, ...appTemplates]);
@@ -263,19 +275,25 @@ export class PermissionService {
   ): Promise<PermissionRecord> {
     const templates = this.getPermissionTemplates();
     const template = templates[templateId];
-    
+
     if (!template) {
-      throw new RBACError(`Permission template ${templateId} not found`, RBACErrorCode.PERMISSION_NOT_FOUND);
+      throw new RBACError(
+        `Permission template ${templateId} not found`,
+        RBACErrorCode.PERMISSION_NOT_FOUND
+      );
     }
 
     let permissionId: string;
-    if (template.scope === 'global') {
+    if (template.scope === "global") {
       permissionId = templateId;
     } else {
       if (!appId) {
-        throw new RBACError('App ID required for app-scoped permission', RBACErrorCode.INVALID_SCOPE);
+        throw new RBACError(
+          "App ID required for app-scoped permission",
+          RBACErrorCode.INVALID_SCOPE
+        );
       }
-      permissionId = templateId.replace('{app_id}', appId);
+      permissionId = templateId.replace("{app_id}", appId);
     }
 
     const permissionRequest: CreatePermissionRequest = {
@@ -285,7 +303,7 @@ export class PermissionService {
       resource: customizations?.resource || template.resource,
       action: customizations?.action || template.action,
       scope: template.scope,
-      ...(appId && { app_id: appId })
+      ...(appId && { app_id: appId }),
     };
 
     return this.createPermission(permissionRequest, createdBy);
@@ -304,23 +322,23 @@ export class PermissionService {
     byAction: Record<string, number>;
   }> {
     const allPermissions = await this.getAllPermissions();
-    
+
     const byResource: Record<string, number> = {};
     const byAction: Record<string, number> = {};
-    
-    allPermissions.forEach(permission => {
+
+    allPermissions.forEach((permission) => {
       byResource[permission.resource] = (byResource[permission.resource] || 0) + 1;
       byAction[permission.action] = (byAction[permission.action] || 0) + 1;
     });
-    
+
     return {
       total: allPermissions.length,
-      global: allPermissions.filter(p => p.scope === 'global').length,
-      app: allPermissions.filter(p => p.scope === 'app').length,
-      system: allPermissions.filter(p => p.is_system_permission).length,
-      custom: allPermissions.filter(p => !p.is_system_permission).length,
+      global: allPermissions.filter((p) => p.scope === "global").length,
+      app: allPermissions.filter((p) => p.scope === "app").length,
+      system: allPermissions.filter((p) => p.is_system_permission).length,
+      custom: allPermissions.filter((p) => !p.is_system_permission).length,
       byResource,
-      byAction
+      byAction,
     };
   }
 
@@ -330,37 +348,38 @@ export class PermissionService {
   async searchPermissions(query: string): Promise<PermissionRecord[]> {
     const allPermissions = await this.getAllPermissions();
     const lowerQuery = query.toLowerCase();
-    
-    return allPermissions.filter(permission => 
-      permission.name.toLowerCase().includes(lowerQuery) ||
-      permission.description.toLowerCase().includes(lowerQuery) ||
-      permission.permission_id.toLowerCase().includes(lowerQuery) ||
-      permission.resource.toLowerCase().includes(lowerQuery) ||
-      permission.action.toLowerCase().includes(lowerQuery)
+
+    return allPermissions.filter(
+      (permission) =>
+        permission.name.toLowerCase().includes(lowerQuery) ||
+        permission.description.toLowerCase().includes(lowerQuery) ||
+        permission.permission_id.toLowerCase().includes(lowerQuery) ||
+        permission.resource.toLowerCase().includes(lowerQuery) ||
+        permission.action.toLowerCase().includes(lowerQuery)
     );
   }
 
   /**
    * Get roles that have specific permission
    */
-  async getRolesWithPermission(permissionId: string): Promise<import('@/types/rbac').RoleRecord[]> {
+  async getRolesWithPermission(permissionId: string): Promise<import("@/types/rbac").RoleRecord[]> {
     const allRoles = await apiClient.getAllRoles();
-    return allRoles.filter(role => role.permission_ids.includes(permissionId));
+    return allRoles.filter((role) => role.permission_ids.includes(permissionId));
   }
 
   /**
    * Get users who have specific permission (through roles)
    */
-  async getUsersWithPermission(permissionId: string): Promise<import('@/types/rbac').UserRecord[]> {
+  async getUsersWithPermission(permissionId: string): Promise<import("@/types/rbac").UserRecord[]> {
     const rolesWithPermission = await this.getRolesWithPermission(permissionId);
-    const roleIds = rolesWithPermission.map(role => role.role_id);
-    
+    const roleIds = rolesWithPermission.map((role) => role.role_id);
+
     const allUsers = await apiClient.getAllUsers();
-    return allUsers.filter(user => {
+    return allUsers.filter((user) => {
       // Check if user has any role that contains this permission
-      const hasGlobalRole = user.global_roles.some(roleId => roleIds.includes(roleId));
-      const hasAppRole = Object.values(user.app_roles).some(appRoles => 
-        appRoles.some(roleId => roleIds.includes(roleId))
+      const hasGlobalRole = user.global_roles.some((roleId) => roleIds.includes(roleId));
+      const hasAppRole = Object.values(user.app_roles).some((appRoles) =>
+        appRoles.some((roleId) => roleIds.includes(roleId))
       );
       return hasGlobalRole || hasAppRole;
     });
@@ -373,7 +392,7 @@ export class PermissionService {
     // Check if it matches expected patterns
     const globalPattern = /^system\.[a-zA-Z_]+\.[a-zA-Z_*]+$/;
     const appPattern = /^[a-zA-Z_]+\.[a-zA-Z_]+\.[a-zA-Z_*]+$/;
-    
+
     return globalPattern.test(permissionId) || appPattern.test(permissionId);
   }
 
@@ -456,9 +475,9 @@ export class PermissionService {
     return {
       canDelete: rolesWithPermission.length === 0,
       blockers: {
-        roles: rolesWithPermission.map(role => role.role_id),
-        users: usersWithPermission.map(user => user.email)
-      }
+        roles: rolesWithPermission.map((role) => role.role_id),
+        users: usersWithPermission.map((user) => user.email),
+      },
     };
   }
 }

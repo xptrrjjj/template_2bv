@@ -1,20 +1,25 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { useMsal } from '@azure/msal-react';
-import { AuthState, User, EnhancedAuthContextType, RBACState } from '@/types/auth';
-import { loginRequest } from '@/config/msalConfig';
-import { 
-  PermissionContext 
-} from '@/types/rbac';
-import { userService, permissionService, bootstrapService } from '@/services/rbac';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
+import { useMsal } from "@azure/msal-react";
+import { AuthState, User, EnhancedAuthContextType, RBACState } from "@/types/auth";
+import { loginRequest } from "@/config/msalConfig";
+import { PermissionContext } from "@/types/rbac";
+import { userService, permissionService, bootstrapService } from "@/services/rbac";
 
 const AuthContext = createContext<EnhancedAuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -36,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     rbacUser: null,
     userRoles: [],
     userPermissions: [],
-    currentApp: process.env.NEXT_PUBLIC_APP_ID || 'recruitment_tool',
+    currentApp: process.env.NEXT_PUBLIC_APP_ID || "recruitment_tool",
     rbacLoading: false,
   });
 
@@ -44,9 +49,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Check for existing authentication on mount
     const initializeAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('access_token');
-        const storedUser = localStorage.getItem('user');
-        
+        const storedToken = localStorage.getItem("access_token");
+        const storedUser = localStorage.getItem("user");
+
         if (storedToken && storedUser) {
           // Validate stored user data
           const parsedUser = JSON.parse(storedUser);
@@ -60,10 +65,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return;
           }
         }
-        
+
         // Clear invalid data and set as unauthenticated
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
         setAuthState({
           isAuthenticated: false,
           user: null,
@@ -71,10 +76,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           loading: false,
         });
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error("Error initializing auth:", error);
         // Clear corrupted data
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
         setAuthState({
           isAuthenticated: false,
           user: null,
@@ -89,19 +94,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const exchangeTokenWithBackend = async (microsoftToken: string): Promise<{ access_token: string; user: User }> => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/microsoft/callback`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        microsoft_token: microsoftToken,
-      }),
-    });
+  const exchangeTokenWithBackend = async (
+    microsoftToken: string
+  ): Promise<{ access_token: string; user: User }> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/microsoft/callback`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          microsoft_token: microsoftToken,
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error('Token exchange failed');
+      throw new Error("Token exchange failed");
     }
 
     return response.json();
@@ -110,23 +120,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchUserProfile = async (accessToken: string) => {
     try {
       // Fetch user profile from Microsoft Graph
-      const profileResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
+      const profileResponse = await fetch("https://graph.microsoft.com/v1.0/me", {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
-      
+
       if (profileResponse.ok) {
         const profile = await profileResponse.json();
-        
+
         // Fetch profile picture
         try {
-          const photoResponse = await fetch('https://graph.microsoft.com/v1.0/me/photo/$value', {
+          const photoResponse = await fetch("https://graph.microsoft.com/v1.0/me/photo/$value", {
             headers: {
-              'Authorization': `Bearer ${accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           });
-          
+
           if (photoResponse.ok) {
             const photoBlob = await photoResponse.blob();
             // Convert blob to base64 data URL instead of blob URL
@@ -138,13 +148,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return { ...profile, profilePicture: photoDataUrl };
           }
         } catch (photoError) {
-          console.log('Profile picture not available:', photoError);
+          console.log("Profile picture not available:", photoError);
         }
-        
+
         return profile;
       }
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
+      console.error("Failed to fetch user profile:", error);
     }
     return null;
   };
@@ -153,11 +163,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeRBACSystem = async () => {
     try {
       // Ensure system is bootstrapped
-      console.log('Initializing RBAC system...');
+      console.log("Initializing RBAC system...");
       const result = await bootstrapService.ensureBootstrapped();
-      console.log('RBAC bootstrap result:', result);
+      console.log("RBAC bootstrap result:", result);
     } catch (error) {
-      console.error('Failed to initialize RBAC system:', error);
+      console.error("Failed to initialize RBAC system:", error);
     }
   };
 
@@ -168,95 +178,106 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     profilePicture?: string;
   }) => {
     try {
-      setRbacState(prev => ({ ...prev, rbacLoading: true }));
-      console.log('Provisioning user in RBAC:', microsoftData);
+      setRbacState((prev) => ({ ...prev, rbacLoading: true }));
+      console.log("Provisioning user in RBAC:", microsoftData);
       const provisionedUser = await userService.provisionUser(microsoftData);
-      console.log('User provisioned:', provisionedUser);
-      
+      console.log("User provisioned:", provisionedUser);
+
       if (!provisionedUser) {
-        console.warn('User provisioning returned undefined - this might indicate an issue');
+        console.warn("User provisioning returned undefined - this might indicate an issue");
       } else {
-        console.log('User provisioned successfully with super admin status:', provisionedUser.is_super_admin);
+        console.log(
+          "User provisioned successfully with super admin status:",
+          provisionedUser.is_super_admin
+        );
       }
     } catch (error) {
-      console.error('Failed to provision user in RBAC:', error);
+      console.error("Failed to provision user in RBAC:", error);
       throw error; // Re-throw to handle in calling function
     } finally {
-      setRbacState(prev => ({ ...prev, rbacLoading: false }));
+      setRbacState((prev) => ({ ...prev, rbacLoading: false }));
     }
   };
 
   const loadUserRBACData = useCallback(async (microsoftOid: string) => {
     try {
-      setRbacState(prev => ({ ...prev, rbacLoading: true }));
-      console.log('Loading RBAC data for user:', microsoftOid);
-      
+      setRbacState((prev) => ({ ...prev, rbacLoading: true }));
+      console.log("Loading RBAC data for user:", microsoftOid);
+
       // Get user with resolved roles and permissions
       const resolvedUser = await userService.getResolvedUser(microsoftOid);
-      console.log('Resolved user data:', resolvedUser);
-      
+      console.log("Resolved user data:", resolvedUser);
+
       if (resolvedUser) {
-        setRbacState(prev => ({
+        setRbacState((prev) => ({
           ...prev,
           rbacUser: resolvedUser.user,
           userRoles: [...resolvedUser.globalRoles, ...Object.values(resolvedUser.appRoles).flat()],
-          userPermissions: resolvedUser.allPermissions.map(p => p.permission),
+          userPermissions: resolvedUser.allPermissions.map((p) => p.permission),
           rbacLoading: false,
         }));
-        console.log('RBAC state updated for user with super admin status:', resolvedUser.user.is_super_admin);
+        console.log(
+          "RBAC state updated for user with super admin status:",
+          resolvedUser.user.is_super_admin
+        );
       } else {
-        console.warn('No resolved user data found');
-        setRbacState(prev => ({ ...prev, rbacLoading: false }));
+        console.warn("No resolved user data found");
+        setRbacState((prev) => ({ ...prev, rbacLoading: false }));
       }
     } catch (error) {
-      console.error('Failed to load user RBAC data:', error);
-      setRbacState(prev => ({ ...prev, rbacLoading: false }));
+      console.error("Failed to load user RBAC data:", error);
+      setRbacState((prev) => ({ ...prev, rbacLoading: false }));
     }
   }, []);
 
   const refreshPermissions = async () => {
-    if (authState.user?.microsoftOid) {
+    if (authState.user?.microsoftOid && typeof authState.user.microsoftOid === "string") {
       await loadUserRBACData(authState.user.microsoftOid);
     }
   };
 
-  const checkPermission = async (resource: string, action: string, appId?: string): Promise<boolean> => {
-    if (!authState.user?.microsoftOid) return false;
-    
+  const checkPermission = async (
+    resource: string,
+    action: string,
+    appId?: string
+  ): Promise<boolean> => {
+    if (!authState.user?.microsoftOid || typeof authState.user.microsoftOid !== "string")
+      return false;
+
     // Super admin has all permissions
     if (rbacState.rbacUser?.is_super_admin) {
       return true;
     }
-    
+
     try {
       const context: PermissionContext = {
         userId: authState.user.microsoftOid,
         resource,
         action,
-        appId: appId || rbacState.currentApp
+        appId: appId || rbacState.currentApp,
       };
-      
+
       const result = await permissionService.checkPermission(context);
       return result.granted;
     } catch (error) {
-      console.error('Permission check failed:', error);
+      console.error("Permission check failed:", error);
       return false;
     }
   };
 
   const hasRole = (roleId: string, appId?: string): boolean => {
     if (!rbacState.rbacUser) return false;
-    
+
     // Super admin is considered to have all roles
     if (rbacState.rbacUser.is_super_admin) {
       return true;
     }
-    
+
     // Check global roles
     if (rbacState.rbacUser.global_roles.includes(roleId)) {
       return true;
     }
-    
+
     // Check app-specific roles
     const targetAppId = appId || rbacState.currentApp;
     const appRoles = rbacState.rbacUser.app_roles[targetAppId] || [];
@@ -265,9 +286,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAdmin = (appId?: string): boolean => {
     const targetAppId = appId || rbacState.currentApp;
-    return hasRole('super_admin') || 
-           hasRole('system_admin') || 
-           hasRole(`${targetAppId}_app_admin`);
+    return hasRole("super_admin") || hasRole("system_admin") || hasRole(`${targetAppId}_app_admin`);
   };
 
   const isSuperAdmin = (): boolean => {
@@ -275,8 +294,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const switchApplication = async (appId: string) => {
-    setRbacState(prev => ({ ...prev, currentApp: appId }));
-    if (authState.user?.microsoftOid) {
+    setRbacState((prev) => ({ ...prev, currentApp: appId }));
+    if (authState.user?.microsoftOid && typeof authState.user.microsoftOid === "string") {
       await loadUserRBACData(authState.user.microsoftOid);
     }
   };
@@ -290,30 +309,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Load RBAC data when authentication state changes
   useEffect(() => {
-    if (authState.isAuthenticated && authState.user?.microsoftOid && !rbacState.rbacUser) {
+    if (
+      authState.isAuthenticated &&
+      authState.user?.microsoftOid &&
+      typeof authState.user.microsoftOid === "string" &&
+      !rbacState.rbacUser
+    ) {
       loadUserRBACData(authState.user.microsoftOid);
     }
   }, [authState.isAuthenticated, authState.user, rbacState.rbacUser, loadUserRBACData]);
 
   const login = async () => {
     try {
-      setAuthState(prev => ({ ...prev, loading: true }));
-      
+      setAuthState((prev) => ({ ...prev, loading: true }));
+
       // Get Microsoft token via MSAL
       const loginResponse = await instance.loginPopup(loginRequest);
-      console.log('Microsoft Login Response:', loginResponse);
-      
+      console.log("Microsoft Login Response:", loginResponse);
+
       if (loginResponse.accessToken) {
         // Fetch user profile from Microsoft Graph
         const microsoftProfile = await fetchUserProfile(loginResponse.accessToken);
-        
+
         // Exchange Microsoft token for API access token
         const { access_token, user } = await exchangeTokenWithBackend(loginResponse.accessToken);
-        console.log('Backend API Response:', { access_token, user });
-        
+        console.log("Backend API Response:", { access_token, user });
+
         // Store access token immediately so it's available for RBAC API calls
-        localStorage.setItem('access_token', access_token);
-        
+        localStorage.setItem("access_token", access_token);
+
         // Merge Microsoft profile data with backend user data
         const enhancedUser = {
           ...user,
@@ -322,19 +346,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: microsoftProfile?.mail || microsoftProfile?.userPrincipalName || user.email,
           microsoftOid: loginResponse.account.localAccountId || loginResponse.uniqueId, // Add Microsoft OID
         };
-        console.log('Enhanced User:', enhancedUser);
-        
+        console.log("Enhanced User:", enhancedUser);
+
         // Store user info
-        localStorage.setItem('user', JSON.stringify(enhancedUser));
-        
+        localStorage.setItem("user", JSON.stringify(enhancedUser));
+
         // Provision user in RBAC system (now that token is stored)
         await provisionUserInRBAC({
           oid: loginResponse.account.localAccountId || loginResponse.uniqueId,
-          email: enhancedUser.email || '',
+          email: enhancedUser.email || "",
           name: enhancedUser.name,
           profilePicture: enhancedUser.profilePicture,
         });
-        
+
         // Load RBAC data for the user first
         await loadUserRBACData(loginResponse.account.localAccountId || loginResponse.uniqueId);
 
@@ -347,7 +371,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -359,19 +383,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     // Clear local storage
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+
     // Clear all cookies
     document.cookie.split(";").forEach((c) => {
       document.cookie = c
         .replace(/^ +/, "")
         .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
-    
+
     // Clear session storage as well
     sessionStorage.clear();
-    
+
     setAuthState({
       isAuthenticated: false,
       user: null,
@@ -384,12 +408,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       rbacUser: null,
       userRoles: [],
       userPermissions: [],
-      currentApp: process.env.NEXT_PUBLIC_APP_ID || 'recruitment_tool',
+      currentApp: process.env.NEXT_PUBLIC_APP_ID || "recruitment_tool",
       rbacLoading: false,
     });
 
     // Force redirect to home page
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const contextValue: EnhancedAuthContextType = {
@@ -405,9 +429,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     switchApplication,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };

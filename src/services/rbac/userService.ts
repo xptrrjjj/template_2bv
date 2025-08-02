@@ -1,13 +1,13 @@
-import { apiClient } from '../api';
-import { 
-  UserRecord, 
-  AssignUserRoleRequest, 
+import { apiClient } from "../api";
+import {
+  UserRecord,
+  AssignUserRoleRequest,
   RemoveUserRoleRequest,
   ResolvedUser,
   RoleRecord,
   RBACError,
-  RBACErrorCode
-} from '@/types/rbac';
+  RBACErrorCode,
+} from "@/types/rbac";
 
 /**
  * User Service - Handles all user-related RBAC operations
@@ -31,31 +31,31 @@ export class UserService {
     app_roles?: Record<string, string[]>;
     is_super_admin?: boolean;
     profile_picture?: string;
-    status?: UserRecord['status'];
+    status?: UserRecord["status"];
   }): Promise<UserRecord> {
     try {
-      console.log('UserService.createUser: Input data:', userData);
-      
-      const user: Omit<UserRecord, 'record_id' | 'created_at' | 'updated_at'> = {
+      console.log("UserService.createUser: Input data:", userData);
+
+      const user: Omit<UserRecord, "record_id" | "created_at" | "updated_at"> = {
         microsoft_oid: userData.microsoft_oid,
         email: userData.email,
         name: userData.name,
         global_roles: userData.global_roles || [],
         app_roles: userData.app_roles || {},
-        status: userData.status || 'active',
+        status: userData.status || "active",
         is_super_admin: userData.is_super_admin || false,
         profile_picture: userData.profile_picture,
         last_login: new Date().toISOString(),
       };
 
-      console.log('UserService.createUser: Formatted user data:', user);
-      
+      console.log("UserService.createUser: Formatted user data:", user);
+
       const result = await apiClient.createUser(user);
-      console.log('UserService.createUser: API client result:', result);
-      
+      console.log("UserService.createUser: API client result:", result);
+
       return result;
     } catch (error) {
-      console.error('UserService.createUser: Error:', error);
+      console.error("UserService.createUser: Error:", error);
       throw error;
     }
   }
@@ -86,7 +86,7 @@ export class UserService {
   /**
    * Get users by status
    */
-  async getUsersByStatus(status: UserRecord['status']): Promise<UserRecord[]> {
+  async getUsersByStatus(status: UserRecord["status"]): Promise<UserRecord[]> {
     return apiClient.getUsersByStatus(status);
   }
 
@@ -94,21 +94,21 @@ export class UserService {
    * Activate user
    */
   async activateUser(microsoftOid: string): Promise<UserRecord> {
-    return this.updateUser(microsoftOid, { status: 'active' });
+    return this.updateUser(microsoftOid, { status: "active" });
   }
 
   /**
    * Deactivate user
    */
   async deactivateUser(microsoftOid: string): Promise<UserRecord> {
-    return this.updateUser(microsoftOid, { status: 'inactive' });
+    return this.updateUser(microsoftOid, { status: "inactive" });
   }
 
   /**
    * Suspend user
    */
   async suspendUser(microsoftOid: string): Promise<UserRecord> {
-    return this.updateUser(microsoftOid, { status: 'suspended' });
+    return this.updateUser(microsoftOid, { status: "suspended" });
   }
 
   /**
@@ -116,18 +116,18 @@ export class UserService {
    */
   async assignRole(request: AssignUserRoleRequest): Promise<void> {
     await apiClient.assignUserRole(request);
-    
+
     // Create audit log
     await apiClient.createAuditLog({
       user_id: request.user_id,
-      action: 'assign',
-      resource_type: 'role_assignment',
+      action: "assign",
+      resource_type: "role_assignment",
       resource_id: request.role_id,
       details: {
         roleId: request.role_id,
         appId: request.app_id,
-        action: 'role_assigned'
-      }
+        action: "role_assigned",
+      },
     });
   }
 
@@ -136,18 +136,18 @@ export class UserService {
    */
   async removeRole(request: RemoveUserRoleRequest): Promise<void> {
     await apiClient.removeUserRole(request);
-    
+
     // Create audit log
     await apiClient.createAuditLog({
       user_id: request.user_id,
-      action: 'revoke',
-      resource_type: 'role_assignment',
+      action: "revoke",
+      resource_type: "role_assignment",
       resource_id: request.role_id,
       details: {
         roleId: request.role_id,
         appId: request.app_id,
-        action: 'role_removed'
-      }
+        action: "role_removed",
+      },
     });
   }
 
@@ -180,7 +180,7 @@ export class UserService {
     // Get all permissions from all roles
     const allPermissions = [];
     const allRoles = [...globalRoles, ...Object.values(appRoles).flat()];
-    
+
     for (const role of allRoles) {
       for (const permissionId of role.permission_ids) {
         const permission = await apiClient.getPermission(permissionId);
@@ -188,7 +188,7 @@ export class UserService {
           allPermissions.push({
             permission,
             sourceRoles: [role],
-            isInherited: false
+            isInherited: false,
           });
         }
       }
@@ -198,7 +198,7 @@ export class UserService {
       user,
       globalRoles,
       appRoles,
-      allPermissions
+      allPermissions,
     };
   }
 
@@ -237,18 +237,18 @@ export class UserService {
    */
   async setSuperAdmin(microsoftOid: string, isSuperAdmin: boolean): Promise<UserRecord> {
     const result = await this.updateUser(microsoftOid, { is_super_admin: isSuperAdmin });
-    
+
     // Create audit log
     await apiClient.createAuditLog({
       user_id: microsoftOid,
-      action: 'update',
-      resource_type: 'user',
+      action: "update",
+      resource_type: "user",
       resource_id: microsoftOid,
       details: {
-        field: 'is_super_admin',
+        field: "is_super_admin",
         newValue: isSuperAdmin,
-        action: isSuperAdmin ? 'super_admin_granted' : 'super_admin_revoked'
-      }
+        action: isSuperAdmin ? "super_admin_granted" : "super_admin_revoked",
+      },
     });
 
     return result;
@@ -264,69 +264,73 @@ export class UserService {
     profilePicture?: string;
   }): Promise<UserRecord> {
     try {
-      console.log('UserService: Starting user provisioning for OID:', microsoftData.oid);
-      
+      console.log("UserService: Starting user provisioning for OID:", microsoftData.oid);
+
       // Check if user already exists
       let user = await this.getUser(microsoftData.oid);
-      console.log('UserService: Existing user found:', user ? 'Yes' : 'No');
-      
+      console.log("UserService: Existing user found:", user ? "Yes" : "No");
+
       if (user) {
         // Update existing user with latest Microsoft data
-        console.log('UserService: Updating existing user');
+        console.log("UserService: Updating existing user");
         user = await this.updateUser(microsoftData.oid, {
           email: microsoftData.email,
           name: microsoftData.name,
           profile_picture: microsoftData.profilePicture,
           last_login: new Date().toISOString(),
         });
-        console.log('UserService: User updated:', user);
+        console.log("UserService: User updated:", user);
       } else {
         // Create new user
-        const defaultRole = process.env.NEXT_PUBLIC_DEFAULT_ROLE || 'app_viewer';
-        const superAdminOids = (process.env.NEXT_PUBLIC_SUPER_ADMIN_OIDS || '').split(',').map(s => s.trim());
+        const defaultRole = process.env.NEXT_PUBLIC_DEFAULT_ROLE || "app_viewer";
+        const superAdminOids = (process.env.NEXT_PUBLIC_SUPER_ADMIN_OIDS || "")
+          .split(",")
+          .map((s) => s.trim());
         const isSuperAdmin = superAdminOids.includes(microsoftData.oid);
-        
-        console.log('UserService: Creating new user with super admin status:', isSuperAdmin);
-        console.log('UserService: Super admin OIDs configured:', superAdminOids);
-        
+
+        console.log("UserService: Creating new user with super admin status:", isSuperAdmin);
+        console.log("UserService: Super admin OIDs configured:", superAdminOids);
+
         const userData = {
           microsoft_oid: microsoftData.oid,
           email: microsoftData.email,
           name: microsoftData.name,
           profile_picture: microsoftData.profilePicture,
           is_super_admin: isSuperAdmin,
-          status: 'active' as const,
+          status: "active" as const,
           // Assign default role for current app
-          app_roles: isSuperAdmin ? {} : {
-            [process.env.NEXT_PUBLIC_APP_ID || 'recruitment_tool']: [defaultRole]
-          }
+          app_roles: isSuperAdmin
+            ? {}
+            : {
+                [process.env.NEXT_PUBLIC_APP_ID || "recruitment_tool"]: [defaultRole],
+              },
         };
-        
-        console.log('UserService: User data to create:', userData);
-        
+
+        console.log("UserService: User data to create:", userData);
+
         user = await this.createUser(userData);
-        console.log('UserService: User created:', user);
+        console.log("UserService: User created:", user);
 
         // Create audit log for new user
         await apiClient.createAuditLog({
           user_id: microsoftData.oid,
-          action: 'create',
-          resource_type: 'user',
+          action: "create",
+          resource_type: "user",
           resource_id: microsoftData.oid,
           details: {
             email: microsoftData.email,
             name: microsoftData.name,
             isSuperAdmin,
             defaultRole,
-            action: 'user_provisioned'
-          }
+            action: "user_provisioned",
+          },
         });
       }
 
-      console.log('UserService: Final user object:', user);
+      console.log("UserService: Final user object:", user);
       return user;
     } catch (error) {
-      console.error('UserService: Error during user provisioning:', error);
+      console.error("UserService: Error during user provisioning:", error);
       throw error;
     }
   }
@@ -338,27 +342,27 @@ export class UserService {
     // First check if user exists
     const user = await this.getUser(microsoftOid);
     if (!user) {
-      throw new RBACError('User not found', RBACErrorCode.USER_NOT_FOUND);
+      throw new RBACError("User not found", RBACErrorCode.USER_NOT_FOUND);
     }
 
     // Cannot delete super admin
     if (user.is_super_admin) {
-      throw new RBACError('Cannot delete super admin user', RBACErrorCode.PERMISSION_DENIED);
+      throw new RBACError("Cannot delete super admin user", RBACErrorCode.PERMISSION_DENIED);
     }
 
-    await apiClient.deleteRecord('rbac_users', `user_${microsoftOid}`);
-    
+    await apiClient.deleteRecord("rbac_users", `user_${microsoftOid}`);
+
     // Create audit log
     await apiClient.createAuditLog({
       user_id: microsoftOid,
-      action: 'delete',
-      resource_type: 'user',
+      action: "delete",
+      resource_type: "user",
       resource_id: microsoftOid,
       details: {
         email: user.email,
         name: user.name,
-        action: 'user_deleted'
-      }
+        action: "user_deleted",
+      },
     });
   }
 
@@ -373,13 +377,13 @@ export class UserService {
     superAdmins: number;
   }> {
     const allUsers = await this.getAllUsers();
-    
+
     return {
       total: allUsers.length,
-      active: allUsers.filter(u => u.status === 'active').length,
-      inactive: allUsers.filter(u => u.status === 'inactive').length,
-      suspended: allUsers.filter(u => u.status === 'suspended').length,
-      superAdmins: allUsers.filter(u => u.is_super_admin).length,
+      active: allUsers.filter((u) => u.status === "active").length,
+      inactive: allUsers.filter((u) => u.status === "inactive").length,
+      suspended: allUsers.filter((u) => u.status === "suspended").length,
+      superAdmins: allUsers.filter((u) => u.is_super_admin).length,
     };
   }
 
@@ -389,10 +393,11 @@ export class UserService {
   async searchUsers(query: string): Promise<UserRecord[]> {
     const allUsers = await this.getAllUsers();
     const lowerQuery = query.toLowerCase();
-    
-    return allUsers.filter(user => 
-      user.name.toLowerCase().includes(lowerQuery) ||
-      user.email.toLowerCase().includes(lowerQuery)
+
+    return allUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(lowerQuery) ||
+        user.email.toLowerCase().includes(lowerQuery)
     );
   }
 
@@ -401,18 +406,18 @@ export class UserService {
    */
   async getUsersWithRole(roleId: string, appId?: string): Promise<UserRecord[]> {
     const allUsers = await this.getAllUsers();
-    
-    return allUsers.filter(user => {
+
+    return allUsers.filter((user) => {
       // Check global roles
       if (user.global_roles.includes(roleId)) {
         return true;
       }
-      
+
       // Check app-specific roles
       if (appId && user.app_roles[appId]?.includes(roleId)) {
         return true;
       }
-      
+
       return false;
     });
   }

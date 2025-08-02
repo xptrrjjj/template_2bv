@@ -1,4 +1,8 @@
-import { DatastoreCreateRequest, DatastoreRetrieveRequest, DatastoreResponse } from '@/types/datastore';
+import {
+  DatastoreCreateRequest,
+  DatastoreRetrieveRequest,
+  DatastoreResponse,
+} from "@/types/datastore";
 import {
   UserRecord,
   RoleRecord,
@@ -17,20 +21,20 @@ import {
   SystemBootstrapConfig,
   SystemHealthCheck,
   RBACError,
-  RBACErrorCode
-} from '@/types/rbac';
+  RBACErrorCode,
+} from "@/types/rbac";
 
 class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   }
 
   private getAuthHeaders(): Record<string, string> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     return {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     };
   }
@@ -54,40 +58,49 @@ class ApiClient {
 
   // Datastore operations
   async datastoreCreate(request: DatastoreCreateRequest): Promise<DatastoreResponse> {
-    return this.makeRequest<DatastoreResponse>('/api/datastore/create', {
-      method: 'POST',
+    return this.makeRequest<DatastoreResponse>("/api/datastore/create", {
+      method: "POST",
       body: JSON.stringify(request),
     });
   }
 
   async datastoreRetrieve(request: DatastoreRetrieveRequest): Promise<DatastoreResponse> {
-    return this.makeRequest<DatastoreResponse>('/api/datastore/retrieve', {
-      method: 'POST',
+    return this.makeRequest<DatastoreResponse>("/api/datastore/retrieve", {
+      method: "POST",
       body: JSON.stringify(request),
     });
   }
 
   // Convenience methods for specific actions
-  async createRecord(identifier: string, data: Record<string, unknown>): Promise<DatastoreResponse> {
+  async createRecord(
+    identifier: string,
+    data: Record<string, unknown>
+  ): Promise<DatastoreResponse> {
     return this.datastoreCreate({
       identifier,
-      action: 'create',
+      action: "create",
       data,
     });
   }
 
-  async updateRecord(identifier: string, data: Record<string, unknown>): Promise<DatastoreResponse> {
+  async updateRecord(
+    identifier: string,
+    data: Record<string, unknown>
+  ): Promise<DatastoreResponse> {
     return this.datastoreCreate({
       identifier,
-      action: 'update',
+      action: "update",
       data,
     });
   }
 
-  async appendToRecord(identifier: string, data: Record<string, unknown>): Promise<DatastoreResponse> {
+  async appendToRecord(
+    identifier: string,
+    data: Record<string, unknown>
+  ): Promise<DatastoreResponse> {
     return this.datastoreCreate({
       identifier,
-      action: 'append',
+      action: "append",
       data,
     });
   }
@@ -95,7 +108,7 @@ class ApiClient {
   async deleteRecord(identifier: string, recordId: string): Promise<DatastoreResponse> {
     return this.datastoreCreate({
       identifier,
-      action: 'delete',
+      action: "delete",
       data: { record_id: recordId },
     });
   }
@@ -103,12 +116,15 @@ class ApiClient {
   async deleteAllRecords(identifier: string): Promise<DatastoreResponse> {
     return this.datastoreCreate({
       identifier,
-      action: 'delete_all',
+      action: "delete_all",
       data: {},
     });
   }
 
-  async getRecords(identifier: string, filters?: Record<string, unknown>): Promise<DatastoreResponse> {
+  async getRecords(
+    identifier: string,
+    filters?: Record<string, unknown>
+  ): Promise<DatastoreResponse> {
     return this.datastoreRetrieve({
       identifier,
       filters,
@@ -120,83 +136,84 @@ class ApiClient {
   // User Management
   async getUser(microsoftOid: string): Promise<UserRecord | null> {
     try {
-      const response = await this.getRecords('rbac_users', { microsoft_oid: microsoftOid });
-      return response.data?.[0] || null;
+      const response = await this.getRecords("rbac_users", { microsoft_oid: microsoftOid });
+      return (response.data?.[0] as UserRecord) || null;
     } catch (error) {
-      if (error instanceof Error && error.message.includes('404')) {
+      if (error instanceof Error && error.message.includes("404")) {
         return null;
       }
       throw error;
     }
   }
 
-  async createUser(user: Omit<UserRecord, 'record_id' | 'created_at' | 'updated_at'>): Promise<UserRecord> {
+  async createUser(
+    user: Omit<UserRecord, "record_id" | "created_at" | "updated_at">
+  ): Promise<UserRecord> {
     try {
-      console.log('ApiClient.createUser: Input user data:', user);
-      
+      console.log("ApiClient.createUser: Input user data:", user);
+
       const userData = {
         // Required datastore fields
-        app_id: 'rbac_users',
+        app_id: "rbac_users",
         record_id: `user_${user.microsoft_oid}`,
-        
+
         // User identity fields
         microsoft_oid: user.microsoft_oid,
         email: user.email,
         name: user.name,
-        
+
         // RBAC fields
         global_roles: user.global_roles || [],
         app_roles: user.app_roles || {},
-        status: user.status || 'active',
+        status: user.status || "active",
         is_super_admin: user.is_super_admin || false,
-        
+
         // Optional fields
         profile_picture: user.profile_picture || null,
-        
+
         // Timestamps
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         last_login: new Date().toISOString(),
       };
 
-      console.log('ApiClient.createUser: Final user data with timestamps:', userData);
-      
+      console.log("ApiClient.createUser: Final user data with timestamps:", userData);
+
       const response = await this.datastoreCreate({
-        identifier: 'rbac_users',
-        action: 'create',
+        identifier: "rbac_users",
+        action: "create",
         data: userData,
       });
-      
-      console.log('ApiClient.createUser: Datastore response:', response);
-      
-      if (response.status === 'error') {
+
+      console.log("ApiClient.createUser: Datastore response:", response);
+
+      if (response.status === "error") {
         throw new Error(`Datastore error: ${response.message}`);
       }
-      
+
       // Datastore create doesn't return the created data, so fetch it
-      console.log('ApiClient.createUser: Fetching created user...');
+      console.log("ApiClient.createUser: Fetching created user...");
       const createdUser = await this.getUser(user.microsoft_oid);
-      console.log('ApiClient.createUser: Fetched user:', createdUser);
-      
+      console.log("ApiClient.createUser: Fetched user:", createdUser);
+
       if (!createdUser) {
-        throw new Error('User was created but could not be retrieved');
+        throw new Error("User was created but could not be retrieved");
       }
-      
+
       return createdUser;
     } catch (error) {
-      console.error('ApiClient.createUser: Error creating user:', error);
+      console.error("ApiClient.createUser: Error creating user:", error);
       throw error;
     }
   }
 
   async updateUser(microsoftOid: string, updates: Partial<UserRecord>): Promise<UserRecord> {
     try {
-      console.log('ApiClient.updateUser: Updating user:', microsoftOid, updates);
-      
+      console.log("ApiClient.updateUser: Updating user:", microsoftOid, updates);
+
       // Remove key fields that cannot be updated in DynamoDB, but we need record_id for the update operation
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { app_id, ...updateableFields } = updates;
-      
+      const updateableFields = updates;
+
       const userData = {
         ...updateableFields,
         record_id: `user_${microsoftOid}`, // Required for datastore update operation
@@ -204,48 +221,48 @@ class ApiClient {
         updated_at: new Date().toISOString(),
       };
 
-      console.log('ApiClient.updateUser: Final update data:', userData);
+      console.log("ApiClient.updateUser: Final update data:", userData);
 
-      const response = await this.updateRecord('rbac_users', userData);
-      console.log('ApiClient.updateUser: Update response:', response);
-      
-      if (response.status === 'error') {
+      const response = await this.updateRecord("rbac_users", userData);
+      console.log("ApiClient.updateUser: Update response:", response);
+
+      if (response.status === "error") {
         throw new Error(`Datastore error: ${response.message}`);
       }
-      
+
       // Fetch the updated user since update doesn't return the data
-      console.log('ApiClient.updateUser: Fetching updated user...');
+      console.log("ApiClient.updateUser: Fetching updated user...");
       const updatedUser = await this.getUser(microsoftOid);
-      console.log('ApiClient.updateUser: Fetched updated user:', updatedUser);
-      
+      console.log("ApiClient.updateUser: Fetched updated user:", updatedUser);
+
       if (!updatedUser) {
-        throw new Error('User was updated but could not be retrieved');
+        throw new Error("User was updated but could not be retrieved");
       }
-      
+
       return updatedUser;
     } catch (error) {
-      console.error('ApiClient.updateUser: Error:', error);
+      console.error("ApiClient.updateUser: Error:", error);
       throw error;
     }
   }
 
   async getAllUsers(): Promise<UserRecord[]> {
-    const response = await this.getRecords('rbac_users');
-    return response.data || [];
+    const response = await this.getRecords("rbac_users");
+    return (response.data as UserRecord[]) || [];
   }
 
-  async getUsersByStatus(status: UserRecord['status']): Promise<UserRecord[]> {
-    const response = await this.getRecords('rbac_users', { status });
-    return response.data || [];
+  async getUsersByStatus(status: UserRecord["status"]): Promise<UserRecord[]> {
+    const response = await this.getRecords("rbac_users", { status });
+    return (response.data as UserRecord[]) || [];
   }
 
   // Role Management
   async getRole(roleId: string): Promise<RoleRecord | null> {
     try {
-      const response = await this.getRecords('rbac_roles', { role_id: roleId });
-      return response.data?.[0] || null;
+      const response = await this.getRecords("rbac_roles", { role_id: roleId });
+      return (response.data?.[0] as RoleRecord) || null;
     } catch (error) {
-      if (error instanceof Error && error.message.includes('404')) {
+      if (error instanceof Error && error.message.includes("404")) {
         return null;
       }
       throw error;
@@ -263,11 +280,18 @@ class ApiClient {
       updated_by: createdBy,
     };
 
-    const response = await this.createRecord('rbac_roles', roleData);
-    return response.data as RoleRecord;
+    const response = await this.createRecord(
+      "rbac_roles",
+      roleData as unknown as Record<string, unknown>
+    );
+    return response.data as unknown as RoleRecord;
   }
 
-  async updateRole(roleId: string, updates: UpdateRoleRequest, updatedBy: string): Promise<RoleRecord> {
+  async updateRole(
+    roleId: string,
+    updates: UpdateRoleRequest,
+    updatedBy: string
+  ): Promise<RoleRecord> {
     const roleData = {
       ...updates,
       role_id: roleId,
@@ -275,48 +299,51 @@ class ApiClient {
       updated_by: updatedBy,
     };
 
-    const response = await this.updateRecord('rbac_roles', roleData);
-    return response.data as RoleRecord;
+    const response = await this.updateRecord("rbac_roles", roleData);
+    return response.data as unknown as RoleRecord;
   }
 
   async deleteRole(roleId: string): Promise<void> {
     // Check if role is system role
     const role = await this.getRole(roleId);
     if (role?.is_system_role) {
-      throw new RBACError('Cannot delete system role', RBACErrorCode.SYSTEM_ROLE_PROTECTED);
+      throw new RBACError("Cannot delete system role", RBACErrorCode.SYSTEM_ROLE_PROTECTED);
     }
 
-    await this.deleteRecord('rbac_roles', `role_${roleId}`);
+    await this.deleteRecord("rbac_roles", `role_${roleId}`);
   }
 
   async getAllRoles(): Promise<RoleRecord[]> {
-    const response = await this.getRecords('rbac_roles');
-    return response.data || [];
+    const response = await this.getRecords("rbac_roles");
+    return (response.data as RoleRecord[]) || [];
   }
 
-  async getRolesByScope(scope: RoleRecord['scope'], appId?: string): Promise<RoleRecord[]> {
+  async getRolesByScope(scope: RoleRecord["scope"], appId?: string): Promise<RoleRecord[]> {
     const filters: Record<string, unknown> = { scope };
     if (appId) {
       filters.app_id = appId;
     }
-    const response = await this.getRecords('rbac_roles', filters);
-    return response.data || [];
+    const response = await this.getRecords("rbac_roles", filters);
+    return (response.data as RoleRecord[]) || [];
   }
 
   // Permission Management
   async getPermission(permissionId: string): Promise<PermissionRecord | null> {
     try {
-      const response = await this.getRecords('rbac_permissions', { permission_id: permissionId });
-      return response.data?.[0] || null;
+      const response = await this.getRecords("rbac_permissions", { permission_id: permissionId });
+      return (response.data?.[0] as PermissionRecord) || null;
     } catch (error) {
-      if (error instanceof Error && error.message.includes('404')) {
+      if (error instanceof Error && error.message.includes("404")) {
         return null;
       }
       throw error;
     }
   }
 
-  async createPermission(permissionRequest: CreatePermissionRequest, createdBy: string): Promise<PermissionRecord> {
+  async createPermission(
+    permissionRequest: CreatePermissionRequest,
+    createdBy: string
+  ): Promise<PermissionRecord> {
     const permissionData: PermissionRecord = {
       record_id: `permission_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       ...permissionRequest,
@@ -325,48 +352,57 @@ class ApiClient {
       created_by: createdBy,
     };
 
-    const response = await this.createRecord('rbac_permissions', permissionData);
-    return response.data as PermissionRecord;
+    const response = await this.createRecord(
+      "rbac_permissions",
+      permissionData as unknown as Record<string, unknown>
+    );
+    return response.data as unknown as PermissionRecord;
   }
 
   async deletePermission(permissionId: string): Promise<void> {
     // Check if permission is system permission
     const permission = await this.getPermission(permissionId);
     if (permission?.is_system_permission) {
-      throw new RBACError('Cannot delete system permission', RBACErrorCode.SYSTEM_ROLE_PROTECTED);
+      throw new RBACError("Cannot delete system permission", RBACErrorCode.SYSTEM_ROLE_PROTECTED);
     }
 
-    await this.deleteRecord('rbac_permissions', `permission_${permissionId}`);
+    await this.deleteRecord("rbac_permissions", `permission_${permissionId}`);
   }
 
   async getAllPermissions(): Promise<PermissionRecord[]> {
-    const response = await this.getRecords('rbac_permissions');
-    return response.data || [];
+    const response = await this.getRecords("rbac_permissions");
+    return (response.data as PermissionRecord[]) || [];
   }
 
-  async getPermissionsByScope(scope: PermissionRecord['scope'], appId?: string): Promise<PermissionRecord[]> {
+  async getPermissionsByScope(
+    scope: PermissionRecord["scope"],
+    appId?: string
+  ): Promise<PermissionRecord[]> {
     const filters: Record<string, unknown> = { scope };
     if (appId) {
       filters.app_id = appId;
     }
-    const response = await this.getRecords('rbac_permissions', filters);
-    return response.data || [];
+    const response = await this.getRecords("rbac_permissions", filters);
+    return (response.data as PermissionRecord[]) || [];
   }
 
   // Application Management
   async getApplication(appId: string): Promise<ApplicationRecord | null> {
     try {
-      const response = await this.getRecords('rbac_applications', { app_id: appId });
-      return response.data?.[0] || null;
+      const response = await this.getRecords("rbac_applications", { app_id: appId });
+      return (response.data?.[0] as ApplicationRecord) || null;
     } catch (error) {
-      if (error instanceof Error && error.message.includes('404')) {
+      if (error instanceof Error && error.message.includes("404")) {
         return null;
       }
       throw error;
     }
   }
 
-  async createApplication(appRequest: CreateApplicationRequest, createdBy: string): Promise<ApplicationRecord> {
+  async createApplication(
+    appRequest: CreateApplicationRequest,
+    createdBy: string
+  ): Promise<ApplicationRecord> {
     const appData: ApplicationRecord = {
       record_id: `app_${appRequest.app_id}`,
       ...appRequest,
@@ -375,45 +411,51 @@ class ApiClient {
       is_active: true,
     };
 
-    const response = await this.createRecord('rbac_applications', appData);
-    return response.data as ApplicationRecord;
+    const response = await this.createRecord(
+      "rbac_applications",
+      appData as unknown as Record<string, unknown>
+    );
+    return response.data as unknown as ApplicationRecord;
   }
 
-  async updateApplication(appId: string, updates: Partial<ApplicationRecord>): Promise<ApplicationRecord> {
+  async updateApplication(
+    appId: string,
+    updates: Partial<ApplicationRecord>
+  ): Promise<ApplicationRecord> {
     const appData = {
       ...updates,
       app_id: appId,
     };
 
-    const response = await this.updateRecord('rbac_applications', appData);
-    return response.data as ApplicationRecord;
+    const response = await this.updateRecord("rbac_applications", appData);
+    return response.data as unknown as ApplicationRecord;
   }
 
   async getAllApplications(): Promise<ApplicationRecord[]> {
-    const response = await this.getRecords('rbac_applications');
-    return response.data || [];
+    const response = await this.getRecords("rbac_applications");
+    return (response.data as ApplicationRecord[]) || [];
   }
 
   async getActiveApplications(): Promise<ApplicationRecord[]> {
-    const response = await this.getRecords('rbac_applications', { is_active: true });
-    return response.data || [];
+    const response = await this.getRecords("rbac_applications", { is_active: true });
+    return (response.data as ApplicationRecord[]) || [];
   }
 
   // Role Assignment
   async assignUserRole(request: AssignUserRoleRequest): Promise<void> {
     const user = await this.getUser(request.user_id);
     if (!user) {
-      throw new RBACError('User not found', RBACErrorCode.USER_NOT_FOUND);
+      throw new RBACError("User not found", RBACErrorCode.USER_NOT_FOUND);
     }
 
     const role = await this.getRole(request.role_id);
     if (!role) {
-      throw new RBACError('Role not found', RBACErrorCode.ROLE_NOT_FOUND);
+      throw new RBACError("Role not found", RBACErrorCode.ROLE_NOT_FOUND);
     }
 
     // Update user record with new role assignment
     let updatedUser: UserRecord;
-    if (role.scope === 'global') {
+    if (role.scope === "global") {
       // Add to global roles if not already present
       if (!user.global_roles.includes(request.role_id)) {
         updatedUser = {
@@ -427,7 +469,7 @@ class ApiClient {
     } else {
       // Add to app-specific roles
       if (!request.app_id) {
-        throw new RBACError('App ID required for app-scoped role', RBACErrorCode.INVALID_SCOPE);
+        throw new RBACError("App ID required for app-scoped role", RBACErrorCode.INVALID_SCOPE);
       }
 
       const appRoles = user.app_roles[request.app_id] || [];
@@ -445,32 +487,32 @@ class ApiClient {
       }
     }
 
-    await this.updateRecord('rbac_users', updatedUser);
+    await this.updateRecord("rbac_users", updatedUser as unknown as Record<string, unknown>);
   }
 
   async removeUserRole(request: RemoveUserRoleRequest): Promise<void> {
     const user = await this.getUser(request.user_id);
     if (!user) {
-      throw new RBACError('User not found', RBACErrorCode.USER_NOT_FOUND);
+      throw new RBACError("User not found", RBACErrorCode.USER_NOT_FOUND);
     }
 
     const role = await this.getRole(request.role_id);
     if (!role) {
-      throw new RBACError('Role not found', RBACErrorCode.ROLE_NOT_FOUND);
+      throw new RBACError("Role not found", RBACErrorCode.ROLE_NOT_FOUND);
     }
 
     let updatedUser: UserRecord;
-    if (role.scope === 'global') {
+    if (role.scope === "global") {
       // Remove from global roles
       updatedUser = {
         ...user,
-        global_roles: user.global_roles.filter(roleId => roleId !== request.role_id),
+        global_roles: user.global_roles.filter((roleId) => roleId !== request.role_id),
         updated_at: new Date().toISOString(),
       };
     } else {
       // Remove from app-specific roles
       if (!request.app_id) {
-        throw new RBACError('App ID required for app-scoped role', RBACErrorCode.INVALID_SCOPE);
+        throw new RBACError("App ID required for app-scoped role", RBACErrorCode.INVALID_SCOPE);
       }
 
       const appRoles = user.app_roles[request.app_id] || [];
@@ -478,30 +520,30 @@ class ApiClient {
         ...user,
         app_roles: {
           ...user.app_roles,
-          [request.app_id]: appRoles.filter(roleId => roleId !== request.role_id),
+          [request.app_id]: appRoles.filter((roleId) => roleId !== request.role_id),
         },
         updated_at: new Date().toISOString(),
       };
     }
 
-    await this.updateRecord('rbac_users', updatedUser);
+    await this.updateRecord("rbac_users", updatedUser as unknown as Record<string, unknown>);
   }
 
   // Permission Checking
   async checkPermission(context: PermissionContext): Promise<PermissionCheckResult> {
     const user = await this.getUser(context.userId);
     if (!user) {
-      return { granted: false, reason: 'User not found' };
+      return { granted: false, reason: "User not found" };
     }
 
     // Super admin has all permissions
     if (user.is_super_admin) {
-      return { granted: true, reason: 'Super admin access' };
+      return { granted: true, reason: "Super admin access" };
     }
 
     // Get all user roles (global + app-specific)
     const userRoles: RoleRecord[] = [];
-    
+
     // Add global roles
     for (const roleId of user.global_roles) {
       const role = await this.getRole(roleId);
@@ -517,33 +559,33 @@ class ApiClient {
     }
 
     // Check permissions in each role
-    const permissionPattern = context.appId 
+    const permissionPattern = context.appId
       ? `${context.appId}.${context.resource}.${context.action}`
       : `system.${context.resource}.${context.action}`;
 
     for (const role of userRoles) {
       for (const permissionId of role.permission_ids) {
         // Handle wildcard permissions
-        if (permissionId.endsWith('.*')) {
+        if (permissionId.endsWith(".*")) {
           const basePattern = permissionId.slice(0, -2);
           if (permissionPattern.startsWith(basePattern)) {
             return { granted: true, sourceRole: role.role_id };
           }
         }
-        
+
         // Handle exact match
         if (permissionId === permissionPattern) {
           return { granted: true, sourceRole: role.role_id };
         }
 
         // Handle system.* for super permissions
-        if (permissionId === 'system.*') {
+        if (permissionId === "system.*") {
           return { granted: true, sourceRole: role.role_id };
         }
       }
     }
 
-    return { granted: false, reason: 'Permission not found in user roles' };
+    return { granted: false, reason: "Permission not found in user roles" };
   }
 
   // System Bootstrap
@@ -554,37 +596,43 @@ class ApiClient {
       permissionsCreated: 0,
       rolesCreated: 0,
       superAdminsAssigned: 0,
-      errors: []
+      errors: [],
     };
 
     try {
       // Create applications
       for (const app of config.applications) {
         try {
-          await this.createApplication(app, 'system');
+          await this.createApplication(app, "system");
           result.applicationsCreated++;
         } catch (error) {
-          result.errors.push(`Failed to create application ${app.app_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Failed to create application ${app.app_id}: ${error instanceof Error ? error.message : "Unknown error"}`
+          );
         }
       }
 
       // Create permissions
       for (const permission of config.permissions) {
         try {
-          await this.createPermission(permission, 'system');
+          await this.createPermission(permission, "system");
           result.permissionsCreated++;
         } catch (error) {
-          result.errors.push(`Failed to create permission ${permission.permission_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Failed to create permission ${permission.permission_id}: ${error instanceof Error ? error.message : "Unknown error"}`
+          );
         }
       }
 
       // Create roles
       for (const role of config.roles) {
         try {
-          await this.createRole(role, 'system');
+          await this.createRole(role, "system");
           result.rolesCreated++;
         } catch (error) {
-          result.errors.push(`Failed to create role ${role.role_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Failed to create role ${role.role_id}: ${error instanceof Error ? error.message : "Unknown error"}`
+          );
         }
       }
 
@@ -597,14 +645,18 @@ class ApiClient {
           }
           result.superAdminsAssigned++;
         } catch (error) {
-          result.errors.push(`Failed to assign super admin ${oid}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          result.errors.push(
+            `Failed to assign super admin ${oid}: ${error instanceof Error ? error.message : "Unknown error"}`
+          );
         }
       }
 
       result.success = result.errors.length === 0;
       return result;
     } catch (error) {
-      result.errors.push(`Bootstrap failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      result.errors.push(
+        `Bootstrap failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
       return result;
     }
   }
@@ -616,7 +668,7 @@ class ApiClient {
         this.getAllUsers(),
         this.getAllRoles(),
         this.getAllPermissions(),
-        this.getAllApplications()
+        this.getAllApplications(),
       ]);
 
       return {
@@ -625,7 +677,7 @@ class ApiClient {
         roleCount: roles.length,
         permissionCount: permissions.length,
         applicationCount: applications.length,
-        issues: []
+        issues: [],
       };
     } catch (error) {
       return {
@@ -634,20 +686,22 @@ class ApiClient {
         roleCount: 0,
         permissionCount: 0,
         applicationCount: 0,
-        issues: [`Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
+        issues: [
+          `Health check failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        ],
       };
     }
   }
 
   // Audit Operations
-  async createAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): Promise<void> {
+  async createAuditLog(entry: Omit<AuditLogEntry, "id" | "timestamp">): Promise<void> {
     const auditData: AuditLogEntry = {
       ...entry,
       id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
     };
 
-    await this.createRecord('rbac_audit_logs', auditData);
+    await this.createRecord("rbac_audit_logs", auditData as unknown as Record<string, unknown>);
   }
 
   async getAuditLogs(filters?: {
@@ -657,8 +711,8 @@ class ApiClient {
     startDate?: string;
     endDate?: string;
   }): Promise<AuditLogEntry[]> {
-    const response = await this.getRecords('rbac_audit_logs', filters);
-    return response.data || [];
+    const response = await this.getRecords("rbac_audit_logs", filters);
+    return (response.data as AuditLogEntry[]) || [];
   }
 }
 

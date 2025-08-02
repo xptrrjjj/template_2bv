@@ -3,14 +3,17 @@
 ## 1. Integration Overview
 
 ### Purpose
+
 This document outlines the Draft → Approval → Publish workflow for TeamTailor job posting integration, designed as a reference implementation for the extensible integrations system. The workflow ensures data validation and approval before external publishing while maintaining all state exclusively in the Datastore.
 
 ### Integration Flow
+
 ```
 Role Creation → Dynamic Options Fetch → Draft State → Approval → Publish → Sync State Tracking
 ```
 
 ### Key Principles
+
 - **Draft-First**: All roles start in draft state with external options pre-populated
 - **Approval Gate**: Manual approval required before external publishing
 - **Optional Sync**: Publishing to external service is user-triggered, not automatic
@@ -20,18 +23,20 @@ Role Creation → Dynamic Options Fetch → Draft State → Approval → Publish
 ## 2. Workflow States and Transitions
 
 ### Role Lifecycle States
+
 ```typescript
 enum RolePublishState {
-  DRAFT = 'draft',                    // Initial state, external options fetched
-  PENDING_APPROVAL = 'pending_approval', // Submitted for review
-  APPROVED = 'approved',              // Ready for publishing
-  PUBLISHED = 'published',            // Successfully published to external service
-  PUBLISH_FAILED = 'publish_failed',  // Publishing attempt failed
-  UNPUBLISHED = 'unpublished'         // Removed from external service
+  DRAFT = "draft", // Initial state, external options fetched
+  PENDING_APPROVAL = "pending_approval", // Submitted for review
+  APPROVED = "approved", // Ready for publishing
+  PUBLISHED = "published", // Successfully published to external service
+  PUBLISH_FAILED = "publish_failed", // Publishing attempt failed
+  UNPUBLISHED = "unpublished", // Removed from external service
 }
 ```
 
 ### State Transition Matrix
+
 ```
 DRAFT → PENDING_APPROVAL (on submit for approval)
 PENDING_APPROVAL → APPROVED (on approval)
@@ -43,8 +48,9 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ```
 
 ### Workflow Actions
+
 - **Submit for Approval**: DRAFT → PENDING_APPROVAL
-- **Approve**: PENDING_APPROVAL → APPROVED  
+- **Approve**: PENDING_APPROVAL → APPROVED
 - **Reject**: PENDING_APPROVAL → DRAFT
 - **Publish**: APPROVED → PUBLISHED/PUBLISH_FAILED
 - **Unpublish**: PUBLISHED → UNPUBLISHED
@@ -53,29 +59,28 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ## 3. Datastore Schema Design
 
 ### Role Integration Metadata (`role_integration_metadata`)
+
 ```json
 {
   "record_id": "role_integration_meta_role123",
-  "app_id": "role_integration_metadata", 
+  "app_id": "role_integration_metadata",
   "role_id": "role_123",
   "integration_provider": "teamtailor",
   "publish_state": "draft",
   "external_options": {
     "departments": [
-      {"id": "dept_001", "name": "Engineering", "selected": true},
-      {"id": "dept_002", "name": "Marketing", "selected": false}
+      { "id": "dept_001", "name": "Engineering", "selected": true },
+      { "id": "dept_002", "name": "Marketing", "selected": false }
     ],
-    "job_templates": [
-      {"id": "tmpl_001", "name": "Senior Developer Template", "selected": true}
-    ],
+    "job_templates": [{ "id": "tmpl_001", "name": "Senior Developer Template", "selected": true }],
     "hiring_stages": [
-      {"id": "stage_001", "name": "Application", "order": 1},
-      {"id": "stage_002", "name": "Phone Screen", "order": 2},
-      {"id": "stage_003", "name": "Technical Interview", "order": 3}
+      { "id": "stage_001", "name": "Application", "order": 1 },
+      { "id": "stage_002", "name": "Phone Screen", "order": 2 },
+      { "id": "stage_003", "name": "Technical Interview", "order": 3 }
     ],
     "locations": [
-      {"id": "loc_001", "name": "New York", "selected": true},
-      {"id": "loc_002", "name": "Remote", "selected": false}
+      { "id": "loc_001", "name": "New York", "selected": true },
+      { "id": "loc_002", "name": "Remote", "selected": false }
     ]
   },
   "field_mappings": {
@@ -99,6 +104,7 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ```
 
 ### Role Publishing History (`role_publishing_history`)
+
 ```json
 {
   "record_id": "role_publish_hist_20240120_100530",
@@ -129,6 +135,7 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ```
 
 ### External Options Cache (`integration_external_options`)
+
 ```json
 {
   "record_id": "ext_options_teamtailor_20240120",
@@ -136,9 +143,9 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
   "integration_provider": "teamtailor",
   "option_type": "departments",
   "options_data": [
-    {"id": "dept_001", "name": "Engineering", "parent_id": null},
-    {"id": "dept_002", "name": "Marketing", "parent_id": null},
-    {"id": "dept_003", "name": "Frontend", "parent_id": "dept_001"}
+    { "id": "dept_001", "name": "Engineering", "parent_id": null },
+    { "id": "dept_002", "name": "Marketing", "parent_id": null },
+    { "id": "dept_003", "name": "Frontend", "parent_id": "dept_001" }
   ],
   "fetched_at": "2024-01-20T09:30:00Z",
   "expires_at": "2024-01-20T21:30:00Z",
@@ -148,6 +155,7 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ```
 
 ### Integration Sync State (`role_sync_state`)
+
 ```json
 {
   "record_id": "role_sync_state_role123",
@@ -175,11 +183,12 @@ PUBLISH_FAILED → APPROVED (on retry/fix)
 ### Datastore Operations
 
 #### Create Role with Integration Setup
+
 ```typescript
 // 1. Create role record in main roles table
 const createRolePayload = {
   identifier: "recruitment_roles",
-  action: "create", 
+  action: "create",
   data: {
     app_id: "recruitment_roles",
     record_id: "role_123",
@@ -189,8 +198,8 @@ const createRolePayload = {
     location: "New York",
     status: "draft",
     created_by: "user_123",
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 };
 
 // 2. Fetch external options from TeamTailor
@@ -209,14 +218,15 @@ const integrationMetaPayload = {
     external_options: externalOptions,
     field_mappings: getDefaultFieldMappings(),
     approval_workflow: {
-      required_approvers: await getRequiredApprovers(roleId)
+      required_approvers: await getRequiredApprovers(roleId),
     },
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 };
 ```
 
 #### Submit for Approval
+
 ```typescript
 const submitForApprovalPayload = {
   identifier: "role_integration_metadata",
@@ -226,14 +236,15 @@ const submitForApprovalPayload = {
     publish_state: "pending_approval",
     approval_workflow: {
       submitted_at: new Date().toISOString(),
-      submitted_by: "user_123"
+      submitted_by: "user_123",
     },
-    updated_at: new Date().toISOString()
-  }
+    updated_at: new Date().toISOString(),
+  },
 };
 ```
 
 #### Approve Role
+
 ```typescript
 const approveRolePayload = {
   identifier: "role_integration_metadata",
@@ -243,14 +254,15 @@ const approveRolePayload = {
     publish_state: "approved",
     approval_workflow: {
       approved_at: new Date().toISOString(),
-      approved_by: "manager_user_456"
+      approved_by: "manager_user_456",
     },
-    updated_at: new Date().toISOString()
-  }
+    updated_at: new Date().toISOString(),
+  },
 };
 ```
 
 #### Log Publishing Attempt
+
 ```typescript
 const logPublishPayload = {
   identifier: "role_publishing_history",
@@ -270,86 +282,91 @@ const logPublishPayload = {
     sync_duration_ms: 1250,
     triggered_by: "user_123",
     triggered_at: startTime.toISOString(),
-    completed_at: new Date().toISOString()
-  }
+    completed_at: new Date().toISOString(),
+  },
 };
 ```
 
 ### TeamTailor API Interactions
 
 #### Fetch Dynamic Options
+
 ```typescript
 class TeamTailorOptionsService {
   async fetchAllOptions(): Promise<ExternalOptions> {
     const [departments, locations, templates, stages] = await Promise.all([
       this.fetchDepartments(),
-      this.fetchLocations(), 
+      this.fetchLocations(),
       this.fetchJobTemplates(),
-      this.fetchHiringStages()
+      this.fetchHiringStages(),
     ]);
 
     return {
       departments,
       locations,
       job_templates: templates,
-      hiring_stages: stages
+      hiring_stages: stages,
     };
   }
 
   private async fetchDepartments(): Promise<OptionItem[]> {
-    const response = await fetch('https://api.teamtailor.com/v1/departments', {
+    const response = await fetch("https://api.teamtailor.com/v1/departments", {
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218'
-      }
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+      },
     });
-    
+
     const data = await response.json();
-    return data.data.map(dept => ({
+    return data.data.map((dept) => ({
       id: dept.id,
       name: dept.attributes.name,
-      parent_id: dept.relationships?.parent?.data?.id || null
+      parent_id: dept.relationships?.parent?.data?.id || null,
     }));
   }
 
   private async fetchLocations(): Promise<OptionItem[]> {
-    const response = await fetch('https://api.teamtailor.com/v1/locations', {
+    const response = await fetch("https://api.teamtailor.com/v1/locations", {
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218'
-      }
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+      },
     });
-    
+
     const data = await response.json();
-    return data.data.map(loc => ({
+    return data.data.map((loc) => ({
       id: loc.id,
       name: loc.attributes.name,
       city: loc.attributes.city,
-      country: loc.attributes.country
+      country: loc.attributes.country,
     }));
   }
 }
 ```
 
 #### Publish Job to TeamTailor
+
 ```typescript
 class TeamTailorPublishService {
-  async publishJob(roleData: RoleData, integrationMeta: IntegrationMetadata): Promise<PublishResult> {
+  async publishJob(
+    roleData: RoleData,
+    integrationMeta: IntegrationMetadata
+  ): Promise<PublishResult> {
     const payload = this.transformRoleToTeamTailorJob(roleData, integrationMeta);
-    
-    const response = await fetch('https://api.teamtailor.com/v1/jobs', {
-      method: 'POST',
+
+    const response = await fetch("https://api.teamtailor.com/v1/jobs", {
+      method: "POST",
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218',
-        'Content-Type': 'application/vnd.api+json'
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+        "Content-Type": "application/vnd.api+json",
       },
       body: JSON.stringify({
         data: {
-          type: 'jobs',
-          attributes: payload
-        }
-      })
+          type: "jobs",
+          attributes: payload,
+        },
+      }),
     });
 
     if (!response.ok) {
@@ -360,13 +377,13 @@ class TeamTailorPublishService {
     return {
       external_job_id: result.data.id,
       external_job_url: `https://company.teamtailor.com/jobs/${result.data.id}`,
-      response_data: result.data
+      response_data: result.data,
     };
   }
 
   private transformRoleToTeamTailorJob(roleData: RoleData, integrationMeta: IntegrationMetadata) {
-    const selectedDepartment = integrationMeta.external_options.departments.find(d => d.selected);
-    const selectedLocation = integrationMeta.external_options.locations.find(l => l.selected);
+    const selectedDepartment = integrationMeta.external_options.departments.find((d) => d.selected);
+    const selectedLocation = integrationMeta.external_options.locations.find((l) => l.selected);
 
     return {
       name: roleData.title,
@@ -374,8 +391,8 @@ class TeamTailorPublishService {
       requirements: roleData.requirements,
       department_id: selectedDepartment?.id,
       location_id: selectedLocation?.id,
-      status: 'published',
-      apply_button_text: 'Apply Now'
+      status: "published",
+      apply_button_text: "Apply Now",
     };
   }
 }
@@ -384,6 +401,7 @@ class TeamTailorPublishService {
 ## 5. Service Layer Implementation
 
 ### Integration Service Location
+
 ```
 src/services/integrations/
 ├── core/
@@ -402,59 +420,67 @@ src/services/integrations/
 ```
 
 ### Role Integration Service
+
 ```typescript
 class RoleIntegrationService {
-  async createRoleWithIntegration(roleData: CreateRoleRequest, integrationProvider: string): Promise<RoleWithIntegration> {
+  async createRoleWithIntegration(
+    roleData: CreateRoleRequest,
+    integrationProvider: string
+  ): Promise<RoleWithIntegration> {
     // 1. Create base role
     const role = await this.createRole(roleData);
-    
+
     // 2. Fetch external options
     const provider = this.getProvider(integrationProvider);
     const externalOptions = await provider.fetchOptions();
-    
+
     // 3. Cache external options
     await this.cacheExternalOptions(integrationProvider, externalOptions);
-    
+
     // 4. Create integration metadata
-    const integrationMeta = await this.createIntegrationMetadata(role.role_id, integrationProvider, externalOptions);
-    
+    const integrationMeta = await this.createIntegrationMetadata(
+      role.role_id,
+      integrationProvider,
+      externalOptions
+    );
+
     return {
       role,
       integration_metadata: integrationMeta,
-      external_options: externalOptions
+      external_options: externalOptions,
     };
   }
 
   async submitForApproval(roleId: string, submittedBy: string): Promise<void> {
-    await this.updatePublishState(roleId, 'pending_approval', {
+    await this.updatePublishState(roleId, "pending_approval", {
       submitted_at: new Date().toISOString(),
-      submitted_by: submittedBy
+      submitted_by: submittedBy,
     });
-    
+
     // Send notifications to approvers
     await this.notifyApprovers(roleId);
   }
 
   async approveRole(roleId: string, approvedBy: string): Promise<void> {
-    await this.updatePublishState(roleId, 'approved', {
+    await this.updatePublishState(roleId, "approved", {
       approved_at: new Date().toISOString(),
-      approved_by: approvedBy
+      approved_by: approvedBy,
     });
   }
 
   async publishRole(roleId: string, triggeredBy: string): Promise<PublishResult> {
     const startTime = new Date();
-    
+
     try {
       // 1. Get role and integration metadata
       const [role, integrationMeta] = await Promise.all([
         this.getRole(roleId),
-        this.getIntegrationMetadata(roleId)
+        this.getIntegrationMetadata(roleId),
       ]);
 
       // 2. Validate state
-      if (integrationMeta.publish_state !== 'approved') {
-        throw new Error('Role must be approved before publishing');
+      if (integrationMeta.publish_state !== "approved") {
+        throw new Error("Role must be approved before publishing");
       }
 
       // 3. Publish to external service
@@ -463,17 +489,24 @@ class RoleIntegrationService {
 
       // 4. Update states
       await Promise.all([
-        this.updatePublishState(roleId, 'published'),
+        this.updatePublishState(roleId, "published"),
         this.updateSyncState(roleId, publishResult),
-        this.logPublishingHistory(roleId, 'publish', 'success', publishResult, startTime, triggeredBy)
+        this.logPublishingHistory(
+          roleId,
+          "publish",
+          "success",
+          publishResult,
+          startTime,
+          triggeredBy
+        ),
       ]);
 
       return publishResult;
     } catch (error) {
       // Handle failure
       await Promise.all([
-        this.updatePublishState(roleId, 'publish_failed'),
-        this.logPublishingHistory(roleId, 'publish', 'failed', null, startTime, triggeredBy, error)
+        this.updatePublishState(roleId, "publish_failed"),
+        this.logPublishingHistory(roleId, "publish", "failed", null, startTime, triggeredBy, error),
       ]);
       throw error;
     }
@@ -482,9 +515,15 @@ class RoleIntegrationService {
 ```
 
 ### Workflow Manager
+
 ```typescript
 class RolePublishWorkflowManager {
-  async transitionState(roleId: string, fromState: RolePublishState, toState: RolePublishState, metadata: any = {}): Promise<void> {
+  async transitionState(
+    roleId: string,
+    fromState: RolePublishState,
+    toState: RolePublishState,
+    metadata: any = {}
+  ): Promise<void> {
     // Validate transition
     if (!this.isValidTransition(fromState, toState)) {
       throw new Error(`Invalid state transition: ${fromState} → ${toState}`);
@@ -498,8 +537,8 @@ class RolePublishWorkflowManager {
         record_id: `role_integration_meta_${roleId}`,
         publish_state: toState,
         ...metadata,
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     });
 
     // Log state transition
@@ -513,7 +552,7 @@ class RolePublishWorkflowManager {
       [RolePublishState.APPROVED]: [RolePublishState.PUBLISHED, RolePublishState.PUBLISH_FAILED],
       [RolePublishState.PUBLISHED]: [RolePublishState.UNPUBLISHED],
       [RolePublishState.PUBLISH_FAILED]: [RolePublishState.APPROVED],
-      [RolePublishState.UNPUBLISHED]: [RolePublishState.APPROVED]
+      [RolePublishState.UNPUBLISHED]: [RolePublishState.APPROVED],
     };
 
     return validTransitions[from]?.includes(to) || false;
@@ -524,6 +563,7 @@ class RolePublishWorkflowManager {
 ## 6. UI Integration Points
 
 ### Role Creation Flow
+
 1. **Role Form**: Standard role creation form
 2. **Integration Selection**: Choose external service (TeamTailor)
 3. **Options Loading**: Fetch and display external options dynamically
@@ -531,12 +571,14 @@ class RolePublishWorkflowManager {
 5. **Save as Draft**: Store role and integration metadata
 
 ### Approval Interface
+
 1. **Pending Approvals List**: Show roles awaiting approval
 2. **Role Review**: Display role details with external mapping
 3. **Approve/Reject**: State transition actions
 4. **Approval History**: Track approval workflow
 
 ### Publishing Dashboard
+
 1. **Approved Roles**: List roles ready for publishing
 2. **Publish Action**: Trigger external publishing
 3. **Publishing Status**: Real-time status updates
@@ -545,6 +587,7 @@ class RolePublishWorkflowManager {
 ## 7. Extensibility Notes
 
 ### Adding New Providers
+
 ```typescript
 // 1. Create provider implementation
 class LinkedInIntegration extends BaseIntegration {
@@ -559,9 +602,9 @@ class LinkedInIntegration extends BaseIntegration {
 
 // 2. Register provider
 const integrationRegistry = {
-  'teamtailor': TeamTailorIntegration,
-  'linkedin': LinkedInIntegration,
-  'indeed': IndeedIntegration
+  teamtailor: TeamTailorIntegration,
+  linkedin: LinkedInIntegration,
+  indeed: IndeedIntegration,
 };
 
 // 3. Add to datastore registry
@@ -573,12 +616,13 @@ await apiClient.datastoreCreate({
     name: "LinkedIn Jobs",
     provider: "linkedin",
     type: "job_board",
-    capabilities: ["outbound_sync"]
-  }
+    capabilities: ["outbound_sync"],
+  },
 });
 ```
 
 ### Workflow Customization
+
 ```typescript
 // Custom approval workflows per provider
 interface ApprovalWorkflow {
@@ -599,19 +643,23 @@ interface FieldMappingTemplate {
 ```
 
 ### Multi-Provider Publishing
+
 ```typescript
 class MultiProviderPublisher {
-  async publishToMultipleProviders(roleId: string, providers: string[]): Promise<Record<string, PublishResult>> {
+  async publishToMultipleProviders(
+    roleId: string,
+    providers: string[]
+  ): Promise<Record<string, PublishResult>> {
     const results: Record<string, PublishResult> = {};
-    
+
     for (const provider of providers) {
       try {
         results[provider] = await this.publishToProvider(roleId, provider);
       } catch (error) {
-        results[provider] = { error: error.message, status: 'failed' };
+        results[provider] = { error: error.message, status: "failed" };
       }
     }
-    
+
     return results;
   }
 }

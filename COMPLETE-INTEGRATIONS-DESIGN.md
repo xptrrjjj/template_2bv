@@ -32,18 +32,21 @@ The Integrations System enables the platform to connect with and synchronize dat
 ### Integration Patterns
 
 #### Outbound Sync
+
 - Push new candidate applications to CRM
 - Post job openings to multiple job boards
 - Send welcome emails via email platform
 - Trigger background checks on candidate progression
 
 #### Inbound Webhook
+
 - Receive candidate status updates from background check services
 - Process assessment completion notifications
 - Handle job board application submissions
 - Accept CRM record updates
 
 #### Draft → Approval → Publish Workflow
+
 - **Draft-First**: All entities start in draft state with external options pre-populated
 - **Approval Gate**: Manual approval required before external publishing
 - **Optional Sync**: Publishing to external service is user-triggered, not automatic
@@ -155,27 +158,25 @@ Workflow state and external options for specific entities (roles, candidates, et
 ```json
 {
   "record_id": "role_integration_meta_role123",
-  "app_id": "role_integration_metadata", 
+  "app_id": "role_integration_metadata",
   "entity_id": "role_123",
   "entity_type": "role",
   "integration_provider": "teamtailor",
   "publish_state": "draft",
   "external_options": {
     "departments": [
-      {"id": "dept_001", "name": "Engineering", "selected": true},
-      {"id": "dept_002", "name": "Marketing", "selected": false}
+      { "id": "dept_001", "name": "Engineering", "selected": true },
+      { "id": "dept_002", "name": "Marketing", "selected": false }
     ],
-    "job_templates": [
-      {"id": "tmpl_001", "name": "Senior Developer Template", "selected": true}
-    ],
+    "job_templates": [{ "id": "tmpl_001", "name": "Senior Developer Template", "selected": true }],
     "hiring_stages": [
-      {"id": "stage_001", "name": "Application", "order": 1},
-      {"id": "stage_002", "name": "Phone Screen", "order": 2},
-      {"id": "stage_003", "name": "Technical Interview", "order": 3}
+      { "id": "stage_001", "name": "Application", "order": 1 },
+      { "id": "stage_002", "name": "Phone Screen", "order": 2 },
+      { "id": "stage_003", "name": "Technical Interview", "order": 3 }
     ],
     "locations": [
-      {"id": "loc_001", "name": "New York", "selected": true},
-      {"id": "loc_002", "name": "Remote", "selected": false}
+      { "id": "loc_001", "name": "New York", "selected": true },
+      { "id": "loc_002", "name": "Remote", "selected": false }
     ]
   },
   "field_mappings": {
@@ -243,9 +244,9 @@ Cached options from external services to reduce API calls.
   "integration_provider": "teamtailor",
   "option_type": "departments",
   "options_data": [
-    {"id": "dept_001", "name": "Engineering", "parent_id": null},
-    {"id": "dept_002", "name": "Marketing", "parent_id": null},
-    {"id": "dept_003", "name": "Frontend", "parent_id": "dept_001"}
+    { "id": "dept_001", "name": "Engineering", "parent_id": null },
+    { "id": "dept_002", "name": "Marketing", "parent_id": null },
+    { "id": "dept_003", "name": "Frontend", "parent_id": "dept_001" }
   ],
   "fetched_at": "2024-01-20T09:30:00Z",
   "expires_at": "2024-01-20T21:30:00Z",
@@ -349,7 +350,7 @@ Failed operations queued for retry with exponential backoff.
 // 1. Create base entity (role, candidate, etc.)
 const createEntityPayload = {
   identifier: "recruitment_roles",
-  action: "create", 
+  action: "create",
   data: {
     app_id: "recruitment_roles",
     record_id: "role_123",
@@ -359,12 +360,12 @@ const createEntityPayload = {
     location: "New York",
     status: "draft",
     created_by: "user_123",
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 };
 
 // 2. Fetch external options from provider
-const externalOptions = await fetchProviderOptions('teamtailor');
+const externalOptions = await fetchProviderOptions("teamtailor");
 
 // 3. Create integration metadata
 const integrationMetaPayload = {
@@ -378,12 +379,12 @@ const integrationMetaPayload = {
     integration_provider: "teamtailor",
     publish_state: "draft",
     external_options: externalOptions,
-    field_mappings: getDefaultFieldMappings('teamtailor'),
+    field_mappings: getDefaultFieldMappings("teamtailor"),
     approval_workflow: {
-      required_approvers: await getRequiredApprovers(entityId)
+      required_approvers: await getRequiredApprovers(entityId),
     },
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 };
 ```
 
@@ -399,10 +400,10 @@ const submitForApprovalPayload = {
     publish_state: "pending_approval",
     approval_workflow: {
       submitted_at: new Date().toISOString(),
-      submitted_by: "user_123"
+      submitted_by: "user_123",
     },
-    updated_at: new Date().toISOString()
-  }
+    updated_at: new Date().toISOString(),
+  },
 };
 
 // Approve Entity
@@ -414,10 +415,10 @@ const approveEntityPayload = {
     publish_state: "approved",
     approval_workflow: {
       approved_at: new Date().toISOString(),
-      approved_by: "manager_user_456"
+      approved_by: "manager_user_456",
     },
-    updated_at: new Date().toISOString()
-  }
+    updated_at: new Date().toISOString(),
+  },
 };
 
 // Log Publishing Attempt
@@ -440,8 +441,8 @@ const logPublishPayload = {
     sync_duration_ms: 1250,
     triggered_by: "user_123",
     triggered_at: startTime.toISOString(),
-    completed_at: new Date().toISOString()
-  }
+    completed_at: new Date().toISOString(),
+  },
 };
 ```
 
@@ -459,10 +460,10 @@ const storeCredentialsPayload = {
     auth_method: "api_key",
     credentials: {
       api_key: encryptValue(apiKey),
-      token_type: "Bearer"
+      token_type: "Bearer",
     },
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 };
 
 // Store OAuth Credentials
@@ -479,11 +480,11 @@ const storeOAuthPayload = {
       refresh_token: encryptValue(refreshToken),
       token_type: "Bearer",
       expires_at: new Date(Date.now() + 3600000).toISOString(),
-      scope: "api refresh_token"
+      scope: "api refresh_token",
     },
     created_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + 3600000).toISOString()
-  }
+    expires_at: new Date(Date.now() + 3600000).toISOString(),
+  },
 };
 ```
 
@@ -494,8 +495,8 @@ const storeOAuthPayload = {
 const getActiveIntegrationsPayload = {
   identifier: "integrations_instances",
   filters: {
-    status: "active"
-  }
+    status: "active",
+  },
 };
 
 // Get Entities Pending Approval
@@ -503,8 +504,8 @@ const getPendingApprovalsPayload = {
   identifier: "role_integration_metadata",
   filters: {
     publish_state: "pending_approval",
-    integration_provider: "teamtailor"
-  }
+    integration_provider: "teamtailor",
+  },
 };
 
 // Get Publishing History
@@ -512,8 +513,8 @@ const getPublishingHistoryPayload = {
   identifier: "entity_publishing_history",
   filters: {
     entity_id: "role_123",
-    entity_type: "role"
-  }
+    entity_type: "role",
+  },
 };
 
 // Get Retry Queue Items
@@ -521,8 +522,8 @@ const getRetryQueuePayload = {
   identifier: "integrations_retry_queue",
   filters: {
     status: "pending",
-    next_retry_at: { $lte: new Date().toISOString() }
-  }
+    next_retry_at: { $lte: new Date().toISOString() },
+  },
 };
 ```
 
@@ -534,15 +535,18 @@ const getRetryQueuePayload = {
 
 ```typescript
 // Next.js API route: /api/integrations/webhook/[provider]/[event]
-export async function POST(request: Request, { params }: { params: { provider: string, event: string } }) {
+export async function POST(
+  request: Request,
+  { params }: { params: { provider: string; event: string } }
+) {
   const { provider, event } = params;
   const payload = await request.json();
-  const signature = request.headers.get('X-Webhook-Signature');
+  const signature = request.headers.get("X-Webhook-Signature");
 
   // 1. Verify webhook authenticity
   const isValid = await verifyWebhookSignature(provider, signature, payload);
   if (!isValid) {
-    return Response.json({ error: 'Invalid signature' }, { status: 401 });
+    return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   // 2. Store webhook event
@@ -556,16 +560,16 @@ export async function POST(request: Request, { params }: { params: { provider: s
       event_type: event,
       payload,
       processed: false,
-      received_at: new Date().toISOString()
-    }
+      received_at: new Date().toISOString(),
+    },
   };
-  
+
   await apiClient.datastoreCreate(webhookEvent);
 
   // 3. Process webhook (async)
   processWebhookEvent(provider, event, payload);
 
-  return Response.json({ status: 'received' });
+  return Response.json({ status: "received" });
 }
 ```
 
@@ -577,7 +581,7 @@ async function processWebhookEvent(provider: string, eventType: string, payload:
   const webhookConfig = await apiClient.getRecords("integrations_webhooks", {
     provider,
     event_type: eventType,
-    status: "active"
+    status: "active",
   });
 
   if (!webhookConfig.data?.length) {
@@ -589,7 +593,7 @@ async function processWebhookEvent(provider: string, eventType: string, payload:
   const instanceId = webhookConfig.data[0].instance_id;
   const [instance, credentials] = await Promise.all([
     apiClient.getRecords("integrations_instances", { instance_id: instanceId }),
-    apiClient.getRecords("integrations_credentials", { instance_id: instanceId })
+    apiClient.getRecords("integrations_credentials", { instance_id: instanceId }),
   ]);
 
   // 3. Process the webhook based on event type
@@ -602,20 +606,20 @@ async function processWebhookEvent(provider: string, eventType: string, payload:
 
 ```typescript
 const WEBHOOK_EVENT_HANDLERS = {
-  'teamtailor': {
-    'job.application_created': TeamTailorApplicationHandler,
-    'job.published': TeamTailorJobPublishedHandler,
-    'job.archived': TeamTailorJobArchivedHandler
+  teamtailor: {
+    "job.application_created": TeamTailorApplicationHandler,
+    "job.published": TeamTailorJobPublishedHandler,
+    "job.archived": TeamTailorJobArchivedHandler,
   },
-  'salesforce': {
-    'contact.updated': SalesforceContactUpdateHandler,
-    'opportunity.created': SalesforceOpportunityCreateHandler,
-    'lead.converted': SalesforceLeadConvertHandler
+  salesforce: {
+    "contact.updated": SalesforceContactUpdateHandler,
+    "opportunity.created": SalesforceOpportunityCreateHandler,
+    "lead.converted": SalesforceLeadConvertHandler,
   },
-  'checkr': {
-    'report.completed': CheckrReportCompletedHandler,
-    'report.disputed': CheckrReportDisputedHandler
-  }
+  checkr: {
+    "report.completed": CheckrReportCompletedHandler,
+    "report.disputed": CheckrReportDisputedHandler,
+  },
 };
 ```
 
@@ -627,12 +631,12 @@ const WEBHOOK_EVENT_HANDLERS = {
 
 ```typescript
 enum EntityPublishState {
-  DRAFT = 'draft',                    // Initial state, external options fetched
-  PENDING_APPROVAL = 'pending_approval', // Submitted for review
-  APPROVED = 'approved',              // Ready for publishing
-  PUBLISHED = 'published',            // Successfully published to external service
-  PUBLISH_FAILED = 'publish_failed',  // Publishing attempt failed
-  UNPUBLISHED = 'unpublished'         // Removed from external service
+  DRAFT = "draft", // Initial state, external options fetched
+  PENDING_APPROVAL = "pending_approval", // Submitted for review
+  APPROVED = "approved", // Ready for publishing
+  PUBLISHED = "published", // Successfully published to external service
+  PUBLISH_FAILED = "publish_failed", // Publishing attempt failed
+  UNPUBLISHED = "unpublished", // Removed from external service
 }
 
 // State Transition Matrix
@@ -642,23 +646,26 @@ const VALID_TRANSITIONS = {
   [EntityPublishState.APPROVED]: [EntityPublishState.PUBLISHED, EntityPublishState.PUBLISH_FAILED],
   [EntityPublishState.PUBLISHED]: [EntityPublishState.UNPUBLISHED],
   [EntityPublishState.PUBLISH_FAILED]: [EntityPublishState.APPROVED],
-  [EntityPublishState.UNPUBLISHED]: [EntityPublishState.APPROVED]
+  [EntityPublishState.UNPUBLISHED]: [EntityPublishState.APPROVED],
 };
 ```
 
 ### Sync Execution Strategies
 
 #### Real-time Sync (Event-driven)
+
 - Triggered by platform events (entity created, status updated)
 - Immediate API calls to external services
 - Fallback to retry queue on failure
 
 #### Scheduled Sync (Batch)
+
 - Cron-based execution for bulk operations
 - Configurable intervals (hourly, daily, weekly)
 - Efficient for large data sets
 
 #### On-demand Sync (User-initiated)
+
 - Manual sync triggers from admin interface
 - Full or partial data synchronization
 - Progress tracking and status updates
@@ -675,7 +682,7 @@ class ExponentialBackoffRetryStrategy {
         if (attempt === maxAttempts || !this.isRetryableError(error)) {
           throw error;
         }
-        
+
         const delay = Math.min(1000 * Math.pow(2, attempt), 30000); // Max 30s
         await this.sleep(delay);
       }
@@ -683,13 +690,15 @@ class ExponentialBackoffRetryStrategy {
   }
 
   private async sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private isRetryableError(error: Error): boolean {
-    return error.message.includes('rate limit') || 
-           error.message.includes('timeout') ||
-           error.message.includes('network');
+    return (
+      error.message.includes("rate limit") ||
+      error.message.includes("timeout") ||
+      error.message.includes("network")
+    );
   }
 }
 ```
@@ -703,7 +712,7 @@ class ExponentialBackoffRetryStrategy {
 ```typescript
 class TeamTailorIntegration extends BaseIntegration {
   private apiKey: string;
-  private baseUrl = 'https://api.teamtailor.com/v1';
+  private baseUrl = "https://api.teamtailor.com/v1";
 
   constructor(credentials: IntegrationCredentials) {
     super();
@@ -713,68 +722,71 @@ class TeamTailorIntegration extends BaseIntegration {
   async fetchOptions(): Promise<ExternalOptions> {
     const [departments, locations, templates, stages] = await Promise.all([
       this.fetchDepartments(),
-      this.fetchLocations(), 
+      this.fetchLocations(),
       this.fetchJobTemplates(),
-      this.fetchHiringStages()
+      this.fetchHiringStages(),
     ]);
 
     return {
       departments,
       locations,
       job_templates: templates,
-      hiring_stages: stages
+      hiring_stages: stages,
     };
   }
 
   private async fetchDepartments(): Promise<OptionItem[]> {
     const response = await fetch(`${this.baseUrl}/departments`, {
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218'
-      }
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+      },
     });
-    
+
     const data = await response.json();
-    return data.data.map(dept => ({
+    return data.data.map((dept) => ({
       id: dept.id,
       name: dept.attributes.name,
-      parent_id: dept.relationships?.parent?.data?.id || null
+      parent_id: dept.relationships?.parent?.data?.id || null,
     }));
   }
 
   private async fetchLocations(): Promise<OptionItem[]> {
     const response = await fetch(`${this.baseUrl}/locations`, {
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218'
-      }
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+      },
     });
-    
+
     const data = await response.json();
-    return data.data.map(loc => ({
+    return data.data.map((loc) => ({
       id: loc.id,
       name: loc.attributes.name,
       city: loc.attributes.city,
-      country: loc.attributes.country
+      country: loc.attributes.country,
     }));
   }
 
-  async publishJob(roleData: RoleData, integrationMeta: IntegrationMetadata): Promise<PublishResult> {
+  async publishJob(
+    roleData: RoleData,
+    integrationMeta: IntegrationMetadata
+  ): Promise<PublishResult> {
     const payload = this.transformRoleToTeamTailorJob(roleData, integrationMeta);
-    
+
     const response = await fetch(`${this.baseUrl}/jobs`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Token token=${this.apiKey}`,
-        'X-Api-Version': '20210218',
-        'Content-Type': 'application/vnd.api+json'
+        Authorization: `Token token=${this.apiKey}`,
+        "X-Api-Version": "20210218",
+        "Content-Type": "application/vnd.api+json",
       },
       body: JSON.stringify({
         data: {
-          type: 'jobs',
-          attributes: payload
-        }
-      })
+          type: "jobs",
+          attributes: payload,
+        },
+      }),
     });
 
     if (!response.ok) {
@@ -785,13 +797,13 @@ class TeamTailorIntegration extends BaseIntegration {
     return {
       external_entity_id: result.data.id,
       external_entity_url: `https://company.teamtailor.com/jobs/${result.data.id}`,
-      response_data: result.data
+      response_data: result.data,
     };
   }
 
   private transformRoleToTeamTailorJob(roleData: RoleData, integrationMeta: IntegrationMetadata) {
-    const selectedDepartment = integrationMeta.external_options.departments.find(d => d.selected);
-    const selectedLocation = integrationMeta.external_options.locations.find(l => l.selected);
+    const selectedDepartment = integrationMeta.external_options.departments.find((d) => d.selected);
+    const selectedLocation = integrationMeta.external_options.locations.find((l) => l.selected);
 
     return {
       name: roleData.title,
@@ -799,8 +811,8 @@ class TeamTailorIntegration extends BaseIntegration {
       requirements: roleData.requirements,
       department_id: selectedDepartment?.id,
       location_id: selectedLocation?.id,
-      status: 'published',
-      apply_button_text: 'Apply Now'
+      status: "published",
+      apply_button_text: "Apply Now",
     };
   }
 }
@@ -811,65 +823,73 @@ class TeamTailorIntegration extends BaseIntegration {
 ```typescript
 class EntityIntegrationService {
   async createEntityWithIntegration(
-    entityData: CreateEntityRequest, 
+    entityData: CreateEntityRequest,
     entityType: string,
     integrationProvider: string
   ): Promise<EntityWithIntegration> {
     // 1. Create base entity
     const entity = await this.createEntity(entityData, entityType);
-    
+
     // 2. Fetch external options
     const provider = this.getProvider(integrationProvider);
     const externalOptions = await provider.fetchOptions();
-    
+
     // 3. Cache external options
     await this.cacheExternalOptions(integrationProvider, externalOptions);
-    
+
     // 4. Create integration metadata
     const integrationMeta = await this.createIntegrationMetadata(
-      entity.entity_id, 
+      entity.entity_id,
       entityType,
-      integrationProvider, 
+      integrationProvider,
       externalOptions
     );
-    
+
     return {
       entity,
       integration_metadata: integrationMeta,
-      external_options: externalOptions
+      external_options: externalOptions,
     };
   }
 
-  async submitForApproval(entityId: string, entityType: string, submittedBy: string): Promise<void> {
-    await this.updatePublishState(entityId, entityType, 'pending_approval', {
+  async submitForApproval(
+    entityId: string,
+    entityType: string,
+    submittedBy: string
+  ): Promise<void> {
+    await this.updatePublishState(entityId, entityType, "pending_approval", {
       submitted_at: new Date().toISOString(),
-      submitted_by: submittedBy
+      submitted_by: submittedBy,
     });
-    
+
     // Send notifications to approvers
     await this.notifyApprovers(entityId, entityType);
   }
 
   async approveEntity(entityId: string, entityType: string, approvedBy: string): Promise<void> {
-    await this.updatePublishState(entityId, entityType, 'approved', {
+    await this.updatePublishState(entityId, entityType, "approved", {
       approved_at: new Date().toISOString(),
-      approved_by: approvedBy
+      approved_by: approvedBy,
     });
   }
 
-  async publishEntity(entityId: string, entityType: string, triggeredBy: string): Promise<PublishResult> {
+  async publishEntity(
+    entityId: string,
+    entityType: string,
+    triggeredBy: string
+  ): Promise<PublishResult> {
     const startTime = new Date();
-    
+
     try {
       // 1. Get entity and integration metadata
       const [entity, integrationMeta] = await Promise.all([
         this.getEntity(entityId, entityType),
-        this.getIntegrationMetadata(entityId, entityType)
+        this.getIntegrationMetadata(entityId, entityType),
       ]);
 
       // 2. Validate state
-      if (integrationMeta.publish_state !== 'approved') {
-        throw new Error('Entity must be approved before publishing');
+      if (integrationMeta.publish_state !== "approved") {
+        throw new Error("Entity must be approved before publishing");
       }
 
       // 3. Publish to external service
@@ -878,17 +898,34 @@ class EntityIntegrationService {
 
       // 4. Update states
       await Promise.all([
-        this.updatePublishState(entityId, entityType, 'published'),
+        this.updatePublishState(entityId, entityType, "published"),
         this.updateSyncState(entityId, entityType, publishResult),
-        this.logPublishingHistory(entityId, entityType, 'publish', 'success', publishResult, startTime, triggeredBy)
+        this.logPublishingHistory(
+          entityId,
+          entityType,
+          "publish",
+          "success",
+          publishResult,
+          startTime,
+          triggeredBy
+        ),
       ]);
 
       return publishResult;
     } catch (error) {
       // Handle failure
       await Promise.all([
-        this.updatePublishState(entityId, entityType, 'publish_failed'),
-        this.logPublishingHistory(entityId, entityType, 'publish', 'failed', null, startTime, triggeredBy, error)
+        this.updatePublishState(entityId, entityType, "publish_failed"),
+        this.logPublishingHistory(
+          entityId,
+          entityType,
+          "publish",
+          "failed",
+          null,
+          startTime,
+          triggeredBy,
+          error
+        ),
       ]);
       throw error;
     }
@@ -901,10 +938,10 @@ class EntityIntegrationService {
 ```typescript
 class EntityPublishWorkflowManager {
   async transitionState(
-    entityId: string, 
+    entityId: string,
     entityType: string,
-    fromState: EntityPublishState, 
-    toState: EntityPublishState, 
+    fromState: EntityPublishState,
+    toState: EntityPublishState,
     metadata: any = {}
   ): Promise<void> {
     // Validate transition
@@ -920,8 +957,8 @@ class EntityPublishWorkflowManager {
         record_id: `${entityType}_integration_meta_${entityId}`,
         publish_state: toState,
         ...metadata,
-        updated_at: new Date().toISOString()
-      }
+        updated_at: new Date().toISOString(),
+      },
     });
 
     // Log state transition
@@ -942,34 +979,34 @@ class EntityPublishWorkflowManager {
 
 ```typescript
 class EncryptionService {
-  private readonly algorithm = 'aes-256-gcm';
+  private readonly algorithm = "aes-256-gcm";
   private readonly key = process.env.INTEGRATIONS_ENCRYPTION_KEY;
 
   encryptValue(value: string): string {
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipher(this.algorithm, this.key);
     cipher.setAutoPadding(true);
-    
-    let encrypted = cipher.update(value, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    
+
+    let encrypted = cipher.update(value, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
     const authTag = cipher.getAuthTag();
-    
-    return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
+
+    return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
   }
 
   decryptValue(encryptedValue: string): string {
-    const [ivHex, authTagHex, encrypted] = encryptedValue.split(':');
-    
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    
+    const [ivHex, authTagHex, encrypted] = encryptedValue.split(":");
+
+    const iv = Buffer.from(ivHex, "hex");
+    const authTag = Buffer.from(authTagHex, "hex");
+
     const decipher = crypto.createDecipher(this.algorithm, this.key);
     decipher.setAuthTag(authTag);
-    
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
+
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+
     return decrypted;
   }
 }
@@ -981,22 +1018,22 @@ class EncryptionService {
 class TokenManager {
   async refreshTokenIfNeeded(instanceId: string): Promise<string> {
     const credentials = await this.getCredentials(instanceId);
-    
+
     // Check if token expires within 5 minutes
     if (this.isTokenExpiringSoon(credentials.expires_at)) {
       return await this.refreshToken(instanceId, credentials.refresh_token);
     }
-    
+
     return decryptValue(credentials.access_token);
   }
 
   private async refreshToken(instanceId: string, refreshToken: string): Promise<string> {
     const integration = await this.getIntegrationInstance(instanceId);
     const provider = this.getProvider(integration.integration_id);
-    
+
     try {
       const newTokens = await provider.refreshAccessToken(refreshToken);
-      
+
       // Update credentials in datastore
       await apiClient.datastoreCreate({
         identifier: "integrations_credentials",
@@ -1006,12 +1043,12 @@ class TokenManager {
           credentials: {
             access_token: encryptValue(newTokens.access_token),
             refresh_token: encryptValue(newTokens.refresh_token),
-            expires_at: new Date(Date.now() + newTokens.expires_in * 1000).toISOString()
+            expires_at: new Date(Date.now() + newTokens.expires_in * 1000).toISOString(),
           },
-          updated_at: new Date().toISOString()
-        }
+          updated_at: new Date().toISOString(),
+        },
       });
-      
+
       return newTokens.access_token;
     } catch (error) {
       await this.handleTokenRefreshFailure(instanceId, error);
@@ -1025,24 +1062,32 @@ class TokenManager {
 
 ```typescript
 class WebhookVerifier {
-  async verifyTeamTailorSignature(signature: string, payload: any, secret: string): Promise<boolean> {
+  async verifyTeamTailorSignature(
+    signature: string,
+    payload: any,
+    secret: string
+  ): Promise<boolean> {
     const expectedSignature = crypto
-      .createHmac('sha256', secret)
+      .createHmac("sha256", secret)
       .update(JSON.stringify(payload))
-      .digest('hex');
-    
+      .digest("hex");
+
     return signature === expectedSignature;
   }
 
-  async verifySalesforceSignature(signature: string, payload: any, secret: string): Promise<boolean> {
+  async verifySalesforceSignature(
+    signature: string,
+    payload: any,
+    secret: string
+  ): Promise<boolean> {
     const expectedSignature = crypto
-      .createHmac('sha256', secret)
+      .createHmac("sha256", secret)
       .update(JSON.stringify(payload))
-      .digest('base64');
-    
+      .digest("base64");
+
     return crypto.timingSafeEqual(
-      Buffer.from(signature, 'base64'),
-      Buffer.from(expectedSignature, 'base64')
+      Buffer.from(signature, "base64"),
+      Buffer.from(expectedSignature, "base64")
     );
   }
 }
@@ -1053,24 +1098,28 @@ class WebhookVerifier {
 ```typescript
 // Permission patterns for integration management
 const INTEGRATION_PERMISSIONS = {
-  'system.integrations.manage': 'Full integration system management',
-  'system.integrations.view': 'View integration configurations',
-  'app.integrations.configure': 'Configure app-specific integrations',
-  'app.integrations.sync': 'Trigger sync operations',
-  'app.integrations.logs': 'View sync logs and status',
-  'app.entities.approve': 'Approve entities for publishing',
-  'app.entities.publish': 'Publish approved entities to external services'
+  "system.integrations.manage": "Full integration system management",
+  "system.integrations.view": "View integration configurations",
+  "app.integrations.configure": "Configure app-specific integrations",
+  "app.integrations.sync": "Trigger sync operations",
+  "app.integrations.logs": "View sync logs and status",
+  "app.entities.approve": "Approve entities for publishing",
+  "app.entities.publish": "Publish approved entities to external services",
 };
 
 // Check permissions before integration operations
-async function checkIntegrationPermission(userId: string, action: string, appId?: string): Promise<boolean> {
+async function checkIntegrationPermission(
+  userId: string,
+  action: string,
+  appId?: string
+): Promise<boolean> {
   const permissionContext = {
     userId,
-    resource: 'integrations',
+    resource: "integrations",
     action,
-    appId: appId || 'system'
+    appId: appId || "system",
   };
-  
+
   const result = await apiClient.checkPermission(permissionContext);
   return result.granted;
 }
@@ -1083,10 +1132,10 @@ class DataPrivacyManager {
   async sanitizeDataForSync(data: any, integrationId: string): Promise<any> {
     const integration = await this.getIntegrationConfig(integrationId);
     const privacyRules = integration.privacy_settings;
-    
+
     // Remove or encrypt PII fields based on configuration
     const sanitized = { ...data };
-    
+
     for (const field of privacyRules.pii_fields || []) {
       if (sanitized[field]) {
         if (privacyRules.encrypt_pii) {
@@ -1096,7 +1145,7 @@ class DataPrivacyManager {
         }
       }
     }
-    
+
     return sanitized;
   }
 }
@@ -1115,7 +1164,7 @@ class LinkedInJobsIntegration extends BaseIntegration {
     // LinkedIn-specific options fetching
     const [companies, locations] = await Promise.all([
       this.fetchCompanies(),
-      this.fetchLocations()
+      this.fetchLocations(),
     ]);
 
     return { companies, locations };
@@ -1125,21 +1174,21 @@ class LinkedInJobsIntegration extends BaseIntegration {
     // LinkedIn job posting logic
     const linkedInJob = this.transformToLinkedInJob(roleData, metadata);
     const response = await this.postToLinkedIn(linkedInJob);
-    
+
     return {
       external_entity_id: response.id,
       external_entity_url: `https://linkedin.com/jobs/${response.id}`,
-      response_data: response
+      response_data: response,
     };
   }
 }
 
 // 2. Register provider in system
 const integrationRegistry = {
-  'teamtailor': TeamTailorIntegration,
-  'linkedin': LinkedInJobsIntegration,
-  'indeed': IndeedIntegration,
-  'salesforce': SalesforceIntegration
+  teamtailor: TeamTailorIntegration,
+  linkedin: LinkedInJobsIntegration,
+  indeed: IndeedIntegration,
+  salesforce: SalesforceIntegration,
 };
 
 // 3. Add to datastore registry
@@ -1155,8 +1204,8 @@ await apiClient.datastoreCreate({
     type: "job_board",
     capabilities: ["outbound_sync", "draft_workflow"],
     created_at: new Date().toISOString(),
-    created_by: "system"
-  }
+    created_by: "system",
+  },
 });
 ```
 
@@ -1213,36 +1262,36 @@ src/services/integrations/
 ```typescript
 class MultiProviderPublisher {
   async publishToMultipleProviders(
-    entityId: string, 
+    entityId: string,
     entityType: string,
     providers: string[]
   ): Promise<Record<string, PublishResult>> {
     const results: Record<string, PublishResult> = {};
-    
+
     for (const provider of providers) {
       try {
         results[provider] = await this.publishToProvider(entityId, entityType, provider);
       } catch (error) {
-        results[provider] = { 
-          error: error.message, 
-          status: 'failed',
+        results[provider] = {
+          error: error.message,
+          status: "failed",
           external_entity_id: null,
           external_entity_url: null,
-          response_data: null
+          response_data: null,
         };
       }
     }
-    
+
     return results;
   }
 
   private async publishToProvider(
-    entityId: string, 
+    entityId: string,
     entityType: string,
     provider: string
   ): Promise<PublishResult> {
     const integrationService = new EntityIntegrationService();
-    return await integrationService.publishEntity(entityId, entityType, 'system');
+    return await integrationService.publishEntity(entityId, entityType, "system");
   }
 }
 ```

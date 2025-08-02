@@ -1,23 +1,28 @@
 # Task 02: Workflow Engine Implementation
 
 ## Objective
+
 Implement the Draft → Approval → Publish workflow engine with state management, transitions, and approval logic.
 
 ## Dependencies
+
 - Task 01: Core Infrastructure Setup (requires base types and encryption)
 
 ## Expected Inputs
+
 - Core infrastructure from Task 01
 - Entity metadata data models
 - State transition matrix from design document
 
 ## Expected Outputs
+
 - Workflow state management system
 - Approval service with notification support
 - State transition validation
 - Entity integration service for workflow orchestration
 
 ## Required Tools/Auth
+
 - Datastore API access via `apiClient`
 - RBAC system integration
 - Notification system (for approvals)
@@ -25,6 +30,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 ## Implementation Checklist
 
 ### 1. State Management
+
 - [ ] Create `src/services/integrations/workflows/StateManager.ts`
 - [ ] Implement state persistence to datastore
 - [ ] Add state transition validation
@@ -32,6 +38,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Add state query methods
 
 ### 2. Workflow Manager
+
 - [ ] Create `src/services/integrations/workflows/EntityPublishWorkflow.ts`
 - [ ] Implement `transitionState()` method
 - [ ] Add `isValidTransition()` validation
@@ -39,6 +46,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Add state transition logging
 
 ### 3. Approval Service
+
 - [ ] Create `src/services/integrations/workflows/ApprovalService.ts`
 - [ ] Implement approval workflow logic
 - [ ] Add `getRequiredApprovers()` method
@@ -47,6 +55,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Implement rejection handling with reasons
 
 ### 4. Entity Integration Service
+
 - [ ] Create `src/services/integrations/core/EntityIntegrationService.ts`
 - [ ] Implement `createEntityWithIntegration()` method
 - [ ] Add `submitForApproval()` workflow trigger
@@ -55,6 +64,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Add entity state querying methods
 
 ### 5. Workflow Orchestration
+
 - [ ] Create workflow configuration management
 - [ ] Implement automatic approval conditions
 - [ ] Add escalation rules for stuck approvals
@@ -62,6 +72,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Add workflow analytics and reporting
 
 ### 6. Integration with Datastore
+
 - [ ] Implement datastore operations for workflow states
 - [ ] Add entity metadata CRUD operations
 - [ ] Include publishing history tracking
@@ -69,12 +80,14 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 - [ ] Implement state synchronization
 
 ### 7. RBAC Integration
+
 - [ ] Add permission checks for workflow actions
 - [ ] Implement role-based approval routing
 - [ ] Include audit logging for all workflow actions
 - [ ] Add user context to workflow operations
 
 ## Validation Steps
+
 1. State transitions follow the defined matrix correctly
 2. Invalid transitions are rejected with proper errors
 3. Approval workflows route to correct approvers
@@ -83,6 +96,7 @@ Implement the Draft → Approval → Publish workflow engine with state manageme
 6. Workflow history is maintained accurately
 
 ## Files to Create
+
 - `src/services/integrations/workflows/StateManager.ts`
 - `src/services/integrations/workflows/EntityPublishWorkflow.ts`
 - `src/services/integrations/workflows/ApprovalService.ts`

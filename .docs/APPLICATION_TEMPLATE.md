@@ -79,19 +79,20 @@ export const msalConfig: Configuration = {
   auth: {
     clientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID!,
     authority: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_TENANT_ID}`,
-    redirectUri: typeof window !== 'undefined' ? window.location.origin : ''
-  }
+    redirectUri: typeof window !== "undefined" ? window.location.origin : "",
+  },
 };
 
 export const loginRequest: RedirectRequest = {
-  scopes: ['User.Read', 'User.Read.All', 'User.ReadBasic.All', 'User.ReadWrite'],
-  prompt: 'select_account'
+  scopes: ["User.Read", "User.Read.All", "User.ReadBasic.All", "User.ReadWrite"],
+  prompt: "select_account",
 };
 ```
 
 ### 2. Authentication Context
 
 The AuthContext manages:
+
 - **Authentication State**: `isAuthenticated`, `user`, `accessToken`, `loading`
 - **Login Flow**: MSAL popup → Microsoft Graph profile → Backend token exchange
 - **Token Management**: localStorage persistence with validation
@@ -110,14 +111,15 @@ The AuthContext manages:
 ### 4. Console Logging for Development
 
 ```typescript
-console.log('Microsoft Login Response:', loginResponse);
-console.log('Backend API Response:', { access_token, user });
-console.log('Enhanced User:', enhancedUser);
+console.log("Microsoft Login Response:", loginResponse);
+console.log("Backend API Response:", { access_token, user });
+console.log("Enhanced User:", enhancedUser);
 ```
 
 ## UI Components
 
 ### Design System
+
 - **Colors**: Linear gradients (`#1890ff` to `#722ed1`)
 - **Spacing**: Consistent 16px, 24px, 32px increments
 - **Typography**: Ant Design Typography components
@@ -128,6 +130,7 @@ console.log('Enhanced User:', enhancedUser);
 ### Component Architecture (SOLID Principles)
 
 #### Dashboard Components
+
 - `WelcomeSection`: Hero section with user greeting
 - `StatsSection`: Grid of statistical cards
 - `StatCard`: Individual metric display with trends
@@ -135,6 +138,7 @@ console.log('Enhanced User:', enhancedUser);
 - `SystemHealth`: API testing and health monitoring
 
 #### Form Components
+
 - Template-based forms with quick-fill buttons
 - JSON validation and syntax highlighting
 - Real-time error handling and notifications
@@ -143,6 +147,7 @@ console.log('Enhanced User:', enhancedUser);
 ## Navigation System
 
 ### Sidebar Layout
+
 - **Collapsible**: Default 280px width, collapses to 80px
 - **Light Theme**: Clean white background with subtle borders
 - **User Profile**: Bottom-positioned with dropdown menu
@@ -150,6 +155,7 @@ console.log('Enhanced User:', enhancedUser);
 - **Menu Items**: Icon + label format with active state highlighting
 
 ### Navigation Structure
+
 ```typescript
 const menuItems = [
   {
@@ -168,6 +174,7 @@ const menuItems = [
 ## API Integration
 
 ### API Client Service
+
 ```typescript
 // src/services/api.ts
 class APIClient {
@@ -183,6 +190,7 @@ class APIClient {
 ```
 
 ### Supported Operations
+
 - **CRUD Operations**: Create, Read, Update, Delete
 - **Datastore Operations**: Custom retrieve with filters
 - **Authentication**: Token exchange and validation
@@ -191,6 +199,7 @@ class APIClient {
 ## Environment Configuration
 
 ### Required Environment Variables
+
 ```env
 NEXT_PUBLIC_AZURE_CLIENT_ID=your_azure_client_id
 NEXT_PUBLIC_AZURE_TENANT_ID=your_azure_tenant_id
@@ -198,6 +207,7 @@ NEXT_PUBLIC_API_BASE_URL=your_backend_api_url
 ```
 
 ### Microsoft Azure App Registration
+
 1. **Scopes Required**: `User.Read`, `User.Read.All`, `User.ReadBasic.All`, `User.ReadWrite`
 2. **Authentication Type**: Public client (SPA)
 3. **Redirect URIs**: Your application domain
@@ -206,6 +216,7 @@ NEXT_PUBLIC_API_BASE_URL=your_backend_api_url
 ## Implementation Guide
 
 ### 1. Project Setup
+
 ```bash
 npx create-next-app@latest your-app-name --typescript --tailwind --eslint --app
 cd your-app-name
@@ -214,6 +225,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 ```
 
 ### 2. Core Implementation Steps
+
 1. **Setup MSAL Configuration**: Configure Azure client and tenant IDs
 2. **Create Authentication Context**: Implement login/logout and state management
 3. **Build Navigation System**: Implement Ant Design sidebar with routing
@@ -223,6 +235,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 7. **Setup API Integration**: Create centralized API client with token management
 
 ### 3. Component Development Pattern
+
 1. **Create Base Component**: Start with Ant Design Card container
 2. **Add Business Logic**: Implement feature-specific functionality
 3. **Style Consistently**: Use established design tokens and patterns
@@ -233,6 +246,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 ## Key Features
 
 ### Authentication Features
+
 - ✅ Microsoft SSO with popup flow
 - ✅ Profile picture integration from Microsoft Graph
 - ✅ Token persistence and validation
@@ -240,6 +254,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 - ✅ Protected route implementation
 
 ### UI/UX Features
+
 - ✅ Responsive sidebar navigation
 - ✅ Consistent Ant Design theming
 - ✅ Loading states and skeleton screens
@@ -247,6 +262,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 - ✅ Modular component architecture
 
 ### Development Features
+
 - ✅ TypeScript full coverage
 - ✅ Console logging for development
 - ✅ Error boundary implementation
@@ -256,6 +272,7 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 ## Best Practices
 
 ### Code Organization
+
 1. **Barrel Exports**: Use index.ts files for clean imports
 2. **Component Separation**: Keep components focused and single-responsibility
 3. **Type Safety**: Define interfaces for all data structures
@@ -263,18 +280,21 @@ npm install @ant-design/v5-patch-for-react-19  # React 19 compatibility
 5. **Performance**: Use React.memo for expensive components
 
 ### Authentication Security
+
 1. **Token Storage**: Use localStorage with validation
 2. **Route Protection**: Wrap sensitive routes with authentication checks
 3. **Token Refresh**: Handle token expiration gracefully
 4. **Logout Cleanup**: Clear all storage and cookies on logout
 
 ### UI Consistency
+
 1. **Design Tokens**: Use consistent spacing, colors, and typography
 2. **Component Patterns**: Establish reusable patterns for common elements
 3. **Responsive Design**: Ensure mobile-first responsive implementation
 4. **Loading States**: Provide immediate feedback for all async operations
 
 ### Development Workflow
+
 1. **Console Logging**: Use structured logging for development debugging
 2. **Environment Variables**: Keep sensitive data in environment variables
 3. **Component Testing**: Build components in isolation before integration

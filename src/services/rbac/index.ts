@@ -1,10 +1,10 @@
 // RBAC Service Barrel Exports
 
-export { UserService, userService } from './userService';
-export { RoleService, roleService } from './roleService';
-export { PermissionService, permissionService } from './permissionService';
-export { ApplicationService, applicationService } from './applicationService';
-export { BootstrapService, bootstrapService } from './bootstrapService';
+export { UserService, userService } from "./userService";
+export { RoleService, roleService } from "./roleService";
+export { PermissionService, permissionService } from "./permissionService";
+export { ApplicationService, applicationService } from "./applicationService";
+export { BootstrapService, bootstrapService } from "./bootstrapService";
 
 // Re-export types for convenience
 export type {
@@ -28,5 +28,5 @@ export type {
   SystemBootstrapConfig,
   SystemHealthCheck,
   RBACError,
-  RBACErrorCode
-} from '@/types/rbac';
+  RBACErrorCode,
+} from "@/types/rbac";

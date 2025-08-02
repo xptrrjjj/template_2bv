@@ -1,9 +1,9 @@
-import React from 'react';
-import { Layout } from 'antd';
-import { User } from '@/types/auth';
-import { BrandLogo } from './BrandLogo';
-import { NavigationMenu } from './NavigationMenu';
-import { UserProfile } from './UserProfile';
+import React from "react";
+import { Layout } from "antd";
+import { User } from "@/types/auth";
+import { BrandLogo } from "./BrandLogo";
+import { NavigationMenu } from "./NavigationMenu";
+import { UserProfile } from "./UserProfile";
 
 const { Sider } = Layout;
 
@@ -26,7 +26,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   openKeys,
   onOpenChange,
   onMenuClick,
-  onLogout
+  onLogout,
 }) => {
   return (
     <Sider
@@ -35,30 +35,26 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       onCollapse={onCollapse}
       width={280}
       style={{
-        background: '#fff',
-        borderRight: '1px solid #f0f0f0',
-        boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
-        display: 'flex',
-        flexDirection: 'column'
+        background: "#fff",
+        borderRight: "1px solid #f0f0f0",
+        boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+        display: "flex",
+        flexDirection: "column",
       }}
       theme="light"
       collapsedWidth={80}
       reverseArrow
     >
       <BrandLogo collapsed={collapsed} />
-      
+
       <NavigationMenu
         selectedKeys={selectedKeys}
         openKeys={openKeys}
         onOpenChange={onOpenChange}
         onMenuClick={onMenuClick}
       />
-      
-      <UserProfile
-        user={user}
-        collapsed={collapsed}
-        onLogout={onLogout}
-      />
+
+      <UserProfile user={user} collapsed={collapsed} onLogout={onLogout} />
     </Sider>
   );
 };

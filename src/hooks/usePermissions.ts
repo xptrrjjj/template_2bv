@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * Hook to get current user's permissions
  */
 export const usePermissions = (appId?: string) => {
   const { userPermissions, currentApp, refreshPermissions } = useAuth();
-  
+
   const targetAppId = appId || currentApp;
-  
+
   // Filter permissions by app if specified
-  const filteredPermissions = userPermissions.filter(permission => {
-    if (permission.scope === 'global') return true;
-    if (permission.scope === 'app' && permission.app_id === targetAppId) return true;
+  const filteredPermissions = userPermissions.filter((permission) => {
+    if (permission.scope === "global") return true;
+    if (permission.scope === "app" && permission.app_id === targetAppId) return true;
     return false;
   });
 
@@ -40,7 +40,7 @@ export const useHasPermission = (resource: string, action: string, appId?: strin
         const result = await checkPermission(resource, action, targetAppId);
         setHasPermission(result);
       } catch (error) {
-        console.error('Permission check failed:', error);
+        console.error("Permission check failed:", error);
         setHasPermission(false);
       } finally {
         setLoading(false);
@@ -69,9 +69,9 @@ export const useHasRole = (roleId: string, appId?: string) => {
  */
 export const useUserRoles = (appId?: string) => {
   const { userRoles, rbacUser, currentApp } = useAuth();
-  
+
   const targetAppId = appId || currentApp;
-  
+
   if (!rbacUser) {
     return {
       globalRoles: [],
@@ -80,10 +80,8 @@ export const useUserRoles = (appId?: string) => {
     };
   }
 
-  const globalRoles = userRoles.filter(role => role.scope === 'global');
-  const appRoles = userRoles.filter(role => 
-    role.scope === 'app' && role.app_id === targetAppId
-  );
+  const globalRoles = userRoles.filter((role) => role.scope === "global");
+  const appRoles = userRoles.filter((role) => role.scope === "app" && role.app_id === targetAppId);
 
   return {
     globalRoles,
@@ -113,7 +111,7 @@ export const useIsSuperAdmin = () => {
  */
 export const useApplications = () => {
   const { rbacUser } = useAuth();
-  
+
   if (!rbacUser) {
     return {
       applications: [],
@@ -123,7 +121,7 @@ export const useApplications = () => {
 
   // Extract unique app IDs from user's app roles
   const appIds = Object.keys(rbacUser.app_roles);
-  
+
   return {
     applications: appIds,
     hasApplications: appIds.length > 0,
@@ -133,7 +131,12 @@ export const useApplications = () => {
 /**
  * Hook for permission-based navigation filtering
  */
-export const usePermissionFilter = <T extends { requiredPermission?: { resource: string; action: string; appId?: string }; requiredRole?: string[] }>(
+export const usePermissionFilter = <
+  T extends {
+    requiredPermission?: { resource: string; action: string; appId?: string };
+    requiredRole?: string[];
+  },
+>(
   items: T[],
   appId?: string
 ) => {
@@ -162,19 +165,19 @@ export const usePermissionFilter = <T extends { requiredPermission?: { resource:
         // Check role requirement for non-super-admins
         if (item.requiredRole && item.requiredRole.length > 0) {
           hasAccess = false;
-          
+
           // Check global roles
           if (rbacUser.global_roles) {
-            hasAccess = item.requiredRole.some(roleId => rbacUser.global_roles.includes(roleId));
+            hasAccess = item.requiredRole.some((roleId) => rbacUser.global_roles.includes(roleId));
           }
-          
+
           // Check app-specific roles if not already granted
           if (!hasAccess && rbacUser.app_roles && targetAppId) {
             const appRoles = rbacUser.app_roles[targetAppId] || [];
-            hasAccess = item.requiredRole.some(roleId => appRoles.includes(roleId));
+            hasAccess = item.requiredRole.some((roleId) => appRoles.includes(roleId));
           }
         }
-        
+
         // For permission-based access, super admins already have access
         // For now, we'll allow non-super-admins with roles to access permission-based items
         // This is a simplified approach - you can enhance this later
@@ -200,7 +203,7 @@ export const usePermissionFilter = <T extends { requiredPermission?: { resource:
  */
 export const usePermissionUpdates = () => {
   const { refreshPermissions, rbacLoading } = useAuth();
-  
+
   return {
     refreshPermissions,
     loading: rbacLoading,
@@ -212,9 +215,9 @@ export const usePermissionUpdates = () => {
  */
 export const usePermissionSummary = (appId?: string) => {
   const { rbacUser, userRoles, userPermissions, currentApp } = useAuth();
-  
+
   const targetAppId = appId || currentApp;
-  
+
   if (!rbacUser) {
     return {
       summary: {
@@ -231,19 +234,18 @@ export const usePermissionSummary = (appId?: string) => {
     };
   }
 
-  const globalRoles = userRoles.filter(role => role.scope === 'global');
-  const appRoles = userRoles.filter(role => 
-    role.scope === 'app' && role.app_id === targetAppId
-  );
-  
-  const globalPermissions = userPermissions.filter(p => p.scope === 'global');
-  const appPermissions = userPermissions.filter(p => 
-    p.scope === 'app' && p.app_id === targetAppId
+  const globalRoles = userRoles.filter((role) => role.scope === "global");
+  const appRoles = userRoles.filter((role) => role.scope === "app" && role.app_id === targetAppId);
+
+  const globalPermissions = userPermissions.filter((p) => p.scope === "global");
+  const appPermissions = userPermissions.filter(
+    (p) => p.scope === "app" && p.app_id === targetAppId
   );
 
-  const hasAdminAccess = rbacUser.is_super_admin || 
-    rbacUser.global_roles.includes('system_admin') ||
-    (rbacUser.app_roles[targetAppId] || []).some(roleId => roleId.includes('admin'));
+  const hasAdminAccess =
+    rbacUser.is_super_admin ||
+    rbacUser.global_roles.includes("system_admin") ||
+    (rbacUser.app_roles[targetAppId] || []).some((roleId) => roleId.includes("admin"));
 
   return {
     summary: {
@@ -279,8 +281,8 @@ export const useHasPermissions = (
         const key = `${perm.resource}.${perm.action}.${perm.appId || currentApp}`;
         try {
           newResults[key] = await checkPermission(
-            perm.resource, 
-            perm.action, 
+            perm.resource,
+            perm.action,
             perm.appId || currentApp
           );
         } catch (error) {
@@ -304,14 +306,14 @@ export const useHasPermissions = (
   };
 
   const hasAllPermissions = () => {
-    return permissions.every(perm => {
+    return permissions.every((perm) => {
       const key = `${perm.resource}.${perm.action}.${perm.appId || currentApp}`;
       return results[key];
     });
   };
 
   const hasAnyPermission = () => {
-    return permissions.some(perm => {
+    return permissions.some((perm) => {
       const key = `${perm.resource}.${perm.action}.${perm.appId || currentApp}`;
       return results[key];
     });

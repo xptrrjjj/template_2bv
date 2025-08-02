@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { ReactNode } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import LoginPage from '@/app/login/page';
-import { DashboardSkeleton } from '@/components/loading/DashboardSkeleton';
+import React, { ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import LoginPage from "@/app/login/page";
+import { DashboardSkeleton } from "@/components/loading/DashboardSkeleton";
 
 interface ProtectedRouteProps {
   children: ReactNode;

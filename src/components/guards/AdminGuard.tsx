@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Result } from 'antd';
-import { CrownOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { useIsAdmin, useIsSuperAdmin } from '@/hooks/usePermissions';
+import React from "react";
+import { Result } from "antd";
+import { CrownOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import { useIsAdmin, useIsSuperAdmin } from "@/hooks/usePermissions";
 
 interface AdminOnlyProps {
   appId?: string;
@@ -37,12 +37,17 @@ export const AdminOnly: React.FC<AdminOnlyProps> = ({
         status="403"
         title="Admin Access Required"
         subTitle="You need administrator privileges to access this content."
-        icon={<CrownOutlined style={{ color: '#faad14' }} />}
+        icon={<CrownOutlined style={{ color: "#faad14" }} />}
         extra={
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <p style={{ color: '#8c8c8c', fontSize: '14px' }}>
+          <div style={{ textAlign: "center", marginTop: "16px" }}>
+            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
               Required: Administrator role
-              {appId && <><br />Application: <code>{appId}</code></>}
+              {appId && (
+                <>
+                  <br />
+                  Application: <code>{appId}</code>
+                </>
+              )}
             </p>
           </div>
         }
@@ -83,12 +88,10 @@ export const SuperAdminOnly: React.FC<SuperAdminOnlyProps> = ({
         status="403"
         title="Super Admin Access Required"
         subTitle="You need super administrator privileges to access this content."
-        icon={<SafetyCertificateOutlined style={{ color: '#722ed1' }} />}
+        icon={<SafetyCertificateOutlined style={{ color: "#722ed1" }} />}
         extra={
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <p style={{ color: '#8c8c8c', fontSize: '14px' }}>
-              Required: Super Administrator role
-            </p>
+          <div style={{ textAlign: "center", marginTop: "16px" }}>
+            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>Required: Super Administrator role</p>
           </div>
         }
       />
@@ -113,7 +116,7 @@ export const DeveloperOnly: React.FC<DeveloperOnlyProps> = ({
   fallback,
   showFallback = false,
 }) => {
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = process.env.NODE_ENV === "development";
   const isSuperAdmin = useIsSuperAdmin();
 
   // Show content if in development or user is super admin

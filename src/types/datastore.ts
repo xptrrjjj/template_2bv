@@ -1,4 +1,4 @@
-export type DatastoreAction = 'create' | 'update' | 'append' | 'delete' | 'delete_all';
+export type DatastoreAction = "create" | "update" | "append" | "delete" | "delete_all";
 
 export interface DatastoreCreateRequest {
   identifier: string;
@@ -12,7 +12,7 @@ export interface DatastoreRetrieveRequest {
 }
 
 export interface DatastoreResponse {
-  status: 'success' | 'error';
+  status: "success" | "error";
   data?: unknown[];
   message?: string;
 }

@@ -9,24 +9,28 @@ The RBAC system is a multi-application, datastore-first access control system th
 ## Key Features
 
 ### ✅ Multi-Application Architecture
+
 - App-agnostic roles (`admin`, `editor`, `viewer`) work across applications
 - Application-scoped permissions with pattern `{app_id}.{resource}.{action}`
 - Shared user identity across all applications
 - Easy addition of new applications without code changes
 
 ### ✅ Datastore-First Approach
+
 - All RBAC data stored exclusively in Datastore
 - Zero compile-time role/permission definitions
 - Runtime creation and modification of roles/permissions
 - Bearer token authentication for all operations
 
 ### ✅ Microsoft Integration
+
 - Seamless integration with existing MSAL authentication
 - Automatic user provisioning during login
 - Profile picture and user data sync from Microsoft Graph
 - Super admin detection via Microsoft Object IDs
 
 ### ✅ Real-Time Permission System
+
 - Dynamic permission checking with <100ms response time
 - Client-side permission caching for optimal UX
 - Permission-aware navigation and component rendering
@@ -64,16 +68,19 @@ The RBAC system is a multi-application, datastore-first access control system th
 ## Core Components
 
 ### 1. Type System (`src/types/rbac.ts`)
+
 - Complete TypeScript definitions for all RBAC entities
 - Type-safe interfaces for requests and responses
 - Error handling with custom RBAC error types
 
 ### 2. API Client (`src/services/api.ts`)
+
 - Extended with comprehensive RBAC operations
 - Bearer token authentication for all requests
 - Type-safe datastore operations
 
 ### 3. Service Layer (`src/services/rbac/`)
+
 - **UserService**: User provisioning, role assignment, management
 - **RoleService**: Role creation, permission assignment, templates
 - **PermissionService**: Permission management, usage tracking
@@ -81,12 +88,14 @@ The RBAC system is a multi-application, datastore-first access control system th
 - **BootstrapService**: System initialization and maintenance
 
 ### 4. Authentication Context (`src/contexts/AuthContext.tsx`)
+
 - Enhanced with RBAC state management
 - Real-time permission checking
 - User provisioning during Microsoft login
 - Permission caching and updates
 
 ### 5. Hooks (`src/hooks/usePermissions.ts`)
+
 - `usePermissions()` - Get current user's permissions
 - `useHasPermission()` - Check specific permission
 - `useHasRole()` - Check role assignment
@@ -94,12 +103,14 @@ The RBAC system is a multi-application, datastore-first access control system th
 - `usePermissionFilter()` - Filter UI elements by permissions
 
 ### 6. Guard Components (`src/components/guards/`)
+
 - `PermissionGuard` - Component-level permission protection
 - `RoleGuard` - Role-based access control
 - `AdminOnly` / `SuperAdminOnly` - Admin-specific guards
 - Customizable fallback content for denied access
 
 ### 7. Admin Interface (`src/app/admin/`)
+
 - **Dashboard** (`/admin`) - System overview and statistics
 - **User Management** (`/admin/users`) - Manage users and role assignments
 - **Role Management** (`/admin/roles`) - Create and manage roles
@@ -108,34 +119,38 @@ The RBAC system is a multi-application, datastore-first access control system th
 ## Permission System
 
 ### Global Permissions
+
 ```typescript
-'system.admin'              // Full system administration
-'system.users.read'         // View all users
-'system.users.write'        // Manage users
-'system.roles.read'         // View all roles
-'system.roles.write'        // Manage system roles
-'system.permissions.read'   // View all permissions
-'system.applications.read'  // View registered applications
+"system.admin"; // Full system administration
+"system.users.read"; // View all users
+"system.users.write"; // Manage users
+"system.roles.read"; // View all roles
+"system.roles.write"; // Manage system roles
+"system.permissions.read"; // View all permissions
+"system.applications.read"; // View registered applications
 ```
 
 ### Application Permissions
+
 ```typescript
-'{app_id}.dashboard.read'   // View application dashboard
-'{app_id}.dashboard.write'  // Modify application dashboard
-'{app_id}.data.read'        // Read application data
-'{app_id}.data.write'       // Create/update application data
-'{app_id}.data.delete'      // Delete application data
-'{app_id}.admin.users'      // Manage app users
-'{app_id}.admin.settings'   // Manage app settings
+"{app_id}.dashboard.read"; // View application dashboard
+"{app_id}.dashboard.write"; // Modify application dashboard
+"{app_id}.data.read"; // Read application data
+"{app_id}.data.write"; // Create/update application data
+"{app_id}.data.delete"; // Delete application data
+"{app_id}.admin.users"; // Manage app users
+"{app_id}.admin.settings"; // Manage app settings
 ```
 
 ## System Roles
 
 ### Global Roles
+
 - **super_admin** - Full system access across all applications
 - **system_admin** - System administration without super admin privileges
 
 ### Application Roles (Template)
+
 - **app_admin** - Full administration within a specific application
 - **app_editor** - Create and edit content within a specific application
 - **app_viewer** - Read-only access to a specific application
@@ -143,24 +158,27 @@ The RBAC system is a multi-application, datastore-first access control system th
 ## Usage Examples
 
 ### Protecting Components with Permissions
+
 ```tsx
-import { PermissionGuard } from '@/components/guards';
+import { PermissionGuard } from "@/components/guards";
 
 <PermissionGuard resource="users" action="read" appId="recruitment">
   <UserManagementComponent />
-</PermissionGuard>
+</PermissionGuard>;
 ```
 
 ### Role-Based Access Control
-```tsx
-import { RoleGuard } from '@/components/guards';
 
-<RoleGuard roles={['admin', 'super_admin']} appId="recruitment">
+```tsx
+import { RoleGuard } from "@/components/guards";
+
+<RoleGuard roles={["admin", "super_admin"]} appId="recruitment">
   <AdminPanel />
-</RoleGuard>
+</RoleGuard>;
 ```
 
 ### Admin-Only Content
+
 ```tsx
 import { AdminOnly, SuperAdminOnly } from '@/components/guards';
 
@@ -174,15 +192,16 @@ import { AdminOnly, SuperAdminOnly } from '@/components/guards';
 ```
 
 ### Using Permission Hooks
+
 ```tsx
-import { useHasPermission, useIsAdmin } from '@/hooks/usePermissions';
+import { useHasPermission, useIsAdmin } from "@/hooks/usePermissions";
 
 function MyComponent() {
-  const { hasPermission, loading } = useHasPermission('users', 'write');
+  const { hasPermission, loading } = useHasPermission("users", "write");
   const isAdmin = useIsAdmin();
 
   if (loading) return <Spinner />;
-  
+
   return (
     <div>
       {hasPermission && <EditUserButton />}
@@ -193,23 +212,24 @@ function MyComponent() {
 ```
 
 ### Permission-Aware Navigation
+
 ```tsx
 const menuItems: NavigationItem[] = [
   {
-    key: '/dashboard',
+    key: "/dashboard",
     icon: <HomeOutlined />,
-    label: 'Dashboard',
+    label: "Dashboard",
     requiredPermission: {
-      resource: 'dashboard',
-      action: 'read'
-    }
+      resource: "dashboard",
+      action: "read",
+    },
   },
   {
-    key: '/admin',
+    key: "/admin",
     icon: <SettingOutlined />,
-    label: 'Administration',
-    requiredRole: ['super_admin', 'system_admin']
-  }
+    label: "Administration",
+    requiredRole: ["super_admin", "system_admin"],
+  },
 ];
 ```
 
@@ -247,6 +267,7 @@ The system automatically bootstraps itself on first run:
 ### Manual Bootstrap Operations
 
 Access the System Administration panel (`/admin/system`) to:
+
 - **Bootstrap System** - Initialize all components
 - **Repair System** - Fix common configuration issues
 - **Reset System** - Complete system reset (dangerous)
@@ -254,17 +275,20 @@ Access the System Administration panel (`/admin/system`) to:
 ## Security Features
 
 ### Token-Based Authentication
+
 - All RBAC operations require valid Microsoft Bearer token
 - Token validation on every permission check
 - Automatic token refresh integration
 
 ### Data Protection
+
 - All sensitive RBAC data encrypted in datastore
 - Complete audit trail for all permission changes
 - No client-side storage of sensitive permission data
 - Rate limiting on permission checking APIs
 
 ### Permission Checking Strategy
+
 - Server-side verification when possible
 - Client-side caching for optimal user experience
 - Real-time permission updates
@@ -273,18 +297,21 @@ Access the System Administration panel (`/admin/system`) to:
 ## Development Workflow
 
 ### Adding New Permissions
+
 1. Define permission in application service
 2. Add permission to appropriate roles
 3. Use `PermissionGuard` to protect components
 4. Test with different user roles
 
 ### Creating Custom Roles
+
 1. Use Role Management interface (`/admin/roles`)
 2. Select appropriate permissions
 3. Assign to users via User Management
 4. Test role functionality
 
 ### Adding New Applications
+
 1. Register application via System Settings
 2. Define app-specific permissions
 3. Create app-specific roles
@@ -293,12 +320,14 @@ Access the System Administration panel (`/admin/system`) to:
 ## Troubleshooting
 
 ### Common Issues
+
 1. **User not provisioned** - Check Microsoft OID in logs
 2. **Permissions not loading** - Verify token validity
 3. **Bootstrap fails** - Check environment variables
 4. **Navigation not filtering** - Verify permission configuration
 
 ### Debug Tools
+
 - Console logging for authentication flow
 - System health monitoring in admin panel
 - Bootstrap progress tracking
@@ -315,6 +344,7 @@ Access the System Administration panel (`/admin/system`) to:
 ## Migration and Rollout
 
 The system is designed for gradual rollout:
+
 1. **Foundation Phase** - Deploy core services (no UI changes)
 2. **Admin Phase** - Enable role management for admins
 3. **Guard Phase** - Add permission checks to components

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Result, Spin } from 'antd';
-import { LockOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useHasPermission } from '@/hooks/usePermissions';
+import React from "react";
+import { Result, Spin } from "antd";
+import { LockOutlined, LoadingOutlined } from "@ant-design/icons";
+import { useHasPermission } from "@/hooks/usePermissions";
 
 interface PermissionGuardProps {
   resource: string;
@@ -29,15 +29,15 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        padding: '20px' 
-      }}>
-        <Spin 
-          indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} 
-        />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
       </div>
     );
   }
@@ -56,12 +56,20 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
         status="403"
         title="Access Denied"
         subTitle={`You don't have permission to ${action} ${resource}.`}
-        icon={<LockOutlined style={{ color: '#ff4d4f' }} />}
+        icon={<LockOutlined style={{ color: "#ff4d4f" }} />}
         extra={
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <p style={{ color: '#8c8c8c', fontSize: '14px' }}>
-              Required permission: <code>{resource}.{action}</code>
-              {appId && <><br />Application: <code>{appId}</code></>}
+          <div style={{ textAlign: "center", marginTop: "16px" }}>
+            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
+              Required permission:{" "}
+              <code>
+                {resource}.{action}
+              </code>
+              {appId && (
+                <>
+                  <br />
+                  Application: <code>{appId}</code>
+                </>
+              )}
             </p>
           </div>
         }
@@ -74,7 +82,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
 interface MultiPermissionGuardProps {
   permissions: Array<{ resource: string; action: string; appId?: string }>;
-  operator?: 'AND' | 'OR';
+  operator?: "AND" | "OR";
   children: React.ReactNode;
   fallback?: React.ReactNode;
   showFallback?: boolean;
@@ -85,40 +93,41 @@ interface MultiPermissionGuardProps {
  */
 export const MultiPermissionGuard: React.FC<MultiPermissionGuardProps> = ({
   permissions,
-  operator = 'AND',
+  operator = "AND",
   children,
   fallback,
   showFallback = true,
 }) => {
   // Get permission results for all permissions
-  const permissionResults = permissions.map(perm => 
+  const permissionResults = permissions.map((perm) =>
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useHasPermission(perm.resource, perm.action, perm.appId)
   );
-  
+
   // Check if any results are still loading
-  const isLoading = permissionResults.some(result => result.loading);
-  
+  const isLoading = permissionResults.some((result) => result.loading);
+
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        padding: '20px' 
-      }}>
-        <Spin 
-          indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} 
-        />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
       </div>
     );
   }
-  
+
   // Apply AND/OR logic
-  const hasRequiredPermissions = operator === 'AND'
-    ? permissionResults.every(result => result.hasPermission)
-    : permissionResults.some(result => result.hasPermission);
-  
+  const hasRequiredPermissions =
+    operator === "AND"
+      ? permissionResults.every((result) => result.hasPermission)
+      : permissionResults.some((result) => result.hasPermission);
+
   if (!hasRequiredPermissions) {
     if (fallback) {
       return <>{fallback}</>;
@@ -132,18 +141,22 @@ export const MultiPermissionGuard: React.FC<MultiPermissionGuardProps> = ({
       <Result
         status="403"
         title="Access Denied"
-        subTitle={`You need ${operator === 'AND' ? 'all' : 'one'} of the required permissions.`}
-        icon={<LockOutlined style={{ color: '#ff4d4f' }} />}
+        subTitle={`You need ${operator === "AND" ? "all" : "one"} of the required permissions.`}
+        icon={<LockOutlined style={{ color: "#ff4d4f" }} />}
         extra={
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <p style={{ color: '#8c8c8c', fontSize: '14px' }}>
-              Required permissions: {permissions.map(perm => 
-                <code key={`${perm.resource}.${perm.action}`}>
-                  {perm.resource}.{perm.action}
-                </code>
-              ).reduce((acc, curr, i) => 
-                i === 0 ? [curr] : [...acc, ', ', curr], [] as React.ReactNode[]
-              )}
+          <div style={{ textAlign: "center", marginTop: "16px" }}>
+            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
+              Required permissions:{" "}
+              {permissions
+                .map((perm) => (
+                  <code key={`${perm.resource}.${perm.action}`}>
+                    {perm.resource}.{perm.action}
+                  </code>
+                ))
+                .reduce(
+                  (acc, curr, i) => (i === 0 ? [curr] : [...acc, ", ", curr]),
+                  [] as React.ReactNode[]
+                )}
             </p>
           </div>
         }
@@ -179,12 +192,7 @@ export const ConditionalPermissionGuard: React.FC<ConditionalPermissionGuardProp
   }
 
   return (
-    <PermissionGuard
-      resource={resource}
-      action={action}
-      appId={appId}
-      fallback={fallback}
-    >
+    <PermissionGuard resource={resource} action={action} appId={appId} fallback={fallback}>
       {children}
     </PermissionGuard>
   );
