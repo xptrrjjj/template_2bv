@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Layout, Card, Typography, Row, Col, Statistic, Space } from 'antd';
+import { Card, Typography, Row, Col, Statistic, Space } from 'antd';
 import { 
   UserOutlined, 
   SafetyCertificateOutlined, 
@@ -13,7 +13,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/services/api';
 
-const { Content } = Layout;
 const { Title, Text } = Typography;
 
 interface AdminStats {
@@ -60,7 +59,7 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <Content style={{ padding: '32px', background: '#f8fafc' }}>
+    <div style={{ padding: '32px', background: '#f8fafc', height: '100%' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
         <Card
@@ -239,6 +238,6 @@ export default function AdminPage() {
           </Col>
         </Row>
       </div>
-    </Content>
+    </div>
   );
 }
