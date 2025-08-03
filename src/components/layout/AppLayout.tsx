@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppNavigation } from "@/components/navigation/AppNavigation";
@@ -14,6 +14,21 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  
+  // Initialize auth interceptor once (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('@/services/authInterceptor').then(({ authInterceptor }) => {
+        authInterceptor.configure({
+          onUnauthorized: () => {
+            console.log('🔒 User session expired');
+            // Could trigger additional cleanup here if needed
+          },
+          redirectUrl: '/login',
+        });
+      });
+    }
+  }, []);
 
   // Routes that don't need navigation (login, landing, etc.)
   const publicRoutes = ["/login", "/"];

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Typography,
@@ -12,10 +12,10 @@ import {
   Modal,
   Form,
   Select,
-  message,
   Tooltip,
   Popconfirm,
   Input,
+  App,
 } from "antd";
 import {
   UserOutlined,
@@ -36,6 +36,7 @@ interface UserWithRoles extends UserRecord {
 }
 
 export default function UsersPage() {
+  const { message } = App.useApp();
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [roles, setRoles] = useState<RoleRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +45,7 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [form] = Form.useForm();
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       const [usersData, rolesData] = await Promise.all([
@@ -86,11 +87,11 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [loadUsers]);
 
   const handleEditUser = (user: UserWithRoles) => {
     setSelectedUser(user);

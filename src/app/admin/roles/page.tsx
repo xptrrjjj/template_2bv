@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Typography,
@@ -12,10 +12,10 @@ import {
   Form,
   Input,
   Select,
-  message,
   Popconfirm,
   Descriptions,
   Divider,
+  App,
 } from "antd";
 import {
   EditOutlined,
@@ -40,6 +40,7 @@ interface RoleWithDetails extends RoleRecord {
 }
 
 export default function RolesPage() {
+  const { message } = App.useApp();
   const { rbacUser } = useAuth();
   const [roles, setRoles] = useState<RoleWithDetails[]>([]);
   const [permissions, setPermissions] = useState<PermissionRecord[]>([]);
@@ -50,7 +51,7 @@ export default function RolesPage() {
   const [selectedRole, setSelectedRole] = useState<RoleWithDetails | null>(null);
   const [form] = Form.useForm();
 
-  const loadRoles = async () => {
+  const loadRoles = useCallback(async () => {
     try {
       setLoading(true);
       const [rolesData, permissionsData] = await Promise.all([
@@ -79,11 +80,11 @@ export default function RolesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);
 
   useEffect(() => {
     loadRoles();
-  }, []);
+  }, [loadRoles]);
 
   const handleCreateRole = async (values: {
     role_id: string;

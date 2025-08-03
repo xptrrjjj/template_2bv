@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Layout,
   Card,
@@ -13,9 +13,9 @@ import {
   Descriptions,
   Row,
   Col,
-  message,
   Popconfirm,
   Tag,
+  App,
 } from "antd";
 import {
   SettingOutlined,
@@ -40,13 +40,14 @@ interface BootstrapProgress {
 }
 
 export default function SystemPage() {
+  const { message } = App.useApp();
   const [health, setHealth] = useState<SystemHealthCheck | null>(null);
   const [progress, setProgress] = useState<BootstrapProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [bootstrapping, setBootstrapping] = useState(false);
   const [resetting, setResetting] = useState(false);
 
-  const loadSystemInfo = async () => {
+  const loadSystemInfo = useCallback(async () => {
     try {
       setLoading(true);
       const [healthData, progressData] = await Promise.all([
@@ -62,11 +63,11 @@ export default function SystemPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message]);
 
   useEffect(() => {
     loadSystemInfo();
-  }, []);
+  }, [loadSystemInfo]);
 
   const handleBootstrapSystem = async () => {
     try {

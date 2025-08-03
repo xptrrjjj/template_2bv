@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Card, Typography, Space, Row, Col } from "antd";
 import { UserOutlined, SafetyCertificateOutlined, TeamOutlined } from "@ant-design/icons";
 import { LoginButton } from "@/components/auth/LoginButton";
+import { AuthLoadingScreen } from "@/components/loading/AuthLoadingScreen";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -19,8 +20,18 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, loading, router]);
 
-  // Don't render login page if already authenticated
-  if (!loading && isAuthenticated) {
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <AuthLoadingScreen 
+        message="Loading..."
+        description="Checking authentication status"
+      />
+    );
+  }
+
+  // Don't render login page if already authenticated (prevents flash)
+  if (isAuthenticated) {
     return null;
   }
 

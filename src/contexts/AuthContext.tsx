@@ -89,8 +89,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    // Add a small delay to prevent flash
-    const timer = setTimeout(initializeAuth, 100);
+    // Add a small delay to prevent flash and ensure smooth loading
+    const timer = setTimeout(async () => {
+      await initializeAuth();
+      // Minimum loading time to prevent flicker
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
@@ -382,20 +386,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear local storage
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
-
-    // Clear all cookies
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-
-    // Clear session storage as well
-    sessionStorage.clear();
-
+    // Use centralized auth interceptor for cleanup and redirect (client-side only)
+    if (typeof window !== 'undefined') {
+      import('@/services/authInterceptor').then(({ authInterceptor }) => {
+        authInterceptor.logout();
+      });
+    } else {
+      // Fallback cleanup for server-side
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+      }
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
+    }
+    
+    // Update local state
     setAuthState({
       isAuthenticated: false,
       user: null,
@@ -411,9 +418,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       currentApp: process.env.NEXT_PUBLIC_APP_ID || "recruitment_tool",
       rbacLoading: false,
     });
-
-    // Force redirect to home page
-    window.location.href = "/";
   };
 
   const contextValue: EnhancedAuthContextType = {
