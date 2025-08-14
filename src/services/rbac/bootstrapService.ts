@@ -14,12 +14,31 @@ import {
  * Bootstrap Service - Handles system initialization and setup
  */
 export class BootstrapService {
+  private _bootstrapCheckCache: { result: boolean; timestamp: number } | null = null;
+  private readonly CACHE_DURATION = 30000; // 30 seconds cache
   /**
    * Bootstrap the entire RBAC system
    */
   async bootstrapSystem(): Promise<BootstrapResult> {
+    console.log('🚀 BootstrapService: Starting bootstrap system...');
+    // Clear cache since we're about to modify the system
+    this._bootstrapCheckCache = null;
+    
     const config = this.generateBootstrapConfig();
-    return apiClient.bootstrapSystem(config);
+    console.log('📋 BootstrapService: Generated config:', {
+      applications: config.applications.length,
+      permissions: config.permissions.length, 
+      roles: config.roles.length,
+      superAdminOids: config.superAdminOids.length
+    });
+    console.log('📋 BootstrapService: Full config:', config);
+    
+    const result = await apiClient.bootstrapSystem(config);
+    
+    // Clear cache again after bootstrap to force fresh check
+    this._bootstrapCheckCache = null;
+    
+    return result;
   }
 
   /**
@@ -140,10 +159,20 @@ export class BootstrapService {
   }
 
   /**
-   * Check if system is already bootstrapped
+   * Check if system is already bootstrapped (with caching)
    */
   async isSystemBootstrapped(): Promise<boolean> {
+    // Check cache first
+    if (this._bootstrapCheckCache) {
+      const now = Date.now();
+      if (now - this._bootstrapCheckCache.timestamp < this.CACHE_DURATION) {
+        console.log('🔍 BootstrapService: Using cached bootstrap status:', this._bootstrapCheckCache.result);
+        return this._bootstrapCheckCache.result;
+      }
+    }
+
     try {
+      console.log('🔍 BootstrapService: Checking if system is bootstrapped...');
       const [applications, roles, permissions] = await Promise.all([
         apiClient.getAllApplications(),
         apiClient.getAllRoles(),
@@ -157,7 +186,28 @@ export class BootstrapService {
         (permission) => permission.is_system_permission
       );
 
-      return hasCurrentApp && hasSystemRoles && hasSystemPermissions;
+      console.log('🔍 BootstrapService: Bootstrap status check:', {
+        currentAppId,
+        totalApplications: applications.length,
+        totalRoles: roles.length,
+        totalPermissions: permissions.length,
+        hasCurrentApp,
+        hasSystemRoles,
+        hasSystemPermissions,
+        systemRoles: roles.filter(r => r.is_system_role).length,
+        systemPermissions: permissions.filter(p => p.is_system_permission).length
+      });
+
+      const isBootstrapped = hasCurrentApp && hasSystemRoles && hasSystemPermissions;
+      console.log('🔍 BootstrapService: System is bootstrapped:', isBootstrapped);
+      
+      // Cache the result
+      this._bootstrapCheckCache = {
+        result: isBootstrapped,
+        timestamp: Date.now()
+      };
+      
+      return isBootstrapped;
     } catch (error) {
       console.error("Error checking bootstrap status:", error);
       return false;

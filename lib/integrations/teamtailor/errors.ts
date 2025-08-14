@@ -9,14 +9,14 @@ import { TeamTailorErrorResponse } from './types';
 export class TeamTailorError extends Error {
   public readonly code: string;
   public readonly statusCode?: number;
-  public readonly details?: any;
+  public readonly details?: unknown;
   public readonly context?: string;
 
   constructor(
     message: string,
     code: string,
     statusCode?: number,
-    details?: any,
+    details?: unknown,
     context?: string
   ) {
     super(message);
@@ -47,7 +47,7 @@ export class TeamTailorError extends Error {
 
 // Authentication error (401, 403)
 export class AuthenticationError extends TeamTailorError {
-  constructor(message: string = 'Authentication failed', details?: any, context?: string) {
+  constructor(message: string = 'Authentication failed', details?: unknown, context?: string) {
     super(message, 'AUTHENTICATION_ERROR', 401, details, context);
   }
 }
@@ -59,7 +59,7 @@ export class RateLimitError extends TeamTailorError {
   constructor(
     message: string = 'Rate limit exceeded',
     retryAfter?: number,
-    details?: any,
+    details?: unknown,
     context?: string
   ) {
     super(message, 'RATE_LIMIT_ERROR', 429, details, context);

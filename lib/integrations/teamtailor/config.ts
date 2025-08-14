@@ -11,7 +11,7 @@ const teamTailorConfigSchema = z.object({
   apiVersion: z.string().default("20240404"),
   baseUrl: z.string().url().default("https://api.teamtailor.com"),
   rateLimitPerSecond: z.number().default(5), // 50 per 10 seconds = 5 per second
-  maxPageSize: z.number().default(30).max(30), // TeamTailor max page size
+  maxPageSize: z.number().max(30).default(30), // TeamTailor max page size
   defaultPageSize: z.number().default(30), // Use max for efficiency
   requestTimeout: z.number().default(30000), // 30 seconds
   maxRetries: z.number().default(3),
@@ -72,7 +72,7 @@ export function getApiHeaders(customHeaders?: Record<string, string>): Record<st
 }
 
 // Helper to build full URL
-export function buildUrl(endpoint: string, params?: Record<string, any>): string {
+export function buildUrl(endpoint: string, params?: Record<string, unknown>): string {
   const url = new URL(endpoint, teamTailorConfig.baseUrl);
   
   if (params) {

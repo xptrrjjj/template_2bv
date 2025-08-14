@@ -16,6 +16,8 @@ import {
   Descriptions,
   Divider,
   App,
+  Row,
+  Col,
 } from "antd";
 import {
   EditOutlined,
@@ -29,10 +31,11 @@ import {
 import { PermissionGuard } from "@/components/guards";
 import { useAuth } from "@/contexts/AuthContext";
 import { RoleRecord, PermissionRecord, CreateRoleRequest } from "@/types/rbac";
-import { roleService, permissionService } from "@/services/rbac";
+import { roleService, permissionService, userService } from "@/services/rbac";
+import { RoleStatistics } from "@/components/roles/RoleStatistics";
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 
 interface RoleWithDetails extends RoleRecord {
   permissionNames: string[];
@@ -49,6 +52,9 @@ export default function RolesPage() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleWithDetails | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'global' | 'app'>('all');
+  const [systemFilter, setSystemFilter] = useState<'all' | 'system' | 'custom'>('all');
   const [form] = Form.useForm();
 
   const loadRoles = useCallback(async () => {
@@ -60,17 +66,25 @@ export default function RolesPage() {
       ]);
 
       // Enhance roles with permission names and user counts
-      const rolesWithDetails: RoleWithDetails[] = rolesData.map((role) => {
-        const rolePermissions = role.permission_ids
-          .map((permId) => permissionsData.find((p) => p.permission_id === permId))
-          .filter(Boolean) as PermissionRecord[];
+      const rolesWithDetails: RoleWithDetails[] = await Promise.all(
+        rolesData.map(async (role) => {
+          const rolePermissions = role.permission_ids
+            .map((permId) => permissionsData.find((p) => p.permission_id === permId))
+            .filter(Boolean) as PermissionRecord[];
 
-        return {
-          ...role,
-          permissionNames: rolePermissions.map((p) => p.name),
-          userCount: 0, // TODO: Implement actual user count
-        };
-      });
+          // Get actual user count for this role
+          const usersWithRole = await userService.getUsersWithRole(
+            role.role_id,
+            role.scope === 'app' ? role.app_id : undefined
+          );
+
+          return {
+            ...role,
+            permissionNames: rolePermissions.map((p) => p.name),
+            userCount: usersWithRole.length,
+          };
+        })
+      );
 
       setRoles(rolesWithDetails);
       setPermissions(permissionsData);
@@ -168,6 +182,22 @@ export default function RolesPage() {
     setViewModalVisible(true);
   };
 
+  // Filter roles based on search and filters
+  const filteredRoles = roles.filter(role => {
+    const matchesSearch = !searchTerm || 
+      role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.role_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.permissionNames.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesScope = scopeFilter === 'all' || role.scope === scopeFilter;
+    const matchesSystem = systemFilter === 'all' || 
+      (systemFilter === 'system' && role.is_system_role) ||
+      (systemFilter === 'custom' && !role.is_system_role);
+    
+    return matchesSearch && matchesScope && matchesSystem;
+  });
+
   const columns = [
     {
       title: "Role",
@@ -195,15 +225,27 @@ export default function RolesPage() {
     {
       title: "Permissions",
       key: "permissions",
+      sorter: (a: RoleWithDetails, b: RoleWithDetails) => a.permission_ids.length - b.permission_ids.length,
       render: (_: unknown, record: RoleWithDetails) => (
-        <Space direction="vertical" size="small">
-          <Text>{record.permission_ids.length} permissions</Text>
-          <div>
-            {record.permissionNames.slice(0, 3).map((name) => (
-              <Tag key={name}>{name}</Tag>
+        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Text strong style={{ color: '#1890ff' }}>
+              {record.permission_ids.length}
+            </Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              {record.permission_ids.length === 1 ? 'permission' : 'permissions'}
+            </Text>
+          </div>
+          <div style={{ maxWidth: '200px' }}>
+            {record.permissionNames.slice(0, 2).map((name) => (
+              <Tag key={name} style={{ marginBottom: '2px', fontSize: '11px' }}>
+                {name.length > 15 ? `${name.substring(0, 15)}...` : name}
+              </Tag>
             ))}
-            {record.permissionNames.length > 3 && (
-              <Tag>+{record.permissionNames.length - 3} more</Tag>
+            {record.permissionNames.length > 2 && (
+              <Tag color="blue" style={{ fontSize: '11px' }}>
+                +{record.permissionNames.length - 2} more
+              </Tag>
             )}
           </div>
         </Space>
@@ -213,13 +255,33 @@ export default function RolesPage() {
       title: "Users",
       dataIndex: "userCount",
       key: "userCount",
-      render: (count: number) => <Text>{count} users</Text>,
+      sorter: (a: RoleWithDetails, b: RoleWithDetails) => a.userCount - b.userCount,
+      render: (count: number) => (
+        <Space>
+          <Text strong style={{ color: count > 0 ? '#52c41a' : '#8c8c8c' }}>
+            {count}
+          </Text>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {count === 1 ? 'user' : 'users'}
+          </Text>
+        </Space>
+      ),
     },
     {
       title: "Created",
       dataIndex: "created_at",
       key: "created_at",
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      sorter: (a: RoleWithDetails, b: RoleWithDetails) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      render: (date: string, record: RoleWithDetails) => (
+        <Space direction="vertical" size={0}>
+          <Text style={{ fontSize: '13px' }}>
+            {new Date(date).toLocaleDateString()}
+          </Text>
+          <Text type="secondary" style={{ fontSize: '11px' }}>
+            by {record.created_by.split('@')[0] || 'System'}
+          </Text>
+        </Space>
+      ),
     },
     {
       title: "Actions",
@@ -296,6 +358,86 @@ export default function RolesPage() {
             </div>
           </Card>
 
+          {/* Role Statistics */}
+          <RoleStatistics roles={roles} loading={loading} />
+
+          {/* Search and Filters */}
+          <Card
+            style={{
+              background: "white",
+              border: "1px solid #e2e8f0",
+              borderRadius: "12px",
+              marginBottom: "24px",
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+            }}
+            styles={{ body: { padding: "20px" } }}
+          >
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={24} md={12} lg={10}>
+                <Search
+                  placeholder="Search roles by name, description, ID, or permissions..."
+                  allowClear
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+              <Col xs={12} sm={8} md={6} lg={4}>
+                <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>Scope</Text>
+                  <Select
+                    value={scopeFilter}
+                    onChange={setScopeFilter}
+                    style={{ width: '100%' }}
+                    size="small"
+                  >
+                    <Select.Option value="all">All Scopes</Select.Option>
+                    <Select.Option value="global">Global</Select.Option>
+                    <Select.Option value="app">Application</Select.Option>
+                  </Select>
+                </Space>
+              </Col>
+              <Col xs={12} sm={8} md={6} lg={4}>
+                <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>Type</Text>
+                  <Select
+                    value={systemFilter}
+                    onChange={setSystemFilter}
+                    style={{ width: '100%' }}
+                    size="small"
+                  >
+                    <Select.Option value="all">All Types</Select.Option>
+                    <Select.Option value="system">System</Select.Option>
+                    <Select.Option value="custom">Custom</Select.Option>
+                  </Select>
+                </Space>
+              </Col>
+              <Col xs={24} sm={8} md={6} lg={6}>
+                <div style={{ textAlign: 'right' }}>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    Showing {filteredRoles.length} of {roles.length} roles
+                  </Text>
+                  {(searchTerm || scopeFilter !== 'all' || systemFilter !== 'all') && (
+                    <div style={{ marginTop: 4 }}>
+                      <Button 
+                        type="link" 
+                        size="small" 
+                        style={{ padding: 0, height: 'auto' }}
+                        onClick={() => {
+                          setSearchTerm('');
+                          setScopeFilter('all');
+                          setSystemFilter('all');
+                        }}
+                      >
+                        Clear filters
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </Col>
+            </Row>
+          </Card>
+
           {/* Roles Table */}
           <Card
             style={{
@@ -307,14 +449,20 @@ export default function RolesPage() {
           >
             <Table
               columns={columns}
-              dataSource={roles}
+              dataSource={filteredRoles}
               rowKey="role_id"
               loading={loading}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} roles`,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                showTotal: (total, range) => {
+                  const filtered = filteredRoles.length !== roles.length;
+                  return filtered 
+                    ? `${range[0]}-${range[1]} of ${total} filtered roles (${roles.length} total)`
+                    : `${range[0]}-${range[1]} of ${total} roles`;
+                },
               }}
             />
           </Card>

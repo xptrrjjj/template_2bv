@@ -386,6 +386,38 @@ export interface CustomFieldRequestOptions extends TeamTailorRequestOptions {
   };
 }
 
+// Department types
+export interface DepartmentAttributes extends TeamTailorResourceAttributes {
+  name: string;
+}
+
+export interface DepartmentResource extends TeamTailorResource {
+  type: 'departments';
+  attributes: DepartmentAttributes;
+  relationships?: {
+    jobs?: {
+      data: Array<{ id: string; type: 'jobs' }>;
+    };
+  };
+}
+
+export interface DepartmentOption {
+  id: string;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DepartmentPayload {
+  name: string;
+}
+
+export interface DepartmentRequestOptions extends TeamTailorRequestOptions {
+  filter?: {
+    name?: string;
+  };
+}
+
 // Error response type
 export interface TeamTailorErrorResponse {
   errors: Array<{

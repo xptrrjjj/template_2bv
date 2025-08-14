@@ -13,12 +13,12 @@ import {
   TimeoutError,
   ConfigurationError
 } from './errors';
-import { TeamTailorPaginatedResponse, PaginationOptions, PaginationConfig } from './types';
+import { PaginationOptions, PaginationConfig } from './types';
 import { fetchAllPages } from './pagination';
 
 export interface RequestOptions {
   headers?: Record<string, string>;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
   timeout?: number;
   maxRetries?: number;
   priority?: number;
@@ -49,14 +49,14 @@ export class TeamTailorClient {
   /**
    * Perform a POST request
    */
-  async post<T>(endpoint: string, data: any, options?: RequestOptions): Promise<T> {
+  async post<T>(endpoint: string, data: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('POST', endpoint, data, options);
   }
   
   /**
    * Perform a PATCH request
    */
-  async patch<T>(endpoint: string, data: any, options?: RequestOptions): Promise<T> {
+  async patch<T>(endpoint: string, data: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>('PATCH', endpoint, data, options);
   }
   
@@ -84,7 +84,7 @@ export class TeamTailorClient {
   private async request<T>(
     method: string,
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: RequestOptions
   ): Promise<T> {
     const maxRetries = options?.maxRetries ?? this.config.maxRetries;
@@ -101,7 +101,7 @@ export class TeamTailorClient {
           priority
         );
         
-        return response;
+        return response as T;
       } catch (error) {
         lastError = error as Error;
         
@@ -126,7 +126,7 @@ export class TeamTailorClient {
   private async executeRequest<T>(
     method: string,
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: RequestOptions,
     timeout?: number
   ): Promise<T> {
@@ -159,7 +159,7 @@ export class TeamTailorClient {
       
       // Handle empty responses (like DELETE)
       const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
+      if (!contentType || (!contentType.includes('application/json') && !contentType.includes('application/vnd.api+json'))) {
         return {} as T;
       }
       
@@ -229,7 +229,7 @@ export class TeamTailorClient {
   /**
    * Build full URL for a request
    */
-  buildUrl(endpoint: string, params?: Record<string, any>): string {
+  buildUrl(endpoint: string, params?: Record<string, unknown>): string {
     return buildUrl(endpoint, params);
   }
 }

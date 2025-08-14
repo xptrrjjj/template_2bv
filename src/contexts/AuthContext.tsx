@@ -45,6 +45,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     rbacLoading: false,
   });
 
+  // Track if bootstrap is currently running to prevent concurrent calls
+  const [bootstrapRunning, setBootstrapRunning] = useState(false);
+  
+  // Track which user we've already initialized RBAC for in this session
+  const [initializedUserOid, setInitializedUserOid] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('rbac_initialized_user') || null;
+    }
+    return null;
+  });
+
+  // Helper to set initialized user with persistence
+  const setInitializedUserOidPersistent = (oid: string | null) => {
+    setInitializedUserOid(oid);
+    if (typeof window !== 'undefined') {
+      if (oid) {
+        sessionStorage.setItem('rbac_initialized_user', oid);
+      } else {
+        sessionStorage.removeItem('rbac_initialized_user');
+      }
+    }
+  };
+
   useEffect(() => {
     // Check for existing authentication on mount
     const initializeAuth = async () => {
@@ -165,13 +188,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // RBAC helper functions
   const initializeRBACSystem = async () => {
+    // Prevent concurrent bootstrap attempts
+    if (bootstrapRunning) {
+      console.log("Bootstrap already running, skipping...");
+      return;
+    }
+    
     try {
-      // Ensure system is bootstrapped
+      setBootstrapRunning(true);
       console.log("Initializing RBAC system...");
+      
+      // The bootstrap service has its own caching and will check if already bootstrapped
       const result = await bootstrapService.ensureBootstrapped();
       console.log("RBAC bootstrap result:", result);
     } catch (error) {
       console.error("Failed to initialize RBAC system:", error);
+    } finally {
+      setBootstrapRunning(false);
     }
   };
 
@@ -304,24 +337,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Initialize RBAC system only when user is authenticated
+  // Initialize RBAC system and load user data when authenticated
   useEffect(() => {
-    if (authState.isAuthenticated && authState.user) {
-      initializeRBACSystem();
-    }
-  }, [authState.isAuthenticated, authState.user]);
+    const initializeAndLoadRBAC = async () => {
+      if (
+        authState.isAuthenticated &&
+        authState.user?.microsoftOid &&
+        typeof authState.user.microsoftOid === "string" &&
+        !rbacState.rbacUser &&
+        initializedUserOid !== authState.user.microsoftOid // Don't re-initialize for the same user
+      ) {
+        console.log("Initializing RBAC system and loading user data for user:", authState.user.microsoftOid);
+        
+        // Mark this user as being initialized
+        setInitializedUserOidPersistent(authState.user.microsoftOid);
+        
+        // Initialize RBAC system first (only once per system)
+        await initializeRBACSystem();
+        
+        // Then load user-specific data
+        await loadUserRBACData(authState.user.microsoftOid);
+      } else if (
+        authState.isAuthenticated &&
+        authState.user?.microsoftOid &&
+        initializedUserOid === authState.user.microsoftOid &&
+        !rbacState.rbacUser
+      ) {
+        // User already initialized but RBAC data not loaded (hard refresh case)
+        console.log("Loading RBAC data for already initialized user:", authState.user.microsoftOid);
+        await loadUserRBACData(String(authState.user.microsoftOid || ""));
+      }
+    };
 
-  // Load RBAC data when authentication state changes
-  useEffect(() => {
-    if (
-      authState.isAuthenticated &&
-      authState.user?.microsoftOid &&
-      typeof authState.user.microsoftOid === "string" &&
-      !rbacState.rbacUser
-    ) {
-      loadUserRBACData(authState.user.microsoftOid);
-    }
-  }, [authState.isAuthenticated, authState.user, rbacState.rbacUser, loadUserRBACData]);
+    initializeAndLoadRBAC();
+  }, [authState.isAuthenticated, authState.user, rbacState.rbacUser, initializedUserOid, loadUserRBACData]);
 
   const login = async () => {
     try {
@@ -355,16 +404,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Store user info
         localStorage.setItem("user", JSON.stringify(enhancedUser));
 
+        const userOid = loginResponse.account.localAccountId || loginResponse.uniqueId;
+
         // Provision user in RBAC system (now that token is stored)
         await provisionUserInRBAC({
-          oid: loginResponse.account.localAccountId || loginResponse.uniqueId,
+          oid: userOid,
           email: enhancedUser.email || "",
           name: enhancedUser.name,
           profilePicture: enhancedUser.profilePicture,
         });
 
+        // Mark this user as initialized to prevent re-initialization on refresh
+        setInitializedUserOidPersistent(userOid);
+
         // Load RBAC data for the user first
-        await loadUserRBACData(loginResponse.account.localAccountId || loginResponse.uniqueId);
+        await loadUserRBACData(userOid);
 
         // Set auth state after everything is loaded to prevent UI flicker
         setAuthState({
@@ -418,6 +472,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       currentApp: process.env.NEXT_PUBLIC_APP_ID || "recruitment_tool",
       rbacLoading: false,
     });
+    
+    // Reset initialized user tracking
+    setInitializedUserOidPersistent(null);
   };
 
   const contextValue: EnhancedAuthContextType = {

@@ -172,7 +172,7 @@ export default function AdminPage() {
 
         {/* Quick Actions */}
         <Row gutter={[24, 24]}>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={12} xl={6}>
             <Card
               title={
                 <Space>
@@ -195,7 +195,7 @@ export default function AdminPage() {
               </Text>
             </Card>
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={12} xl={6}>
             <Card
               title={
                 <Space>
@@ -218,7 +218,30 @@ export default function AdminPage() {
               </Text>
             </Card>
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={12} xl={6}>
+            <Card
+              title={
+                <Space>
+                  <KeyOutlined style={{ color: "#faad14" }} />
+                  <Text strong>Permission Management</Text>
+                </Space>
+              }
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+              }}
+              hoverable
+              onClick={() => router.push("/admin/permissions")}
+            >
+              <Text type="secondary">
+                Create custom permissions, manage system permissions, and control granular access
+                rights.
+              </Text>
+            </Card>
+          </Col>
+          <Col xs={24} lg={12} xl={6}>
             <Card
               title={
                 <Space>

@@ -76,7 +76,7 @@ export class PermissionService {
       );
     }
 
-    await apiClient.deletePermission(permissionId);
+    await apiClient.deletePermission(permissionId, deletedBy);
 
     // Create audit log
     await apiClient.createAuditLog({

@@ -26,17 +26,24 @@ import {
 
 class ApiClient {
   private baseUrl: string;
+  private apiBaseUrl: string;
 
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    this.apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   }
 
   private getAuthHeaders(): Record<string, string> {
-    const token = localStorage.getItem("access_token");
+    // Check if we're in a browser environment
+    const token = typeof window !== 'undefined' ? localStorage.getItem("access_token") : null;
     return {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     };
+  }
+
+  private getHeaders(): Record<string, string> {
+    return this.getAuthHeaders();
   }
 
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -259,7 +266,8 @@ class ApiClient {
   // Role Management
   async getRole(roleId: string): Promise<RoleRecord | null> {
     try {
-      const response = await this.getRecords("rbac_roles", { role_id: roleId });
+      const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+      const response = await this.getRecords(APP_IDENTIFIER, { role_id: roleId });
       return (response.data?.[0] as RoleRecord) || null;
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
@@ -270,10 +278,19 @@ class ApiClient {
   }
 
   async createRole(roleRequest: CreateRoleRequest, createdBy: string): Promise<RoleRecord> {
+    // Check if role already exists
+    const existing = await this.getRole(roleRequest.role_id);
+    if (existing) {
+      return existing;
+    }
+    
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    
     const roleData: RoleRecord = {
-      record_id: `role_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      app_id: roleRequest.scope === "app" && roleRequest.app_id ? roleRequest.app_id : "rbac_roles",
+      record_id: `role_${roleRequest.role_id}`,
       ...roleRequest,
-      is_system_role: false,
+      is_system_role: createdBy === "system", // Set as system role if created by "system"
       created_at: new Date().toISOString(),
       created_by: createdBy,
       updated_at: new Date().toISOString(),
@@ -281,10 +298,16 @@ class ApiClient {
     };
 
     const response = await this.createRecord(
-      "rbac_roles",
+      APP_IDENTIFIER, // Use consistent identifier
       roleData as unknown as Record<string, unknown>
     );
-    return response.data as unknown as RoleRecord;
+    
+    // Since datastore create doesn't return the data, fetch it
+    const createdRole = await this.getRole(roleRequest.role_id);
+    if (!createdRole) {
+      throw new Error("Role was created but could not be retrieved");
+    }
+    return createdRole;
   }
 
   async updateRole(
@@ -294,43 +317,57 @@ class ApiClient {
   ): Promise<RoleRecord> {
     const roleData = {
       ...updates,
+      record_id: `role_${roleId}`, // Required for datastore update operation
       role_id: roleId,
       updated_at: new Date().toISOString(),
       updated_by: updatedBy,
     };
 
-    const response = await this.updateRecord("rbac_roles", roleData);
-    return response.data as unknown as RoleRecord;
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    const response = await this.updateRecord(APP_IDENTIFIER, roleData);
+    
+    // Fetch the updated role since update doesn't return the data
+    const updatedRole = await this.getRole(roleId);
+    if (!updatedRole) {
+      throw new Error("Role was updated but could not be retrieved");
+    }
+    return updatedRole;
   }
 
-  async deleteRole(roleId: string): Promise<void> {
+  async deleteRole(roleId: string, deletedBy: string): Promise<void> {
     // Check if role is system role
     const role = await this.getRole(roleId);
     if (role?.is_system_role) {
       throw new RBACError("Cannot delete system role", RBACErrorCode.SYSTEM_ROLE_PROTECTED);
     }
 
-    await this.deleteRecord("rbac_roles", `role_${roleId}`);
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    await this.deleteRecord(APP_IDENTIFIER, `role_${roleId}`);
   }
 
   async getAllRoles(): Promise<RoleRecord[]> {
-    const response = await this.getRecords("rbac_roles");
-    return (response.data as RoleRecord[]) || [];
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    const response = await this.getRecords(APP_IDENTIFIER);
+    // Filter to only get role records (they have role_id field)
+    return ((response.data as RoleRecord[]) || []).filter(record => record.role_id);
   }
 
   async getRolesByScope(scope: RoleRecord["scope"], appId?: string): Promise<RoleRecord[]> {
-    const filters: Record<string, unknown> = { scope };
-    if (appId) {
-      filters.app_id = appId;
-    }
-    const response = await this.getRecords("rbac_roles", filters);
-    return (response.data as RoleRecord[]) || [];
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    const response = await this.getRecords(APP_IDENTIFIER);
+    // Filter roles by scope and app_id
+    return ((response.data as RoleRecord[]) || []).filter(record => 
+      record.role_id && 
+      record.scope === scope && 
+      (!appId || record.app_id === appId)
+    );
   }
 
   // Permission Management
   async getPermission(permissionId: string): Promise<PermissionRecord | null> {
     try {
-      const response = await this.getRecords("rbac_permissions", { permission_id: permissionId });
+      const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+      const response = await this.getRecords(APP_IDENTIFIER, { permission_id: permissionId });
       return (response.data?.[0] as PermissionRecord) || null;
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
@@ -344,46 +381,66 @@ class ApiClient {
     permissionRequest: CreatePermissionRequest,
     createdBy: string
   ): Promise<PermissionRecord> {
+    // Check if permission already exists
+    const existing = await this.getPermission(permissionRequest.permission_id);
+    if (existing) {
+      return existing;
+    }
+    
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    
     const permissionData: PermissionRecord = {
-      record_id: `permission_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      app_id: permissionRequest.scope === "app" && permissionRequest.app_id ? permissionRequest.app_id : "rbac_permissions",
+      record_id: `permission_${permissionRequest.permission_id}`,
       ...permissionRequest,
-      is_system_permission: false,
+      is_system_permission: createdBy === "system", // Set as system permission if created by "system"
       created_at: new Date().toISOString(),
       created_by: createdBy,
     };
 
     const response = await this.createRecord(
-      "rbac_permissions",
+      APP_IDENTIFIER, // Use consistent identifier
       permissionData as unknown as Record<string, unknown>
     );
-    return response.data as unknown as PermissionRecord;
+    
+    // Since datastore create doesn't return the data, fetch it
+    const createdPermission = await this.getPermission(permissionRequest.permission_id);
+    if (!createdPermission) {
+      throw new Error("Permission was created but could not be retrieved");
+    }
+    return createdPermission;
   }
 
-  async deletePermission(permissionId: string): Promise<void> {
+  async deletePermission(permissionId: string, deletedBy: string): Promise<void> {
     // Check if permission is system permission
     const permission = await this.getPermission(permissionId);
     if (permission?.is_system_permission) {
       throw new RBACError("Cannot delete system permission", RBACErrorCode.SYSTEM_ROLE_PROTECTED);
     }
 
-    await this.deleteRecord("rbac_permissions", `permission_${permissionId}`);
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    await this.deleteRecord(APP_IDENTIFIER, `permission_${permissionId}`);
   }
 
   async getAllPermissions(): Promise<PermissionRecord[]> {
-    const response = await this.getRecords("rbac_permissions");
-    return (response.data as PermissionRecord[]) || [];
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    const response = await this.getRecords(APP_IDENTIFIER);
+    // Filter to only get permission records (they have permission_id field)
+    return ((response.data as PermissionRecord[]) || []).filter(record => record.permission_id);
   }
 
   async getPermissionsByScope(
     scope: PermissionRecord["scope"],
     appId?: string
   ): Promise<PermissionRecord[]> {
-    const filters: Record<string, unknown> = { scope };
-    if (appId) {
-      filters.app_id = appId;
-    }
-    const response = await this.getRecords("rbac_permissions", filters);
-    return (response.data as PermissionRecord[]) || [];
+    const APP_IDENTIFIER = process.env.NEXT_PUBLIC_APP_ID || 'antd_recruiter';
+    const response = await this.getRecords(APP_IDENTIFIER);
+    // Filter permissions by scope and app_id
+    return ((response.data as PermissionRecord[]) || []).filter(record => 
+      record.permission_id && 
+      record.scope === scope && 
+      (!appId || record.app_id === appId)
+    );
   }
 
   // Application Management
@@ -403,9 +460,16 @@ class ApiClient {
     appRequest: CreateApplicationRequest,
     createdBy: string
   ): Promise<ApplicationRecord> {
+    // Check if application already exists
+    const existing = await this.getApplication(appRequest.app_id);
+    if (existing) {
+      return existing;
+    }
+    
     const appData: ApplicationRecord = {
-      record_id: `app_${appRequest.app_id}`,
       ...appRequest,
+      app_id: "rbac_applications", // Datastore identifier - override the spread
+      record_id: `app_${appRequest.app_id}`,
       created_at: new Date().toISOString(),
       created_by: createdBy,
       is_active: true,
@@ -415,7 +479,13 @@ class ApiClient {
       "rbac_applications",
       appData as unknown as Record<string, unknown>
     );
-    return response.data as unknown as ApplicationRecord;
+    
+    // Since datastore create doesn't return the data, fetch it
+    const createdApp = await this.getApplication(appRequest.app_id);
+    if (!createdApp) {
+      throw new Error("Application was created but could not be retrieved");
+    }
+    return createdApp;
   }
 
   async updateApplication(
@@ -424,11 +494,19 @@ class ApiClient {
   ): Promise<ApplicationRecord> {
     const appData = {
       ...updates,
+      record_id: `app_${appId}`, // Required for datastore update operation
       app_id: appId,
+      updated_at: new Date().toISOString(),
     };
 
     const response = await this.updateRecord("rbac_applications", appData);
-    return response.data as unknown as ApplicationRecord;
+    
+    // Fetch the updated application since update doesn't return the data
+    const updatedApp = await this.getApplication(appId);
+    if (!updatedApp) {
+      throw new Error("Application was updated but could not be retrieved");
+    }
+    return updatedApp;
   }
 
   async getAllApplications(): Promise<ApplicationRecord[]> {
@@ -487,7 +565,13 @@ class ApiClient {
       }
     }
 
-    await this.updateRecord("rbac_users", updatedUser as unknown as Record<string, unknown>);
+    // Add the proper record_id for datastore update
+    const userUpdateData = {
+      ...updatedUser,
+      record_id: `user_${request.user_id}`, // Required for datastore update operation
+    } as unknown as Record<string, unknown>;
+    
+    await this.updateRecord("rbac_users", userUpdateData);
   }
 
   async removeUserRole(request: RemoveUserRoleRequest): Promise<void> {
@@ -526,7 +610,13 @@ class ApiClient {
       };
     }
 
-    await this.updateRecord("rbac_users", updatedUser as unknown as Record<string, unknown>);
+    // Add the proper record_id for datastore update
+    const userUpdateData = {
+      ...updatedUser,
+      record_id: `user_${request.user_id}`, // Required for datastore update operation
+    } as unknown as Record<string, unknown>;
+    
+    await this.updateRecord("rbac_users", userUpdateData);
   }
 
   // Permission Checking
@@ -590,6 +680,8 @@ class ApiClient {
 
   // System Bootstrap
   async bootstrapSystem(config: SystemBootstrapConfig): Promise<BootstrapResult> {
+    console.log('🚀 Bootstrap: Starting RBAC system bootstrap...');
+
     const result: BootstrapResult = {
       success: false,
       applicationsCreated: 0,
@@ -652,12 +744,57 @@ class ApiClient {
       }
 
       result.success = result.errors.length === 0;
+      console.log('🏁 Bootstrap: Process completed! Created:', {
+        applications: result.applicationsCreated,
+        permissions: result.permissionsCreated,
+        roles: result.rolesCreated,
+        superAdmins: result.superAdminsAssigned,
+        errors: result.errors.length
+      });
       return result;
     } catch (error) {
+      console.error('💥 Bootstrap: Critical error:', error);
       result.errors.push(
         `Bootstrap failed: ${error instanceof Error ? error.message : "Unknown error"}`
       );
       return result;
+    }
+  }
+
+  // Debug method for testing
+  async debugBootstrap(): Promise<void> {
+    console.log('🐛 DEBUG: Starting bootstrap debug...');
+    console.log('🐛 DEBUG: Environment variables:');
+    console.log('  - NEXT_PUBLIC_APP_ID:', process.env.NEXT_PUBLIC_APP_ID);
+    console.log('  - NEXT_PUBLIC_APP_NAME:', process.env.NEXT_PUBLIC_APP_NAME);
+    console.log('  - NEXT_PUBLIC_API_BASE_URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+    
+    // Test creating a single permission
+    try {
+      console.log('🐛 DEBUG: Testing single permission creation...');
+      const testPermission = {
+        permission_id: 'test.debug.permission',
+        name: 'Debug Test Permission',
+        description: 'Test permission for debugging',
+        resource: 'test',
+        action: 'debug',
+        scope: 'global' as const
+      };
+      
+      const result = await this.createPermission(testPermission, 'debug');
+      console.log('🐛 DEBUG: Permission creation result:', result);
+    } catch (error) {
+      console.error('🐛 DEBUG: Permission creation failed:', error);
+    }
+
+    // Test datastore connectivity
+    try {
+      console.log('🐛 DEBUG: Testing datastore read...');
+      const permissions = await this.getAllPermissions();
+      console.log('🐛 DEBUG: Current permissions count:', permissions.length);
+      console.log('🐛 DEBUG: Permissions:', permissions);
+    } catch (error) {
+      console.error('🐛 DEBUG: Datastore read failed:', error);
     }
   }
 
@@ -717,3 +854,9 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Global debug function for browser console
+if (typeof window !== 'undefined') {
+  (window as any).debugBootstrap = () => apiClient.debugBootstrap();
+  (window as any).debugApiClient = apiClient;
+}

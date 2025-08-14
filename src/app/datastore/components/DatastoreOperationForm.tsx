@@ -24,10 +24,10 @@ interface DatastoreOperationFormProps {
 
 const testTemplates = {
   create: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     action: "create" as DatastoreAction,
     data: {
-      app_id: "recruitment_tool",
+      app_id: "test_candidates",
       record_id: "candidate_001",
       name: "John Doe",
       email: "john.doe@example.com",
@@ -38,7 +38,7 @@ const testTemplates = {
     },
   },
   update: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     action: "update" as DatastoreAction,
     data: {
       record_id: "candidate_001",
@@ -48,7 +48,7 @@ const testTemplates = {
     },
   },
   append: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     action: "append" as DatastoreAction,
     data: {
       record_id: "candidate_001",
@@ -57,14 +57,14 @@ const testTemplates = {
     },
   },
   delete: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     action: "delete" as DatastoreAction,
     data: {
       record_id: "candidate_001",
     },
   },
   delete_all: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     action: "delete_all" as DatastoreAction,
     data: {},
   },
@@ -158,7 +158,7 @@ export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ 
         form={form}
         layout="vertical"
         initialValues={{
-          identifier: "recruitment_tool",
+          identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
           action: "create",
         }}
         onFinish={handleSubmit}

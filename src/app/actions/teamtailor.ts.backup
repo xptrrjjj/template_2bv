@@ -1,0 +1,683 @@
+'use server'
+
+/**
+ * TeamTailor Server Actions for Next.js 15.4 App Router
+ * Provides server-side integration functions for all TeamTailor operations
+ */
+
+import { 
+  // Client operations
+  getAllClients,
+  getClient,
+  createClient,
+  updateClient,
+  deleteClient,
+  getClientsByStatus,
+  searchClientsByName,
+  getClientByExternalId,
+  
+  // Job operations (TODO: Implement in TeamTailor integration)
+  // getAllJobs,
+  // getJob,
+  // createJob,
+  // createJobFromTemplate,
+  // updateJob,
+  // deleteJob,
+  // getJobsByStatus,
+  // getJobTemplates,
+  // getJobsByClient,
+  // getJobsByDepartment,
+  // getJobsByLocation,
+  // getJobByExternalId,
+  // publishJob,
+  // unpublishJob,
+  // archiveJob,
+  
+  // Candidate operations (TODO: Implement in TeamTailor integration)
+  // getAllCandidates,
+  // getCandidate,
+  // createCandidate,
+  // updateCandidate,
+  // deleteCandidate,
+  // getCandidateByEmail,
+  // getCandidateByExternalId,
+  // getCandidatesByTag,
+  // getSourcedCandidates,
+  // getConnectedCandidates,
+  // getCandidateApplications,
+  // getHiredCandidates,
+  // getCandidatesByStage,
+  
+  // Custom field operations (TODO: Implement in TeamTailor integration)
+  // getAllCustomFields,
+  // getCustomField,
+  // createCustomField,
+  // updateCustomField,
+  // deleteCustomField,
+  // getCustomFieldsByResourceType,
+  // getCandidateCustomFields,
+  // getJobCustomFields,
+  // getUserCustomFields,
+  // validateCustomFieldValue,
+  
+  // Custom field options (TODO: Implement in TeamTailor integration)
+  // getAllCustomFieldOptions,
+  // getCustomFieldOptionsByFieldId,
+  // getCustomFieldOption,
+  // createCustomFieldOption,
+  // updateCustomFieldOption,
+  // deleteCustomFieldOption,
+  
+  // Locations (TODO: Implement in TeamTailor integration)
+  // getAllLocations,
+  // getLocation,
+  
+  // Types
+  ClientPayload,
+  ClientOption,
+  // JobPayload,
+  // JobOption,
+  // JobTemplate,
+  // CandidatePayload,
+  // CandidateOption,
+  // CustomFieldPayload,
+  // CustomFieldOption,
+  // JobApplication,
+  ClientRequestOptions,
+  // JobRequestOptions,
+  // CandidateRequestOptions,
+  // CustomFieldRequestOptions
+} from '../../../lib/integrations/teamtailor';
+
+// ===== CLIENT ACTIONS =====
+
+export async function fetchAllClients(options?: ClientRequestOptions): Promise<ClientOption[]> {
+  try {
+    return await getAllClients(options);
+  } catch (error) {
+    console.error('Server Action: fetchAllClients failed:', error);
+    throw new Error('Failed to fetch clients');
+  }
+}
+
+export async function fetchClient(id: string): Promise<ClientOption> {
+  try {
+    return await getClient(id);
+  } catch (error) {
+    console.error('Server Action: fetchClient failed:', error);
+    throw new Error(`Failed to fetch client ${id}`);
+  }
+}
+
+export async function createNewClient(data: ClientPayload): Promise<ClientOption> {
+  try {
+    return await createClient(data);
+  } catch (error) {
+    console.error('Server Action: createNewClient failed:', error);
+    throw new Error('Failed to create client');
+  }
+}
+
+export async function updateExistingClient(id: string, data: Partial<ClientPayload>): Promise<ClientOption> {
+  try {
+    return await updateClient(id, data);
+  } catch (error) {
+    console.error('Server Action: updateExistingClient failed:', error);
+    throw new Error(`Failed to update client ${id}`);
+  }
+}
+
+export async function removeClient(id: string): Promise<void> {
+  try {
+    await deleteClient(id);
+  } catch (error) {
+    console.error('Server Action: removeClient failed:', error);
+    throw new Error(`Failed to delete client ${id}`);
+  }
+}
+
+export async function fetchClientsByStatus(status: 'active' | 'inactive'): Promise<ClientOption[]> {
+  try {
+    return await getClientsByStatus(status);
+  } catch (error) {
+    console.error('Server Action: fetchClientsByStatus failed:', error);
+    throw new Error(`Failed to fetch ${status} clients`);
+  }
+}
+
+export async function searchClients(name: string): Promise<ClientOption[]> {
+  try {
+    return await searchClientsByName(name);
+  } catch (error) {
+    console.error('Server Action: searchClients failed:', error);
+    throw new Error('Failed to search clients');
+  }
+}
+
+export async function fetchClientByExternalId(externalId: string): Promise<ClientOption | null> {
+  try {
+    return await getClientByExternalId(externalId);
+  } catch (error) {
+    console.error('Server Action: fetchClientByExternalId failed:', error);
+    throw new Error('Failed to fetch client by external ID');
+  }
+}
+
+// ===== JOB ACTIONS =====
+// TODO: Implement when TeamTailor job operations are ready
+
+/*
+export async function fetchAllJobs(options?: JobRequestOptions): Promise<JobOption[]> {
+  try {
+    return await getAllJobs(options);
+  } catch (error) {
+    console.error('Server Action: fetchAllJobs failed:', error);
+    throw new Error('Failed to fetch jobs');
+  }
+}
+*/
+
+/*
+export async function fetchJob(id: string): Promise<JobOption> {
+  try {
+    return await getJob(id);
+  } catch (error) {
+    console.error('Server Action: fetchJob failed:', error);
+    throw new Error(`Failed to fetch job ${id}`);
+  }
+}
+*/
+
+/*
+// TODO: Uncomment when TeamTailor job operations are implemented
+
+export async function createNewJob(data: JobPayload): Promise<JobOption> {
+  try {
+    return await createJob(data);
+  } catch (error) {
+    console.error('Server Action: createNewJob failed:', error);
+    throw new Error('Failed to create job');
+  }
+}
+
+export async function createJobFromExistingTemplate(templateId: string, data: JobPayload): Promise<JobOption> {
+  try {
+    return await createJobFromTemplate(templateId, data);
+  } catch (error) {
+    console.error('Server Action: createJobFromExistingTemplate failed:', error);
+    throw new Error('Failed to create job from template');
+  }
+}
+
+export async function updateExistingJob(id: string, data: Partial<JobPayload>): Promise<JobOption> {
+  try {
+    return await updateJob(id, data);
+  } catch (error) {
+    console.error('Server Action: updateExistingJob failed:', error);
+    throw new Error(`Failed to update job ${id}`);
+  }
+}
+
+export async function removeJob(id: string): Promise<void> {
+  try {
+    await deleteJob(id);
+  } catch (error) {
+    console.error('Server Action: removeJob failed:', error);
+    throw new Error(`Failed to delete job ${id}`);
+  }
+}
+
+export async function fetchJobsByStatus(status: 'draft' | 'published' | 'archived' | 'template'): Promise<JobOption[]> {
+  try {
+    return await getJobsByStatus(status);
+  } catch (error) {
+    console.error('Server Action: fetchJobsByStatus failed:', error);
+    throw new Error(`Failed to fetch ${status} jobs`);
+  }
+}
+
+export async function fetchJobTemplates(): Promise<JobTemplate[]> {
+  try {
+    return await getJobTemplates();
+  } catch (error) {
+    console.error('Server Action: fetchJobTemplates failed:', error);
+    throw new Error('Failed to fetch job templates');
+  }
+}
+
+export async function fetchJobsByClient(clientId: string): Promise<JobOption[]> {
+  try {
+    return await getJobsByClient(clientId);
+  } catch (error) {
+    console.error('Server Action: fetchJobsByClient failed:', error);
+    throw new Error('Failed to fetch jobs by client');
+  }
+}
+
+export async function fetchJobsByDepartment(departmentId: string): Promise<JobOption[]> {
+  try {
+    return await getJobsByDepartment(departmentId);
+  } catch (error) {
+    console.error('Server Action: fetchJobsByDepartment failed:', error);
+    throw new Error('Failed to fetch jobs by department');
+  }
+}
+
+export async function fetchJobsByLocation(locationId: string): Promise<JobOption[]> {
+  try {
+    return await getJobsByLocation(locationId);
+  } catch (error) {
+    console.error('Server Action: fetchJobsByLocation failed:', error);
+    throw new Error('Failed to fetch jobs by location');
+  }
+}
+
+export async function fetchJobByExternalId(externalId: string): Promise<JobOption | null> {
+  try {
+    return await getJobByExternalId(externalId);
+  } catch (error) {
+    console.error('Server Action: fetchJobByExternalId failed:', error);
+    throw new Error('Failed to fetch job by external ID');
+  }
+}
+
+export async function publishExistingJob(id: string): Promise<JobOption> {
+  try {
+    return await publishJob(id);
+  } catch (error) {
+    console.error('Server Action: publishExistingJob failed:', error);
+    throw new Error(`Failed to publish job ${id}`);
+  }
+}
+
+export async function unpublishExistingJob(id: string): Promise<JobOption> {
+  try {
+    return await unpublishJob(id);
+  } catch (error) {
+    console.error('Server Action: unpublishExistingJob failed:', error);
+    throw new Error(`Failed to unpublish job ${id}`);
+  }
+}
+*/
+
+/*
+export async function archiveExistingJob(id: string): Promise<JobOption> {
+  try {
+    return await archiveJob(id);
+  } catch (error) {
+    console.error('Server Action: archiveExistingJob failed:', error);
+    throw new Error(`Failed to archive job ${id}`);
+  }
+}
+*/
+
+// ===== CANDIDATE ACTIONS =====
+// TODO: Implement when TeamTailor candidate operations are ready
+
+/*
+
+export async function fetchAllCandidates(options?: CandidateRequestOptions): Promise<CandidateOption[]> {
+  try {
+    return await getAllCandidates(options);
+  } catch (error) {
+    console.error('Server Action: fetchAllCandidates failed:', error);
+    throw new Error('Failed to fetch candidates');
+  }
+}
+
+export async function fetchCandidate(id: string): Promise<CandidateOption> {
+  try {
+    return await getCandidate(id);
+  } catch (error) {
+    console.error('Server Action: fetchCandidate failed:', error);
+    throw new Error(`Failed to fetch candidate ${id}`);
+  }
+}
+
+export async function createNewCandidate(data: CandidatePayload): Promise<CandidateOption> {
+  try {
+    return await createCandidate(data);
+  } catch (error) {
+    console.error('Server Action: createNewCandidate failed:', error);
+    throw new Error('Failed to create candidate');
+  }
+}
+
+export async function updateExistingCandidate(id: string, data: Partial<CandidatePayload>): Promise<CandidateOption> {
+  try {
+    return await updateCandidate(id, data);
+  } catch (error) {
+    console.error('Server Action: updateExistingCandidate failed:', error);
+    throw new Error(`Failed to update candidate ${id}`);
+  }
+}
+
+export async function removeCandidate(id: string): Promise<void> {
+  try {
+    await deleteCandidate(id);
+  } catch (error) {
+    console.error('Server Action: removeCandidate failed:', error);
+    throw new Error(`Failed to delete candidate ${id}`);
+  }
+}
+
+export async function fetchCandidateByEmail(email: string): Promise<CandidateOption | null> {
+  try {
+    return await getCandidateByEmail(email);
+  } catch (error) {
+    console.error('Server Action: fetchCandidateByEmail failed:', error);
+    throw new Error('Failed to fetch candidate by email');
+  }
+}
+
+export async function fetchCandidateByExternalId(externalId: string): Promise<CandidateOption | null> {
+  try {
+    return await getCandidateByExternalId(externalId);
+  } catch (error) {
+    console.error('Server Action: fetchCandidateByExternalId failed:', error);
+    throw new Error('Failed to fetch candidate by external ID');
+  }
+}
+
+export async function fetchCandidatesByTag(tag: string): Promise<CandidateOption[]> {
+  try {
+    return await getCandidatesByTag(tag);
+  } catch (error) {
+    console.error('Server Action: fetchCandidatesByTag failed:', error);
+    throw new Error('Failed to fetch candidates by tag');
+  }
+}
+
+export async function fetchSourcedCandidates(): Promise<CandidateOption[]> {
+  try {
+    return await getSourcedCandidates();
+  } catch (error) {
+    console.error('Server Action: fetchSourcedCandidates failed:', error);
+    throw new Error('Failed to fetch sourced candidates');
+  }
+}
+
+export async function fetchConnectedCandidates(): Promise<CandidateOption[]> {
+  try {
+    return await getConnectedCandidates();
+  } catch (error) {
+    console.error('Server Action: fetchConnectedCandidates failed:', error);
+    throw new Error('Failed to fetch connected candidates');
+  }
+}
+
+export async function fetchCandidateApplications(candidateId: string): Promise<JobApplication[]> {
+  try {
+    return await getCandidateApplications(candidateId);
+  } catch (error) {
+    console.error('Server Action: fetchCandidateApplications failed:', error);
+    throw new Error('Failed to fetch candidate applications');
+  }
+}
+
+export async function fetchHiredCandidates(): Promise<CandidateOption[]> {
+  try {
+    return await getHiredCandidates();
+  } catch (error) {
+    console.error('Server Action: fetchHiredCandidates failed:', error);
+    throw new Error('Failed to fetch hired candidates');
+  }
+}
+
+export async function fetchCandidatesByStage(
+  stageType: 'applied' | 'phone_screen' | 'interview' | 'offer' | 'hired' | 'rejected' | 'withdrawn'
+): Promise<CandidateOption[]> {
+  try {
+    return await getCandidatesByStage(stageType);
+  } catch (error) {
+    console.error('Server Action: fetchCandidatesByStage failed:', error);
+    throw new Error(`Failed to fetch candidates in ${stageType} stage`);
+  }
+}
+
+*/
+
+// ===== CUSTOM FIELD ACTIONS =====
+// TODO: Implement when TeamTailor custom field operations are ready
+
+/*
+
+export async function fetchAllCustomFields(options?: CustomFieldRequestOptions): Promise<CustomFieldOption[]> {
+  try {
+    return await getAllCustomFields(options);
+  } catch (error) {
+    console.error('Server Action: fetchAllCustomFields failed:', error);
+    throw new Error('Failed to fetch custom fields');
+  }
+}
+
+export async function fetchCustomField(id: string): Promise<CustomFieldOption> {
+  try {
+    return await getCustomField(id);
+  } catch (error) {
+    console.error('Server Action: fetchCustomField failed:', error);
+    throw new Error(`Failed to fetch custom field ${id}`);
+  }
+}
+
+export async function createNewCustomField(data: CustomFieldPayload): Promise<CustomFieldOption> {
+  try {
+    return await createCustomField(data);
+  } catch (error) {
+    console.error('Server Action: createNewCustomField failed:', error);
+    throw new Error('Failed to create custom field');
+  }
+}
+
+export async function updateExistingCustomField(id: string, data: Partial<CustomFieldPayload>): Promise<CustomFieldOption> {
+  try {
+    return await updateCustomField(id, data);
+  } catch (error) {
+    console.error('Server Action: updateExistingCustomField failed:', error);
+    throw new Error(`Failed to update custom field ${id}`);
+  }
+}
+
+export async function removeCustomField(id: string): Promise<void> {
+  try {
+    await deleteCustomField(id);
+  } catch (error) {
+    console.error('Server Action: removeCustomField failed:', error);
+    throw new Error(`Failed to delete custom field ${id}`);
+  }
+}
+
+export async function fetchCustomFieldsByResourceType(
+  resourceType: 'candidates' | 'jobs' | 'users'
+): Promise<CustomFieldOption[]> {
+  try {
+    return await getCustomFieldsByResourceType(resourceType);
+  } catch (error) {
+    console.error('Server Action: fetchCustomFieldsByResourceType failed:', error);
+    throw new Error(`Failed to fetch custom fields for ${resourceType}`);
+  }
+}
+
+export async function fetchCandidateCustomFields(): Promise<CustomFieldOption[]> {
+  try {
+    return await getCandidateCustomFields();
+  } catch (error) {
+    console.error('Server Action: fetchCandidateCustomFields failed:', error);
+    throw new Error('Failed to fetch candidate custom fields');
+  }
+}
+
+export async function fetchJobCustomFields(): Promise<CustomFieldOption[]> {
+  try {
+    return await getJobCustomFields();
+  } catch (error) {
+    console.error('Server Action: fetchJobCustomFields failed:', error);
+    throw new Error('Failed to fetch job custom fields');
+  }
+}
+
+export async function fetchUserCustomFields(): Promise<CustomFieldOption[]> {
+  try {
+    return await getUserCustomFields();
+  } catch (error) {
+    console.error('Server Action: fetchUserCustomFields failed:', error);
+    throw new Error('Failed to fetch user custom fields');
+  }
+}
+
+export async function validateFieldValue(
+  field: CustomFieldOption,
+  value: unknown
+): Promise<{ valid: boolean; error?: string }> {
+  try {
+    return validateCustomFieldValue(field, value);
+  } catch (error) {
+    console.error('Server Action: validateFieldValue failed:', error);
+    return { valid: false, error: 'Validation error occurred' };
+  }
+}
+
+// ===== UTILITY ACTIONS =====
+// TODO: Implement when all TeamTailor operations are ready
+
+/*
+export async function syncAllData(): Promise<{
+  clients: ClientOption[];
+  jobs: JobOption[];
+  candidates: CandidateOption[];
+  customFields: CustomFieldOption[];
+}> {
+  try {
+    const [clients, jobs, candidates, customFields] = await Promise.all([
+      getAllClients(),
+      getAllJobs(),
+      getAllCandidates(),
+      getAllCustomFields()
+    ]);
+    
+    return { clients, jobs, candidates, customFields };
+  } catch (error) {
+    console.error('Server Action: syncAllData failed:', error);
+    throw new Error('Failed to sync all TeamTailor data');
+  }
+}
+
+export async function fetchDashboardStats(): Promise<{
+  totalClients: number;
+  totalJobs: number;
+  totalCandidates: number;
+  activeJobs: number;
+  publishedJobs: number;
+  hiredCandidates: number;
+  sourcedCandidates: number;
+}> {
+  try {
+    const [clients, jobs, candidates, publishedJobs, hiredCandidates, sourcedCandidates] = await Promise.all([
+      getAllClients(),
+      getAllJobs(),
+      getAllCandidates(),
+      getJobsByStatus('published'),
+      getHiredCandidates(),
+      getSourcedCandidates()
+    ]);
+
+    const activeJobs = jobs.filter((job: JobOption) => job.status === 'published' || job.status === 'draft').length;
+    
+    return {
+      totalClients: clients.length,
+      totalJobs: jobs.length,
+      totalCandidates: candidates.length,
+      activeJobs,
+      publishedJobs: publishedJobs.length,
+      hiredCandidates: hiredCandidates.length,
+      sourcedCandidates: sourcedCandidates.length,
+    };
+  } catch (error) {
+    console.error('Server Action: fetchDashboardStats failed:', error);
+    throw new Error('Failed to fetch dashboard statistics');
+  }
+}
+*/
+
+// ===== CUSTOM FIELD OPTIONS ACTIONS =====
+// TODO: Implement when TeamTailor custom field option operations are ready
+
+/*
+
+export async function fetchAllCustomFieldOptions(): Promise<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionOption[]> {
+  try {
+    return await getAllCustomFieldOptions();
+  } catch (error) {
+    console.error('Server Action: fetchAllCustomFieldOptions failed:', error);
+    throw new Error('Failed to fetch custom field options');
+  }
+}
+
+export async function fetchCustomFieldOptionsByFieldId(customFieldId: string): Promise<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionOption[]> {
+  try {
+    return await getCustomFieldOptionsByFieldId(customFieldId);
+  } catch (error) {
+    console.error('Server Action: fetchCustomFieldOptionsByFieldId failed:', error);
+    throw new Error(`Failed to fetch custom field options for field ${customFieldId}`);
+  }
+}
+
+export async function fetchCustomFieldOption(id: string): Promise<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionOption> {
+  try {
+    return await getCustomFieldOption(id);
+  } catch (error) {
+    console.error('Server Action: fetchCustomFieldOption failed:', error);
+    throw new Error(`Failed to fetch custom field option ${id}`);
+  }
+}
+
+export async function createNewCustomFieldOption(data: import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionPayload): Promise<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionOption> {
+  try {
+    return await createCustomFieldOption(data);
+  } catch (error) {
+    console.error('Server Action: createNewCustomFieldOption failed:', error);
+    throw new Error('Failed to create custom field option');
+  }
+}
+
+export async function updateExistingCustomFieldOption(id: string, data: Partial<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionPayload>): Promise<import('../../../lib/integrations/teamtailor/endpoints/custom-field-options').CustomFieldOptionOption> {
+  try {
+    return await updateCustomFieldOption(id, data);
+  } catch (error) {
+    console.error('Server Action: updateExistingCustomFieldOption failed:', error);
+    throw new Error(`Failed to update custom field option ${id}`);
+  }
+}
+
+export async function removeCustomFieldOption(id: string): Promise<void> {
+  try {
+    await deleteCustomFieldOption(id);
+  } catch (error) {
+    console.error('Server Action: removeCustomFieldOption failed:', error);
+    throw new Error(`Failed to delete custom field option ${id}`);
+  }
+}
+*/
+
+// ===== LOCATION ACTIONS =====
+// TODO: Implement when TeamTailor location operations are ready
+
+/*
+export async function fetchAllLocations(): Promise<import('../../../lib/integrations/teamtailor/endpoints/locations').LocationOption[]> {
+  try {
+    return await getAllLocations();
+  } catch (error) {
+    console.error('Server Action: fetchAllLocations failed:', error);
+    throw new Error('Failed to fetch locations');
+  }
+}
+
+export async function fetchLocation(id: string): Promise<import('../../../lib/integrations/teamtailor/endpoints/locations').LocationOption> {
+  try {
+    return await getLocation(id);
+  } catch (error) {
+    console.error('Server Action: fetchLocation failed:', error);
+    throw new Error(`Failed to fetch location ${id}`);
+  }
+}
+*/

@@ -6,6 +6,10 @@ import {
   SettingOutlined,
   TeamOutlined,
   SafetyCertificateOutlined,
+  BuildOutlined,
+  DeleteOutlined,
+  CarryOutOutlined,
+  KeyOutlined,
 } from "@ant-design/icons";
 import { NavigationItem } from "@/types/rbac";
 import { usePermissionFilter } from "@/hooks/usePermissions";
@@ -32,6 +36,24 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
         label: "Dashboard",
         requiredPermission: {
           resource: "dashboard",
+          action: "read",
+        },
+      },
+      {
+        key: "/companies",
+        icon: <BuildOutlined />,
+        label: "Companies",
+        requiredPermission: {
+          resource: "companies",
+          action: "read",
+        },
+      },
+      {
+        key: "/roles",
+        icon: <CarryOutOutlined />,
+        label: "Job Roles",
+        requiredPermission: {
+          resource: "jobs",
           action: "read",
         },
       },
@@ -64,14 +86,29 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
             icon: <SafetyCertificateOutlined />,
             label: "Role Management",
             requiredPermission: {
-              resource: "admin",
-              action: "users",
+              resource: "roles",
+              action: "read",
+            },
+          },
+          {
+            key: "/admin/permissions",
+            icon: <KeyOutlined />,
+            label: "Permission Management",
+            requiredPermission: {
+              resource: "permissions",
+              action: "read",
             },
           },
           {
             key: "/admin/system",
             icon: <SettingOutlined />,
             label: "System Settings",
+            requiredRole: ["super_admin"],
+          },
+          {
+            key: "/cleanup",
+            icon: <DeleteOutlined />,
+            label: "Cleanup Duplicates",
             requiredRole: ["super_admin"],
           },
         ],

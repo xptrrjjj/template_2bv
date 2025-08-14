@@ -35,8 +35,8 @@ function transformClient(resource: ClientResource): ClientOption {
 /**
  * Transform client payload to TeamTailor API format
  */
-function transformPayload(payload: ClientPayload): Record<string, any> {
-  const attributes: Record<string, any> = {
+function transformPayload(payload: ClientPayload): Record<string, unknown> {
+  const attributes: Record<string, unknown> = {
     name: payload.name,
   };
   
@@ -58,8 +58,49 @@ function transformPayload(payload: ClientPayload): Record<string, any> {
   if (payload.size !== undefined) {
     attributes.size = payload.size;
   }
+
+  return {
+    data: {
+      type: 'clients',
+      attributes
+    }
+  };
+}
+
+/**
+ * Transform partial client payload for updates to TeamTailor API format
+ */
+function transformPartialPayload(payload: Partial<ClientPayload>): Record<string, unknown> {
+  const attributes: Record<string, unknown> = {};
   
-  return attributes;
+  if (payload.name !== undefined) {
+    attributes.name = payload.name;
+  }
+  if (payload.externalId !== undefined) {
+    attributes['external-id'] = payload.externalId;
+  }
+  if (payload.status !== undefined) {
+    attributes.status = payload.status;
+  }
+  if (payload.description !== undefined) {
+    attributes.description = payload.description;
+  }
+  if (payload.website !== undefined) {
+    attributes.website = payload.website;
+  }
+  if (payload.industry !== undefined) {
+    attributes.industry = payload.industry;
+  }
+  if (payload.size !== undefined) {
+    attributes.size = payload.size;
+  }
+  
+  return {
+    data: {
+      type: 'clients',
+      attributes
+    }
+  };
 }
 
 /**
@@ -84,7 +125,7 @@ export async function getClient(
 ): Promise<ClientOption> {
   const response = await teamTailorClient.get<{ data: ClientResource }>(
     `/v1/clients/${id}`,
-    { params: options }
+    options ? { params: options as Record<string, unknown> } : undefined
   );
   
   if (!response.data) {
@@ -119,7 +160,7 @@ export async function updateClient(
   id: string, 
   data: Partial<ClientPayload>
 ): Promise<ClientOption> {
-  const attributes = transformPayload(data);
+  const attributes = transformPartialPayload(data);
   
   const response = await teamTailorClient.patch<{ data: ClientResource }>(
     `/v1/clients/${id}`,
@@ -145,7 +186,7 @@ export async function deleteClient(id: string): Promise<void> {
  */
 export async function getClientsByStatus(
   status: 'active' | 'inactive',
-  options?: Omit<ClientRequestOptions, 'filter'>
+  options?: ClientRequestOptions
 ): Promise<ClientOption[]> {
   return getAllClients({
     ...options,
@@ -161,7 +202,7 @@ export async function getClientsByStatus(
  */
 export async function searchClientsByName(
   name: string,
-  options?: Omit<ClientRequestOptions, 'filter'>
+  options?: ClientRequestOptions
 ): Promise<ClientOption[]> {
   return getAllClients({
     ...options,
@@ -177,7 +218,7 @@ export async function searchClientsByName(
  */
 export async function getClientByExternalId(
   externalId: string,
-  options?: Omit<ClientRequestOptions, 'filter'>
+  options?: ClientRequestOptions
 ): Promise<ClientOption | null> {
   const clients = await getAllClients({
     ...options,
@@ -204,7 +245,7 @@ export async function getClientsPage(
   const endpoint = pageUrl || '/v1/clients';
   const response = await teamTailorClient.get<TeamTailorPaginatedResponse<ClientResource>>(
     endpoint,
-    pageUrl ? {} : { params: options }
+    pageUrl ? {} : { params: options as Record<string, unknown> }
   );
   
   return {

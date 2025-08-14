@@ -130,7 +130,7 @@ export class RoleService {
       );
     }
 
-    await apiClient.deleteRole(roleId);
+    await apiClient.deleteRole(roleId, deletedBy);
 
     // Create audit log
     await apiClient.createAuditLog({

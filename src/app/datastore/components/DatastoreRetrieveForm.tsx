@@ -23,29 +23,29 @@ interface DatastoreRetrieveFormProps {
 
 const retrieveTemplates = {
   all_records: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     filters: {},
   },
   by_status: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     filters: {
       status: "active",
     },
   },
   by_position: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     filters: {
       position: "Senior Developer",
     },
   },
   by_record_id: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     filters: {
       record_id: "candidate_001",
     },
   },
   multiple_filters: {
-    identifier: "recruitment_tool",
+    identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
     filters: {
       status: "active",
       experience_years: 5,
@@ -138,7 +138,7 @@ export const DatastoreRetrieveForm: React.FC<DatastoreRetrieveFormProps> = ({ on
         form={form}
         layout="vertical"
         initialValues={{
-          identifier: "recruitment_tool",
+          identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
           filters: "{}",
         }}
         onFinish={handleSubmit}

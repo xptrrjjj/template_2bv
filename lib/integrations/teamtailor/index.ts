@@ -32,11 +32,38 @@ export {
   getClientsPage
 } from './endpoints/clients';
 
-// Job operations (to be implemented)
-// export * from './endpoints/jobs';
+// Job operations (placeholder implementations)
+export {
+  getAllJobs,
+  createJob,
+  createJobFromTemplate
+} from './endpoints/jobs';
 
-// Candidate operations (to be implemented)
-// export * from './endpoints/candidates';
+// Candidate operations (placeholder implementations)
+export {
+  getAllCandidates,
+  getCandidate,
+  createCandidate,
+  updateCandidate,
+  deleteCandidate,
+  getCandidateApplications
+} from './endpoints/candidates';
 
-// Custom field operations (to be implemented)
-// export * from './endpoints/custom-fields';
+// Custom field operations (placeholder implementations)
+export {
+  getAllCustomFields,
+  getCustomField,
+  createCustomField,
+  updateCustomField,
+  deleteCustomField,
+  validateCustomFieldValue
+} from './endpoints/custom-fields';
+
+// Department operations
+export {
+  getAllDepartments,
+  getDepartment,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment
+} from './endpoints/departments';

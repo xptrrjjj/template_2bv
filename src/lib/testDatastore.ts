@@ -3,7 +3,7 @@ import { apiClient } from "@/services/api";
 export const testDatastoreOperations = async () => {
   const testResults: Array<{ operation: string; status: string; data: unknown; error?: string }> =
     [];
-  const identifier = "recruitment_tool";
+  const identifier = process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter";
   const testRecordId = `test_${Date.now()}`;
 
   try {

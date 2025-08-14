@@ -1,0 +1,104 @@
+/* Performance optimizations for Job Role Wizard */
+
+/* Enable GPU acceleration for smooth animations */
+.job-role-wizard {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: auto;
+}
+
+/* Optimize form field animations */
+.ant-form-item {
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Reduce reflows during typing */
+.ant-input,
+.ant-select,
+.ant-input-number {
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize card rendering */
+.ant-card {
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Smooth transitions for steps */
+.ant-steps-item {
+  transition: all 0.2s ease;
+  transform: translateZ(0);
+}
+
+/* Optimize button interactions */
+.ant-btn {
+  transform: translateZ(0);
+  transition: all 0.15s ease;
+}
+
+/* Prevent layout thrashing in large forms */
+.wizard-stage-content {
+  contain: layout;
+  transform: translateZ(0);
+}
+
+/* Optimize modal rendering */
+.ant-modal {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Remove hover animations - they make UI feel floaty and ugly */
+
+/* Optimize progress bars */
+.ant-progress {
+  contain: strict;
+}
+
+/* Smooth scrolling for content areas */
+.ant-card-body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize tab rendering */
+.ant-tabs {
+  contain: layout;
+}
+
+/* GPU acceleration for badges and statistics */
+.ant-statistic,
+.ant-badge {
+  transform: translateZ(0);
+}
+
+/* Prevent text selection where not needed */
+.wizard-navigation,
+.ant-steps {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Optimize image rendering */
+.wizard-icons {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Container queries for responsive performance */
+@container (min-width: 768px) {
+  .wizard-stage-content {
+    contain: layout style;
+  }
+}
+
+/* Reduce composite layers */
+.performance-optimized {
+  isolation: isolate;
+}
