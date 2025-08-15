@@ -32,7 +32,7 @@ import { PermissionGuard } from "@/components/guards";
 import { useAuth } from "@/contexts/AuthContext";
 import { RoleRecord, PermissionRecord, CreateRoleRequest } from "@/types/rbac";
 import { roleService, permissionService, userService } from "@/services/rbac";
-import { RoleStatistics } from "@/components/roles/RoleStatistics";
+// Removed RoleStatistics component import
 
 const { Title, Text } = Typography;
 const { TextArea, Search } = Input;
@@ -359,7 +359,7 @@ export default function RolesPage() {
           </Card>
 
           {/* Role Statistics */}
-          <RoleStatistics roles={roles} loading={loading} />
+          {/* Removed RoleStatistics component */}
 
           {/* Search and Filters */}
           <Card

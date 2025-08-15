@@ -14,14 +14,12 @@ import {
   Select,
   Popconfirm,
   Descriptions,
-  Divider,
   App,
   Row,
   Col,
   Alert,
 } from "antd";
 import {
-  EditOutlined,
   DeleteOutlined,
   PlusOutlined,
   EyeOutlined,
@@ -30,19 +28,12 @@ import {
   AppstoreOutlined,
   SafetyCertificateOutlined,
   LockOutlined,
-  SettingOutlined,
-  WarningOutlined,
 } from "@ant-design/icons";
 import { PermissionGuard } from "@/components/guards";
 import { useAuth } from "@/contexts/AuthContext";
 import { PermissionRecord, CreatePermissionRequest } from "@/types/rbac";
 import { permissionService, roleService } from "@/services/rbac";
-import { 
-  setupApprovalWorkflow, 
-  wipeApprovalWorkflow, 
-  isApprovalWorkflowSetup,
-  ApprovalWorkflowSetupResult 
-} from "@/scripts/approvalWorkflowSetup";
+// Removed job role approval workflow functionality
 
 const { Title, Text } = Typography;
 const { TextArea, Search } = Input;
@@ -58,12 +49,10 @@ export default function PermissionsPage() {
   const [permissions, setPermissions] = useState<PermissionWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] = useState<PermissionWithDetails | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [approvalWorkflowSetup, setApprovalWorkflowSetup] = useState(false);
-  const [approvalWorkflowLoading, setApprovalWorkflowLoading] = useState(false);
+  // Removed approval workflow state variables
   const [form] = Form.useForm();
 
   const loadPermissions = useCallback(async () => {
@@ -88,10 +77,6 @@ export default function PermissionsPage() {
       });
 
       setPermissions(rolePermissionCounts);
-      
-      // Check if approval workflow is set up
-      const isSetup = await isApprovalWorkflowSetup();
-      setApprovalWorkflowSetup(isSetup);
     } catch (error) {
       console.error("Failed to load permissions:", error);
       message.error("Failed to load permissions");
@@ -143,55 +128,7 @@ export default function PermissionsPage() {
     setViewModalOpen(true);
   };
 
-  const handleSetupApprovalWorkflow = async () => {
-    try {
-      setApprovalWorkflowLoading(true);
-      const result: ApprovalWorkflowSetupResult = await setupApprovalWorkflow(rbacUser?.microsoft_oid || "admin");
-      
-      if (result.success) {
-        message.success(
-          `Approval workflow setup completed! Created ${result.permissionsCreated} permissions and ${result.rolesCreated} roles.`
-        );
-        setApprovalWorkflowSetup(true);
-        loadPermissions(); // Refresh to show new permissions
-      } else {
-        message.warning(
-          `Approval workflow setup completed with ${result.errors.length} errors. Check console for details.`
-        );
-        console.error("Setup errors:", result.errors);
-      }
-    } catch (error) {
-      console.error("Failed to setup approval workflow:", error);
-      message.error("Failed to setup approval workflow");
-    } finally {
-      setApprovalWorkflowLoading(false);
-    }
-  };
-
-  const handleWipeApprovalWorkflow = async () => {
-    try {
-      setApprovalWorkflowLoading(true);
-      const result: ApprovalWorkflowSetupResult = await wipeApprovalWorkflow(rbacUser?.microsoft_oid || "admin");
-      
-      if (result.success) {
-        message.success(
-          `Approval workflow wiped! Removed ${result.permissionsCreated} permissions and ${result.rolesCreated} roles.`
-        );
-        setApprovalWorkflowSetup(false);
-        loadPermissions(); // Refresh to show removed permissions
-      } else {
-        message.warning(
-          `Approval workflow wipe completed with ${result.errors.length} errors. Check console for details.`
-        );
-        console.error("Wipe errors:", result.errors);
-      }
-    } catch (error) {
-      console.error("Failed to wipe approval workflow:", error);
-      message.error("Failed to wipe approval workflow");
-    } finally {
-      setApprovalWorkflowLoading(false);
-    }
-  };
+  // Removed approval workflow handler functions
 
   const filteredPermissions = permissions.filter((permission) =>
     permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -391,68 +328,7 @@ export default function PermissionsPage() {
               </Col>
             </Row>
 
-            {/* Approval Workflow Section */}
-            <Card 
-              size="small" 
-              title={
-                <Space>
-                  <SettingOutlined />
-                  <span>Job Role Approval Workflow</span>
-                </Space>
-              }
-              style={{ marginBottom: 16 }}
-              extra={
-                <Space>
-                  {approvalWorkflowSetup ? (
-                    <Tag color="green">Setup Complete</Tag>
-                  ) : (
-                    <Tag color="orange">Not Setup</Tag>
-                  )}
-                </Space>
-              }
-            >
-              <Row gutter={16} align="middle">
-                <Col flex="auto">
-                  <Text type="secondary">
-                    {approvalWorkflowSetup 
-                      ? "Job role approval workflow permissions and roles are configured." 
-                      : "Setup custom roles and permissions for the job role approval workflow."
-                    }
-                  </Text>
-                </Col>
-                <Col>
-                  <Space>
-                    {!approvalWorkflowSetup ? (
-                      <Button
-                        type="primary"
-                        icon={<SettingOutlined />}
-                        loading={approvalWorkflowLoading}
-                        onClick={handleSetupApprovalWorkflow}
-                      >
-                        Setup Approval Workflow
-                      </Button>
-                    ) : (
-                      <Popconfirm
-                        title="Wipe Approval Workflow"
-                        description="This will remove all approval workflow roles and permissions. Users with these roles will lose their permissions. Are you sure?"
-                        onConfirm={handleWipeApprovalWorkflow}
-                        okText="Yes, Wipe"
-                        cancelText="Cancel"
-                        okButtonProps={{ danger: true }}
-                      >
-                        <Button
-                          danger
-                          icon={<WarningOutlined />}
-                          loading={approvalWorkflowLoading}
-                        >
-                          Wipe Approval Workflow
-                        </Button>
-                      </Popconfirm>
-                    )}
-                  </Space>
-                </Col>
-              </Row>
-            </Card>
+            {/* Removed Approval Workflow Section */}
 
             <Alert
               message="Permission Management Info"

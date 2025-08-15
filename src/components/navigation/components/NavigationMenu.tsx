@@ -6,9 +6,7 @@ import {
   SettingOutlined,
   TeamOutlined,
   SafetyCertificateOutlined,
-  BuildOutlined,
   DeleteOutlined,
-  CarryOutOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
 import { NavigationItem } from "@/types/rbac";
@@ -36,24 +34,6 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
         label: "Dashboard",
         requiredPermission: {
           resource: "dashboard",
-          action: "read",
-        },
-      },
-      {
-        key: "/companies",
-        icon: <BuildOutlined />,
-        label: "Companies",
-        requiredPermission: {
-          resource: "companies",
-          action: "read",
-        },
-      },
-      {
-        key: "/roles",
-        icon: <CarryOutOutlined />,
-        label: "Job Roles",
-        requiredPermission: {
-          resource: "jobs",
           action: "read",
         },
       },

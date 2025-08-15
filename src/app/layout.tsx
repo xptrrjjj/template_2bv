@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Recruitment Tool",
-  description: "Microsoft authenticated recruitment management tool",
+  title: "Admin Dashboard",
+  description: "Microsoft authenticated administration dashboard",
 };
 
 export default function RootLayout({
