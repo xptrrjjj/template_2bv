@@ -11,7 +11,7 @@ services:
         - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
         - NEXT_PUBLIC_APP_IDENTIFIER=${NEXT_PUBLIC_APP_IDENTIFIER}
         - NEXT_PUBLIC_APP_URL=https://recruiter-f.rnd.2bv.io
-        - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io/auth/callback
+        - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io/
         - TEAMTAILOR_API_KEY=${TEAMTAILOR_API_KEY}
         - OPENAI_API_KEY=${OPENAI_API_KEY}
         - GEMINI_API_KEY=${GEMINI_API_KEY}
