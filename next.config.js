@@ -43,7 +43,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.openai.com https://generativelanguage.googleapis.com https://api.testdome.com https://api.teamtailor.com https://graph.microsoft.com https://login.microsoftonline.com",
+              "connect-src 'self' https://framework.2bv.io https://api.openai.com https://generativelanguage.googleapis.com https://api.testdome.com https://api.teamtailor.com https://graph.microsoft.com https://login.microsoftonline.com",
               "frame-src 'self' https://login.microsoftonline.com"
             ].join('; ')
           }
