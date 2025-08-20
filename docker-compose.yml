@@ -7,62 +7,25 @@ services:
       dockerfile: Dockerfile
     container_name: recruiter-f-2bv
     restart: unless-stopped
+    env_file:
+      - .env.local
     environment:
-      # Application Configuration
+      # Docker/Production Configuration
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
       
-      # Domain Configuration  
+      # nginx-proxy Configuration  
       - VIRTUAL_HOST=recruiter-f.rnd.2bv.io
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=recruiter-f.rnd.2bv.io
-      - LETSENCRYPT_EMAIL=admin@2bv.io
+      - LETSENCRYPT_EMAIL=peter.esquilla@simplyautomate.ai
       
-      # Next.js Configuration
-      - NEXT_PUBLIC_APP_URL=https://recruiter-f.rnd.2bv.io
-      - NEXT_PUBLIC_APP_IDENTIFIER=antd_recruiter
-      
-      # Microsoft Azure AD Configuration
-      - NEXT_PUBLIC_AZURE_CLIENT_ID=${NEXT_PUBLIC_AZURE_CLIENT_ID}
-      - NEXT_PUBLIC_AZURE_TENANT_ID=${NEXT_PUBLIC_AZURE_TENANT_ID}
+      # Production Overrides (everything else comes from .env.local)
+      - NEXT_PUBLIC_APP_URL=https://recruiter-f.rnd.2bv.io/
       - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io/
-      
-      # API Configuration
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
-      
-      # RBAC Configuration
-      - NEXT_PUBLIC_APP_ID=${NEXT_PUBLIC_APP_ID}
-      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME}
-      - NEXT_PUBLIC_SUPER_ADMIN_EMAILS=${NEXT_PUBLIC_SUPER_ADMIN_EMAILS}
-      - NEXT_PUBLIC_SUPER_ADMIN_OIDS=${NEXT_PUBLIC_SUPER_ADMIN_OIDS}
-      - NEXT_PUBLIC_DEFAULT_USER_ROLE=${NEXT_PUBLIC_DEFAULT_USER_ROLE}
-      - NEXT_PUBLIC_DEFAULT_ROLE=${NEXT_PUBLIC_DEFAULT_ROLE}
-      - NEXT_PUBLIC_AUTO_PROVISION_USERS=${NEXT_PUBLIC_AUTO_PROVISION_USERS}
-      - NEXT_PUBLIC_REQUIRE_EXPLICIT_ACCESS=${NEXT_PUBLIC_REQUIRE_EXPLICIT_ACCESS}
-      - NEXT_PUBLIC_ENABLE_USER_REGISTRATION=${NEXT_PUBLIC_ENABLE_USER_REGISTRATION}
-      
-      # Advanced Features
-      - NEXT_PUBLIC_ENABLE_AUDIT_LOGGING=${NEXT_PUBLIC_ENABLE_AUDIT_LOGGING}
-      - NEXT_PUBLIC_PERMISSION_CACHE_TTL=${NEXT_PUBLIC_PERMISSION_CACHE_TTL}
-      - NEXT_PUBLIC_MAX_ROLES_PER_USER=${NEXT_PUBLIC_MAX_ROLES_PER_USER}
-      
-      # AI Services Configuration
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      
-      # External Integrations
-      - NEXT_PUBLIC_TESTDOME_API_KEY=${NEXT_PUBLIC_TESTDOME_API_KEY}
-      - NEXT_PUBLIC_TESTDOME_ACCOUNT=${NEXT_PUBLIC_TESTDOME_ACCOUNT}
-      - TEAMTAILOR_API_KEY=${TEAMTAILOR_API_KEY}
-      
-      # Security Configuration (set defaults if not in .env.local)
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-recruiter-2bv-nextauth-secret-production-key-32chars}
       - NEXTAUTH_URL=https://recruiter-f.rnd.2bv.io
-      
-      # Database/Datastore Configuration (use API base URL as fallback)
-      - DATASTORE_API_URL=${DATASTORE_API_URL:-${NEXT_PUBLIC_API_BASE_URL}}
-      - DATASTORE_API_KEY=${DATASTORE_API_KEY:-your-api-key}
+      - NEXTAUTH_SECRET=recruiter-2bv-nextauth-secret-production-key-32chars
       
     expose:
       - "3000"
