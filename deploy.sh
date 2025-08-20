@@ -35,8 +35,13 @@ if [ ! -f .env.local ]; then
 fi
 
 # Load environment variables from your working config
+set -a  # Automatically export all variables
 source .env.local
+set +a  # Stop auto-exporting
 echo "✅ Using .env.local configuration for deployment"
+
+# Export all variables to make them available to docker-compose
+export $(grep -v '^#' .env.local | grep -v '^\s*$' | cut -d= -f1)
 
 # Validate required environment variables
 required_vars=(
