@@ -30,13 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (opt-in for production config)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production - tracked in git for deployment
-.env.example - tracked in git as template
+# env files - only .env.example is tracked
+.env*
+!.env.example
 
 # vercel
 .vercel

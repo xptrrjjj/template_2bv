@@ -72,17 +72,19 @@ Copy the production environment template:
 cp .env.production .env.local
 ```
 
-### 2. Production Configuration
-The production configuration is already set up in `.env.production` (tracked in git). 
-For local development, copy the example:
+### 2. Environment Configuration
+The application uses `.env.local` for all environments. Make sure you have your working `.env.local` file:
 
 ```bash
-# For local development only
+# Make sure .env.local exists with your working configuration
+ls -la .env.local
+
+# If you need to create one, copy from example
 cp .env.example .env.local
-nano .env.local  # Configure with your development values
+nano .env.local  # Configure with your values
 ```
 
-**Note**: The deployment script will automatically use `.env.production` for production deployment.
+**Note**: The deployment script uses `.env.local` directly. The Docker container will override production-specific values like redirect URI.
 
 **Required Configuration:**
 ```env
