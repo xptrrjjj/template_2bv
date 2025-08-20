@@ -32,7 +32,7 @@ yarn-error.log*
 
 # env files (opt-in for production config)
 .env
-.env.local
+#.env.local
 .env.development.local
 .env.test.local
 # .env.production - tracked in git for deployment
