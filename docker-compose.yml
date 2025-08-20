@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  recruiter-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recruiter-f-2bv
+    restart: unless-stopped
+    environment:
+      # Application Configuration
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      
+      # Domain Configuration  
+      - VIRTUAL_HOST=recruiter-f.rnd.2bv.io
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=recruiter-f.rnd.2bv.io
+      - LETSENCRYPT_EMAIL=admin@2bv.io
+      
+      # Next.js Configuration
+      - NEXT_PUBLIC_APP_URL=https://recruiter-f.rnd.2bv.io
+      - NEXT_PUBLIC_APP_IDENTIFIER=antd_recruiter
+      
+      # Microsoft Azure AD Configuration
+      - NEXT_PUBLIC_AZURE_CLIENT_ID=${NEXT_PUBLIC_AZURE_CLIENT_ID}
+      - NEXT_PUBLIC_AZURE_TENANT_ID=${NEXT_PUBLIC_AZURE_TENANT_ID}
+      - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io/auth/callback
+      
+      # API Configuration
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      
+      # RBAC Configuration
+      - NEXT_PUBLIC_APP_ID=${NEXT_PUBLIC_APP_ID}
+      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME}
+      - NEXT_PUBLIC_SUPER_ADMIN_EMAILS=${NEXT_PUBLIC_SUPER_ADMIN_EMAILS}
+      - NEXT_PUBLIC_SUPER_ADMIN_OIDS=${NEXT_PUBLIC_SUPER_ADMIN_OIDS}
+      - NEXT_PUBLIC_DEFAULT_USER_ROLE=${NEXT_PUBLIC_DEFAULT_USER_ROLE}
+      - NEXT_PUBLIC_DEFAULT_ROLE=${NEXT_PUBLIC_DEFAULT_ROLE}
+      - NEXT_PUBLIC_AUTO_PROVISION_USERS=${NEXT_PUBLIC_AUTO_PROVISION_USERS}
+      - NEXT_PUBLIC_REQUIRE_EXPLICIT_ACCESS=${NEXT_PUBLIC_REQUIRE_EXPLICIT_ACCESS}
+      - NEXT_PUBLIC_ENABLE_USER_REGISTRATION=${NEXT_PUBLIC_ENABLE_USER_REGISTRATION}
+      
+      # Advanced Features
+      - NEXT_PUBLIC_ENABLE_AUDIT_LOGGING=${NEXT_PUBLIC_ENABLE_AUDIT_LOGGING}
+      - NEXT_PUBLIC_PERMISSION_CACHE_TTL=${NEXT_PUBLIC_PERMISSION_CACHE_TTL}
+      - NEXT_PUBLIC_MAX_ROLES_PER_USER=${NEXT_PUBLIC_MAX_ROLES_PER_USER}
+      
+      # AI Services Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      
+      # External Integrations
+      - NEXT_PUBLIC_TESTDOME_API_KEY=${NEXT_PUBLIC_TESTDOME_API_KEY}
+      - NEXT_PUBLIC_TESTDOME_ACCOUNT=${NEXT_PUBLIC_TESTDOME_ACCOUNT}
+      - TEAMTAILOR_API_KEY=${TEAMTAILOR_API_KEY}
+      
+      # Security Configuration
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=https://recruiter-f.rnd.2bv.io
+      
+      # Database/Datastore Configuration
+      - DATASTORE_API_URL=${DATASTORE_API_URL}
+      - DATASTORE_API_KEY=${DATASTORE_API_KEY}
+      
+    expose:
+      - "3000"
+    volumes:
+      # Mount logs directory for persistent logging
+      - ./logs:/app/logs
+      # Mount uploads directory if needed for file uploads
+      - ./uploads:/app/uploads
+    networks:
+      - nginx-proxy
+      - default
+    labels:
+      # nginx-proxy labels for automatic configuration
+      - "traefik.enable=false"
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      - redis
+      
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: recruiter-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - default
+    ports:
+      - "127.0.0.1:6379:6379"
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  nginx-proxy:
+    external: true
+  default:
+    driver: bridge
