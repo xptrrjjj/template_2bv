@@ -26,7 +26,7 @@ services:
       # Microsoft Azure AD Configuration
       - NEXT_PUBLIC_AZURE_CLIENT_ID=${NEXT_PUBLIC_AZURE_CLIENT_ID}
       - NEXT_PUBLIC_AZURE_TENANT_ID=${NEXT_PUBLIC_AZURE_TENANT_ID}
-      - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io/auth/callback
+      - NEXT_PUBLIC_REDIRECT_URI=https://recruiter-f.rnd.2bv.io
       
       # API Configuration
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
