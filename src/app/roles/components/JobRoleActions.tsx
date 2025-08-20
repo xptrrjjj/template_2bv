@@ -7,6 +7,7 @@ import {
   SettingOutlined,
   ArrowRightOutlined,
   ExperimentOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import { JobRoleWithStats, JobRoleStatus } from '@/types/job-roles';
 import { 
@@ -14,6 +15,8 @@ import {
   isInDataCollection,
   canStartTestSetup,
   isInTestSetup,
+  canStartManagementReview,
+  isInManagementReview,
   canProgressStatus,
   getNextStatus,
   getStatusActionLabel
@@ -26,6 +29,7 @@ interface JobRoleActionsProps {
   onDelete: (role: JobRoleWithStats) => void;
   onDataCollection: (role: JobRoleWithStats) => void;
   onTestSetup: (role: JobRoleWithStats) => void;
+  onManagementReview: (role: JobRoleWithStats) => void;
   onStatusChange: (role: JobRoleWithStats, newStatus: JobRoleStatus) => void;
 }
 
@@ -43,6 +47,7 @@ const JobRoleActions: React.FC<JobRoleActionsProps> = ({
   onDelete,
   onDataCollection,
   onTestSetup,
+  onManagementReview,
   onStatusChange,
 }) => {
   const handleStatusProgression = () => {
@@ -116,6 +121,31 @@ const JobRoleActions: React.FC<JobRoleActionsProps> = ({
             size="small"
             onClick={() => onTestSetup(role)}
             style={{ color: '#fa8c16' }}
+          />
+        </Tooltip>
+      )}
+
+      {/* Management Review Actions */}
+      {canStartManagementReview(role.status, role) && (
+        <Tooltip title="Start Management Review">
+          <Button
+            type="text"
+            icon={<AuditOutlined />}
+            size="small"
+            onClick={() => onManagementReview(role)}
+            style={{ color: '#722ed1' }}
+          />
+        </Tooltip>
+      )}
+
+      {isInManagementReview(role.status) && (
+        <Tooltip title="Continue Management Review">
+          <Button
+            type="text"
+            icon={<AuditOutlined />}
+            size="small"
+            onClick={() => onManagementReview(role)}
+            style={{ color: '#722ed1' }}
           />
         </Tooltip>
       )}

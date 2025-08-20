@@ -53,6 +53,9 @@ export interface JobRole {
   // Stage 6: Test Setup (for test_setup status)
   test_setup?: TestSetupData; // Test configuration for candidates
   
+  // Stage 7: Management Review (for management_review status)
+  management_review?: ManagementReviewData; // Management approval workflow data
+  
   // Legacy fields for compatibility
   salary_range_min?: number; // Minimum salary (legacy)
   salary_range_max?: number; // Maximum salary (legacy)
@@ -273,6 +276,42 @@ export interface TestSetupData {
   };
 }
 
+// Management Review interfaces for management approval workflow
+export interface ManagementReviewData {
+  review_status: 'pending' | 'approved' | 'rejected' | 'requires_changes';
+  reviewer_name?: string; // Person conducting the review
+  reviewer_email?: string; // Reviewer's email
+  review_notes?: string; // Management feedback/comments
+  requested_changes?: string[]; // Specific changes requested
+  approved_budget?: {
+    target_budget_approved: boolean;
+    maximum_budget_approved: boolean;
+    approved_budget_amount?: number;
+    budget_approval_notes?: string;
+  };
+  hiring_manager_approval?: {
+    approved: boolean;
+    hiring_manager_name?: string;
+    approval_date?: string;
+    approval_notes?: string;
+  };
+  priority_level?: 'urgent' | 'high' | 'normal' | 'low';
+  estimated_approval_timeline?: string; // Expected time to get final approval
+  compliance_checklist?: {
+    budget_approved: boolean;
+    headcount_approved: boolean;
+    department_approval: boolean;
+    legal_review_needed: boolean;
+    diversity_requirements_met: boolean;
+  };
+  completion_metadata?: {
+    reviewed_at?: string;
+    reviewed_by?: string;
+    review_duration_hours?: number;
+    escalation_required?: boolean;
+  };
+}
+
 export interface JobRoleWizardStage5 {
   is_priority: boolean;
   publish_to_teamtailor: boolean;
@@ -311,6 +350,7 @@ export interface UpdateJobRoleForm extends Partial<CreateJobRoleForm> {
   teamtailor_job_id?: string;
   data_collection?: DataCollectionData;
   test_setup?: TestSetupData;
+  management_review?: ManagementReviewData;
 }
 
 // Enhanced interface for display

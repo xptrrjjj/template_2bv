@@ -408,7 +408,7 @@ const TestSetupModal: React.FC<TestSetupModalProps> = ({
                                   )}
                                   <div>
                                     {test.skills_assessed.map(skill => (
-                                      <Tag key={skill} size="small">{skill}</Tag>
+                                      <Tag key={skill}>{skill}</Tag>
                                     ))}
                                   </div>
                                 </Space>
@@ -532,7 +532,7 @@ const TestSetupModal: React.FC<TestSetupModalProps> = ({
                                       )}
                                       <div>
                                         {test.skills_assessed.map(skill => (
-                                          <Tag key={skill} size="small">{skill}</Tag>
+                                          <Tag key={skill}>{skill}</Tag>
                                         ))}
                                       </div>
                                     </Space>

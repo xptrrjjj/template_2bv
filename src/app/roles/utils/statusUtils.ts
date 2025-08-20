@@ -46,6 +46,22 @@ export const isInTestSetup = (status: JobRoleStatus): boolean => {
 };
 
 /**
+ * Check if a role can start management review
+ */
+export const canStartManagementReview = (status: JobRoleStatus, role?: JobRoleWithStats): boolean => {
+  if (status !== 'test_setup') return false;
+  // Check if test setup is complete
+  return role ? isTestSetupComplete(role) : true;
+};
+
+/**
+ * Check if a role is currently in management review phase
+ */
+export const isInManagementReview = (status: JobRoleStatus): boolean => {
+  return status === 'management_review';
+};
+
+/**
  * Check if test setup is complete (has at least one test configured)
  */
 export const isTestSetupComplete = (role: JobRoleWithStats): boolean => {

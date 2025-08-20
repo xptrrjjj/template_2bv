@@ -13,6 +13,7 @@ interface UseJobRoleTableColumnsProps {
   onDelete: (role: JobRoleWithStats) => void;
   onDataCollection: (role: JobRoleWithStats) => void;
   onTestSetup: (role: JobRoleWithStats) => void;
+  onManagementReview: (role: JobRoleWithStats) => void;
   onStatusChange: (role: JobRoleWithStats, newStatus: JobRoleStatus) => void;
 }
 
@@ -27,6 +28,7 @@ export const useJobRoleTableColumns = ({
   onDelete,
   onDataCollection,
   onTestSetup,
+  onManagementReview,
   onStatusChange,
 }: UseJobRoleTableColumnsProps): ColumnType<JobRoleWithStats>[] => {
   return useMemo(() => [
@@ -139,9 +141,10 @@ export const useJobRoleTableColumns = ({
           onDelete={onDelete}
           onDataCollection={onDataCollection}
           onTestSetup={onTestSetup}
+          onManagementReview={onManagementReview}
           onStatusChange={onStatusChange}
         />
       )
     }
-  ], [onView, onEdit, onDelete, onDataCollection, onTestSetup, onStatusChange]);
+  ], [onView, onEdit, onDelete, onDataCollection, onTestSetup, onManagementReview, onStatusChange]);
 };

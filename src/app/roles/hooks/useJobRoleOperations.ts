@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { App } from 'antd';
-import { JobRoleWithStats, JobRoleStatus, DataCollectionData, TestSetupData, CreateJobRoleForm, JobRoleWizardData } from '@/types/job-roles';
+import { JobRoleWithStats, JobRoleStatus, DataCollectionData, TestSetupData, ManagementReviewData, CreateJobRoleForm, JobRoleWizardData, UpdateJobRoleForm } from '@/types/job-roles';
 import { useJobRoles } from '@/hooks/useJobRoles';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,7 +20,7 @@ export const useJobRoleOperations = () => {
    */
   const handleUpdateJobRole = async (
     roleId: string, 
-    updates: Partial<CreateJobRoleForm & { status?: JobRoleStatus; data_collection?: DataCollectionData }>,
+    updates: UpdateJobRoleForm,
     successMessage?: string
   ): Promise<boolean> => {
     setOperationLoading(true);
@@ -116,11 +116,52 @@ export const useJobRoleOperations = () => {
       return false;
     }
     
-    // Then, update the status separately
+    // Then, progress to the next status (management_review)
     return await handleUpdateJobRole(
       role.role_id,
-      { status: 'test_setup' },
-      'Test setup completed successfully!'
+      { status: 'management_review' },
+      'Test setup completed successfully! Ready for management review.'
+    );
+  };
+
+  /**
+   * Save management review data and update status
+   */
+  const handleManagementReviewSave = async (
+    role: JobRoleWithStats, 
+    managementReviewData: ManagementReviewData
+  ): Promise<boolean> => {
+    // First, save the management review data
+    const dataResult = await handleUpdateJobRole(
+      role.role_id,
+      { management_review: managementReviewData },
+      ''
+    );
+    
+    if (!dataResult) {
+      return false;
+    }
+    
+    // Determine the next status based on review decision
+    let nextStatus: JobRoleStatus = 'management_review';
+    let statusMessage = 'Management review saved successfully!';
+    
+    if (managementReviewData.review_status === 'approved') {
+      nextStatus = 'ready_to_publish';
+      statusMessage = 'Management review approved! Role is ready to publish.';
+    } else if (managementReviewData.review_status === 'rejected') {
+      nextStatus = 'draft'; // Send back to draft for major revisions
+      statusMessage = 'Role rejected and returned to draft status.';
+    } else if (managementReviewData.review_status === 'requires_changes') {
+      nextStatus = 'test_setup'; // Send back to test setup for minor changes
+      statusMessage = 'Changes requested - role returned to test setup stage.';
+    }
+    
+    // Update the status separately
+    return await handleUpdateJobRole(
+      role.role_id,
+      { status: nextStatus },
+      statusMessage
     );
   };
 
@@ -220,6 +261,7 @@ export const useJobRoleOperations = () => {
     handleStatusChange,
     handleDataCollectionSave,
     handleTestSetupSave,
+    handleManagementReviewSave,
     handleEditSubmit,
     prepareRoleForEdit,
     prepareRoleForWizard,

@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { Layout, Table } from 'antd';
-import { JobRoleWithStats, DataCollectionData, TestSetupData } from '@/types/job-roles';
+import { JobRoleWithStats, DataCollectionData, TestSetupData, ManagementReviewData } from '@/types/job-roles';
 import { useJobRoles } from '@/hooks/useJobRoles';
 import { jobRoleStatisticsService } from '@/services/jobRoles/index';
 import JobRoleWizard from '@/components/job-roles/JobRoleWizard';
 import JobRoleDetailsModal from '@/components/job-roles/JobRoleDetailsModal';
 import DataCollectionModal from '@/components/job-roles/DataCollectionModal';
 import TestSetupModal from '@/components/job-roles/TestSetupModal';
+import ManagementReviewModal from '@/components/job-roles/ManagementReviewModal';
 import { JobRolesHeader } from './components/JobRolesHeader';
 import { JobRolesFilters } from './components/JobRolesFilters';
 import JobRoleEditModal from './components/JobRoleEditModal';
@@ -49,6 +50,7 @@ export default function JobRolesPage() {
     handleStatusChange,
     handleDataCollectionSave,
     handleTestSetupSave,
+    handleManagementReviewSave,
     handleEditSubmit,
     prepareRoleForEdit,
     prepareRoleForWizard,
@@ -61,8 +63,19 @@ export default function JobRolesPage() {
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [dataCollectionModalVisible, setDataCollectionModalVisible] = useState(false);
   const [testSetupModalVisible, setTestSetupModalVisible] = useState(false);
+  const [managementReviewModalVisible, setManagementReviewModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<JobRoleWithStats | null>(null);
   const [statistics, setStatistics] = useState({ totalRoles: 0, activeRoles: 0, draftRoles: 0 });
+
+  // Update selectedRole when filteredJobRoles changes (to reflect updated data)
+  React.useEffect(() => {
+    if (selectedRole && filteredJobRoles.length > 0) {
+      const updatedRole = filteredJobRoles.find(role => role.role_id === selectedRole.role_id);
+      if (updatedRole && JSON.stringify(updatedRole) !== JSON.stringify(selectedRole)) {
+        setSelectedRole(updatedRole);
+      }
+    }
+  }, [filteredJobRoles, selectedRole]);
 
   // Load statistics
   React.useEffect(() => {
@@ -112,6 +125,11 @@ export default function JobRolesPage() {
     setTestSetupModalVisible(true);
   };
 
+  const handleManagementReview = (role: JobRoleWithStats) => {
+    setSelectedRole(role);
+    setManagementReviewModalVisible(true);
+  };
+
   const handleDelete = async (role: JobRoleWithStats) => {
     await handleDeleteJobRole(role);
   };
@@ -143,6 +161,7 @@ export default function JobRolesPage() {
     const success = await handleDataCollectionSave(selectedRole, dataCollectionData);
     if (success) {
       setDataCollectionModalVisible(false);
+      // selectedRole will be automatically updated by useEffect when filteredJobRoles updates
     }
   };
 
@@ -152,6 +171,17 @@ export default function JobRolesPage() {
     const success = await handleTestSetupSave(selectedRole, testSetupData);
     if (success) {
       setTestSetupModalVisible(false);
+      // selectedRole will be automatically updated by useEffect when filteredJobRoles updates
+    }
+  };
+
+  const handleManagementReviewModalSave = async (managementReviewData: ManagementReviewData) => {
+    if (!selectedRole) return;
+    
+    const success = await handleManagementReviewSave(selectedRole, managementReviewData);
+    if (success) {
+      setManagementReviewModalVisible(false);
+      // selectedRole will be automatically updated by useEffect when filteredJobRoles updates
     }
   };
 
@@ -162,6 +192,7 @@ export default function JobRolesPage() {
     onDelete: handleDelete,
     onDataCollection: handleDataCollection,
     onTestSetup: handleTestSetup,
+    onManagementReview: handleManagementReview,
     onStatusChange: handleStatusChange,
   });
 
@@ -265,6 +296,14 @@ export default function JobRolesPage() {
               visible={testSetupModalVisible}
               onClose={() => setTestSetupModalVisible(false)}
               onSave={handleTestSetupModalSave}
+              loading={operationLoading}
+            />
+
+            <ManagementReviewModal
+              role={selectedRole}
+              visible={managementReviewModalVisible}
+              onClose={() => setManagementReviewModalVisible(false)}
+              onSave={handleManagementReviewModalSave}
               loading={operationLoading}
             />
           </>
