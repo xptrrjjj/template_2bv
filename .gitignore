@@ -35,8 +35,8 @@ yarn-error.log*
 .env.local
 .env.development.local
 .env.test.local
-# .env.production - tracked in git for deployment
-# .env.example - tracked in git as template
+.env.production - tracked in git for deployment
+.env.example - tracked in git as template
 
 # vercel
 .vercel
