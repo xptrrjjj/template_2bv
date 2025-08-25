@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Result } from "antd";
-import { CrownOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import { Result } from "@/components/ui/result";
+import { Crown, Shield } from "lucide-react";
 import { useIsAdmin, useIsSuperAdmin } from "@/hooks/usePermissions";
 
 interface AdminOnlyProps {
@@ -37,15 +37,15 @@ export const AdminOnly: React.FC<AdminOnlyProps> = ({
         status="403"
         title="Admin Access Required"
         subTitle="You need administrator privileges to access this content."
-        icon={<CrownOutlined style={{ color: "#faad14" }} />}
+        icon={<Crown className="h-16 w-16 text-yellow-500" />}
         extra={
-          <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
+          <div className="text-center mt-4">
+            <p className="text-slate-500 text-sm">
               Required: Administrator role
               {appId && (
                 <>
                   <br />
-                  Application: <code>{appId}</code>
+                  Application: <code className="bg-slate-100 px-1 rounded">{appId}</code>
                 </>
               )}
             </p>
@@ -88,10 +88,10 @@ export const SuperAdminOnly: React.FC<SuperAdminOnlyProps> = ({
         status="403"
         title="Super Admin Access Required"
         subTitle="You need super administrator privileges to access this content."
-        icon={<SafetyCertificateOutlined style={{ color: "#722ed1" }} />}
+        icon={<Shield className="h-16 w-16 text-purple-600" />}
         extra={
-          <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>Required: Super Administrator role</p>
+          <div className="text-center mt-4">
+            <p className="text-slate-500 text-sm">Required: Super Administrator role</p>
           </div>
         }
       />

@@ -1,13 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Form, Input, Select, Button, Space, Typography, App } from "antd";
-import { SendOutlined, ClearOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { Send, X, Zap } from "lucide-react";
 import { apiClient } from "@/services/api";
 import { DatastoreAction } from "@/types/datastore";
 
-const { TextArea } = Input;
-const { Text } = Typography;
+const formSchema = z.object({
+  identifier: z.string().min(1, "Please enter identifier"),
+  action: z.string().min(1, "Please select action"),
+  data: z.string().min(1, "Please enter data").refine((value) => {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Invalid JSON format"),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface TestResult {
   operation: string;
@@ -71,11 +92,19 @@ const testTemplates = {
 };
 
 export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ onResult }) => {
-  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const { notification } = App.useApp();
+  const { toast } = useToast();
+  
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
+      action: "create",
+      data: "{}",
+    },
+  });
 
-  const handleSubmit = async (values: { identifier: string; action: string; data: string }) => {
+  const handleSubmit = async (values: FormData) => {
     setLoading(true);
     try {
       const requestData = {
@@ -94,8 +123,8 @@ export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ 
         status: "success",
       });
 
-      notification.success({
-        message: "Operation Successful",
+      toast({
+        title: "Operation Successful",
         description: `${values.action} operation completed successfully`,
       });
     } catch (error) {
@@ -114,9 +143,10 @@ export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ 
         error: errorMessage,
       });
 
-      notification.error({
-        message: "Operation Failed",
+      toast({
+        title: "Operation Failed",
         description: errorMessage,
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -125,144 +155,125 @@ export const DatastoreOperationForm: React.FC<DatastoreOperationFormProps> = ({ 
 
   const loadTemplate = (action: DatastoreAction) => {
     const template = testTemplates[action];
-    form.setFieldsValue({
-      identifier: template.identifier,
-      action: template.action,
-      data: JSON.stringify(template.data, null, 2),
-    });
+    form.setValue("identifier", template.identifier);
+    form.setValue("action", template.action);
+    form.setValue("data", JSON.stringify(template.data, null, 2));
   };
 
   const clearForm = () => {
-    form.resetFields();
+    form.reset();
   };
 
   return (
-    <Card
-      title={
-        <Space>
-          <SendOutlined style={{ color: "#667eea" }} />
-          <Text strong style={{ fontSize: "16px", color: "#1a202c" }}>
+    <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
+      <CardHeader className="pb-6">
+        <CardTitle className="flex items-center gap-2">
+          <Send className="w-5 h-5 text-[#667eea]" />
+          <span className="text-base font-semibold text-slate-800">
             Datastore Operations
-          </Text>
-        </Space>
-      }
-      style={{
-        background: "white",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      }}
-      styles={{ body: { padding: "24px" } }}
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          identifier: process.env.NEXT_PUBLIC_APP_IDENTIFIER || "antd_recruiter",
-          action: "create",
-        }}
-        onFinish={handleSubmit}
-      >
-        <Form.Item
-          label={
-            <Text strong style={{ color: "#1a202c" }}>
-              Identifier
-            </Text>
-          }
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
           name="identifier"
-          rules={[{ required: true, message: "Please enter identifier" }]}
-        >
-          <Input placeholder="e.g., recruitment_tool" />
-        </Form.Item>
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-slate-800">Identifier</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., recruitment_tool" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <Form.Item
-          label={
-            <Text strong style={{ color: "#1a202c" }}>
-              Action
-            </Text>
-          }
+        <FormField
+          control={form.control}
           name="action"
-          rules={[{ required: true, message: "Please select action" }]}
-        >
-          <Select
-            placeholder="Select action"
-            options={[
-              { value: "create", label: "Create" },
-              { value: "update", label: "Update" },
-              { value: "append", label: "Append" },
-              { value: "delete", label: "Delete" },
-              { value: "delete_all", label: "Delete All" },
-            ]}
-          />
-        </Form.Item>
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-slate-800">Action</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select action" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="create">Create</SelectItem>
+                  <SelectItem value="update">Update</SelectItem>
+                  <SelectItem value="append">Append</SelectItem>
+                  <SelectItem value="delete">Delete</SelectItem>
+                  <SelectItem value="delete_all">Delete All</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <Form.Item
-          label={
-            <Text strong style={{ color: "#1a202c" }}>
-              Data (JSON)
-            </Text>
-          }
+        <FormField
+          control={form.control}
           name="data"
-          rules={[
-            { required: true, message: "Please enter data" },
-            {
-              validator: (_, value) => {
-                try {
-                  JSON.parse(value);
-                  return Promise.resolve();
-                } catch {
-                  return Promise.reject(new Error("Invalid JSON format"));
-                }
-              },
-            },
-          ]}
-        >
-          <TextArea
-            rows={12}
-            placeholder="Enter JSON data..."
-            style={{ fontFamily: "monospace", fontSize: "13px" }}
-          />
-        </Form.Item>
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-slate-800">Data (JSON)</FormLabel>
+              <FormControl>
+                <Textarea
+                  rows={12}
+                  placeholder="Enter JSON data..."
+                  className="font-mono text-sm"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <div style={{ marginBottom: "16px" }}>
-            <Text strong style={{ color: "#1a202c", marginBottom: "8px", display: "block" }}>
+        <div className="space-y-4 w-full">
+          <div className="mb-4">
+            <p className="font-semibold text-slate-800 mb-2 block">
               Quick Templates:
-            </Text>
-            <Space wrap>
+            </p>
+            <div className="flex flex-wrap gap-2">
               {Object.keys(testTemplates).map((action) => (
                 <Button
                   key={action}
-                  size="small"
-                  icon={<ThunderboltOutlined />}
+                  size="sm"
+                  variant="outline"
                   onClick={() => loadTemplate(action as DatastoreAction)}
-                  style={{ textTransform: "capitalize" }}
+                  className="gap-1 capitalize"
                 >
+                  <Zap className="w-3 h-3" />
                   {action.replace("_", " ")}
                 </Button>
               ))}
-            </Space>
+            </div>
           </div>
 
-          <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-            <Button icon={<ClearOutlined />} onClick={clearForm}>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={clearForm} className="gap-1">
+              <X className="w-4 h-4" />
               Clear
             </Button>
             <Button
-              type="primary"
-              icon={<SendOutlined />}
-              htmlType="submit"
-              loading={loading}
-              style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                border: "none",
-              }}
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-br from-[#667eea] to-[#764ba2] hover:from-[#5a67d8] to-[#6b5b95] border-none gap-1"
             >
-              Execute
+              <Send className="w-4 h-4" />
+              {loading ? "Executing..." : "Execute"}
             </Button>
-          </Space>
-        </Space>
+          </div>
+        </div>
+        </form>
       </Form>
+      </CardContent>
     </Card>
   );
 };

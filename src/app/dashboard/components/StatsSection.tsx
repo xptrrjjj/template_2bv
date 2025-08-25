@@ -1,13 +1,12 @@
 "use client";
 
 import React from "react";
-import { Row, Col } from "antd";
 import {
-  UserOutlined,
-  PlusOutlined,
-  CalendarOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
+  User,
+  Plus,
+  Calendar,
+  CheckCircle,
+} from "lucide-react";
 import { StatCard } from "./StatCard";
 
 interface StatsSectionProps {
@@ -30,43 +29,35 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ stats }) => {
   const currentStats = stats || defaultStats;
 
   return (
-    <Row gutter={[24, 24]} style={{ marginBottom: "32px" }}>
-      <Col xs={24} sm={12} lg={6}>
-        <StatCard
-          title="Active Candidates"
-          value={currentStats.activeCandidates}
-          icon={<UserOutlined />}
-          color="#667eea"
-          trend={12}
-        />
-      </Col>
-      <Col xs={24} sm={12} lg={6}>
-        <StatCard
-          title="Open Positions"
-          value={currentStats.openPositions}
-          icon={<PlusOutlined />}
-          color="#52c41a"
-          trend={25}
-        />
-      </Col>
-      <Col xs={24} sm={12} lg={6}>
-        <StatCard
-          title="Interviews This Week"
-          value={currentStats.interviewsThisWeek}
-          icon={<CalendarOutlined />}
-          color="#fa8c16"
-          trend={8}
-        />
-      </Col>
-      <Col xs={24} sm={12} lg={6}>
-        <StatCard
-          title="Successful Hires"
-          value={currentStats.successfulHires}
-          icon={<CheckCircleOutlined />}
-          color="#722ed1"
-          trend={50}
-        />
-      </Col>
-    </Row>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <StatCard
+        title="Active Candidates"
+        value={currentStats.activeCandidates}
+        icon={<User />}
+        color="#667eea"
+        trend={12}
+      />
+      <StatCard
+        title="Open Positions"
+        value={currentStats.openPositions}
+        icon={<Plus />}
+        color="#52c41a"
+        trend={25}
+      />
+      <StatCard
+        title="Interviews This Week"
+        value={currentStats.interviewsThisWeek}
+        icon={<Calendar />}
+        color="#fa8c16"
+        trend={8}
+      />
+      <StatCard
+        title="Successful Hires"
+        value={currentStats.successfulHires}
+        icon={<CheckCircle />}
+        color="#722ed1"
+        trend={50}
+      />
+    </div>
   );
 };

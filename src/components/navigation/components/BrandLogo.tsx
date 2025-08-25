@@ -1,7 +1,4 @@
 import React from "react";
-import { Typography } from "antd";
-
-const { Text } = Typography;
 
 interface BrandLogoProps {
   collapsed: boolean;
@@ -10,42 +7,20 @@ interface BrandLogoProps {
 export const BrandLogo: React.FC<BrandLogoProps> = ({ collapsed }) => {
   return (
     <div
-      style={{
-        padding: collapsed ? "16px 8px" : "24px",
-        borderBottom: "1px solid #f0f0f0",
-        textAlign: collapsed ? "center" : "left",
-        height: "80px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: collapsed ? "center" : "flex-start",
-        flexShrink: 0,
-      }}
+      className={`
+        ${collapsed ? "p-4 px-2" : "p-6"}
+        border-b border-slate-200 h-20 flex items-center
+        ${collapsed ? "justify-center" : "justify-start"}
+        shrink-0 ${collapsed ? "text-center" : "text-left"}
+      `}
     >
       {!collapsed ? (
-        <Text
-          style={{
-            fontSize: "20px",
-            fontWeight: "700",
-            background: "linear-gradient(135deg, #1890ff 0%, #722ed1 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
+        <h1 className="text-xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 bg-clip-text text-transparent">
           Recruitment Tool
-        </Text>
+        </h1>
       ) : (
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            background: "linear-gradient(135deg, #1890ff 0%, #722ed1 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: "bold", fontSize: "16px" }}>R</Text>
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-base">R</span>
         </div>
       )}
     </div>

@@ -1,11 +1,10 @@
 import React from "react";
-import { Layout } from "antd";
 import { User } from "@/types/auth";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 import { NavigationMenu } from "./NavigationMenu";
 import { UserProfile } from "./UserProfile";
-
-const { Sider } = Layout;
+import { Button } from "@/components/ui/button";
 
 interface AppSidebarProps {
   user: User | null;
@@ -29,22 +28,25 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onLogout,
 }) => {
   return (
-    <Sider
-      collapsible
-      collapsed={collapsed}
-      onCollapse={onCollapse}
-      width={280}
-      style={{
-        background: "#fff",
-        borderRight: "1px solid #f0f0f0",
-        boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-      }}
-      theme="light"
-      collapsedWidth={80}
-      reverseArrow
+    <div
+      className={`bg-white border-r border-gray-200 shadow-[2px_0_8px_rgba(0,0,0,0.15)] flex flex-col relative transition-all duration-200 ${
+        collapsed ? "w-20" : "w-70"
+      }`}
     >
+      {/* Collapse Toggle Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => onCollapse(!collapsed)}
+        className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full border bg-white shadow-md hover:bg-gray-50"
+      >
+        {collapsed ? (
+          <ChevronRight className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+      </Button>
+
       <BrandLogo collapsed={collapsed} />
 
       <NavigationMenu
@@ -55,6 +57,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       />
 
       <UserProfile user={user} collapsed={collapsed} onLogout={onLogout} />
-    </Sider>
+    </div>
   );
 };

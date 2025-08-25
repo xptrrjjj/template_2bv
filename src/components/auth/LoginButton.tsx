@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Button } from "antd";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const LoginButton: React.FC = () => {
@@ -18,35 +19,22 @@ export const LoginButton: React.FC = () => {
 
   return (
     <Button
-      size="large"
-      icon={<MicrosoftIcon />}
-      loading={loading}
+      size="lg"
       onClick={login}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        height: "56px",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        border: "none",
-        borderRadius: "8px",
-        color: "white",
-        fontSize: "16px",
-        fontWeight: "600",
-        boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
-        transition: "all 0.3s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 8px 20px rgba(102, 126, 234, 0.6)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.4)";
-      }}
+      disabled={loading}
+      className="w-full h-14 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-none text-white text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-3"
     >
-      {loading ? "Signing in..." : "Sign in with Microsoft"}
+      {loading ? (
+        <>
+          <Spinner size="sm" className="border-white/30 border-t-white" />
+          Signing in...
+        </>
+      ) : (
+        <>
+          <MicrosoftIcon />
+          Sign in with Microsoft
+        </>
+      )}
     </Button>
   );
 };

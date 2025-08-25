@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { Card, Typography, Space, Badge } from "antd";
-import { ClockCircleOutlined } from "@ant-design/icons";
-
-const { Text } = Typography;
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock } from "lucide-react";
 
 interface ActivityItem {
   id: string;
@@ -45,63 +44,50 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
 
   const currentActivities = activities || defaultActivities;
 
-  const getStatusBadge = (status: ActivityItem["status"]) => {
+  const getStatusColor = (status: ActivityItem["status"]) => {
     switch (status) {
       case "success":
-        return "success";
+        return "bg-green-100 text-green-800";
       case "scheduled":
-        return "processing";
+        return "bg-blue-100 text-blue-800";
       default:
-        return "default";
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
-    <Card
-      title={
-        <Space>
-          <ClockCircleOutlined style={{ color: "#667eea" }} />
-          <Text strong style={{ fontSize: "16px", color: "#1a202c" }}>
+    <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="w-5 h-5 text-[#667eea]" />
+          <span className="text-base font-semibold text-slate-800">
             Recent Activity
-          </Text>
-        </Space>
-      }
-      style={{
-        background: "white",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      }}
-      styles={{ body: { padding: "24px" } }}
-    >
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+      <div className="space-y-4 w-full">
         {currentActivities.map((item) => (
           <div
             key={item.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "16px",
-              background: "#f8fafc",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-            }}
+            className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <Badge status={getStatusBadge(item.status)} />
+            <div className="flex items-center gap-4">
+              <Badge className={getStatusColor(item.status)}>
+                {item.status}
+              </Badge>
               <div>
-                <Text strong style={{ color: "#1a202c" }}>
+                <p className="font-semibold text-slate-800">
                   {item.action}
-                </Text>
-                <br />
-                <Text style={{ color: "#64748b", fontSize: "14px" }}>{item.position}</Text>
+                </p>
+                <p className="text-slate-500 text-sm">{item.position}</p>
               </div>
             </div>
-            <Text style={{ fontSize: "12px", color: "#94a3b8" }}>{item.time}</Text>
+            <span className="text-xs text-slate-400">{item.time}</span>
           </div>
         ))}
-      </Space>
+      </div>
+      </CardContent>
     </Card>
   );
 };

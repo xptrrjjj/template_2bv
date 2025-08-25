@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Card, Typography, Space, Row, Col } from "antd";
-import { UserOutlined, SafetyCertificateOutlined, TeamOutlined } from "@ant-design/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { User, Shield, Users } from "lucide-react";
 import { LoginButton } from "@/components/auth/LoginButton";
 import { AuthLoadingScreen } from "@/components/loading/AuthLoadingScreen";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
-const { Title, Paragraph, Text } = Typography;
 
 export default function LoginPage() {
   const { isAuthenticated, loading } = useAuth();
@@ -45,157 +44,72 @@ export default function LoginPage() {
         padding: "20px",
       }}
     >
-      <Row style={{ width: "100%", minHeight: "100vh" }} align="middle">
-        <Col
-          xs={24}
-          lg={12}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: "40px",
-            color: "white",
-          }}
-        >
-          <div style={{ maxWidth: "500px" }}>
-            <Title
-              level={1}
-              style={{
-                color: "white",
-                fontSize: "3.5rem",
-                fontWeight: "700",
-                marginBottom: "24px",
-                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              }}
-            >
+      <div className="w-full min-h-screen flex items-center">
+        <div className="flex flex-col justify-center p-10 text-white lg:w-1/2 w-full">
+          <div className="max-w-[500px]">
+            <h1 className="text-white text-[3.5rem] font-bold mb-6 drop-shadow-sm">
               Recruitment
-            </Title>
-            <Title
-              level={2}
-              style={{
-                color: "rgba(255,255,255,0.9)",
-                fontSize: "2.2rem",
-                fontWeight: "300",
-                marginBottom: "32px",
-              }}
-            >
+            </h1>
+            <h2 className="text-white/90 text-[2.2rem] font-light mb-8">
               Management System
-            </Title>
-            <Paragraph
-              style={{
-                color: "rgba(255,255,255,0.8)",
-                fontSize: "1.2rem",
-                marginBottom: "40px",
-                lineHeight: "1.6",
-              }}
-            >
+            </h2>
+            <p className="text-white/80 text-xl mb-10 leading-relaxed">
               Streamline your hiring process with our comprehensive recruitment platform. Manage
               candidates, track applications, and make better hiring decisions.
-            </Paragraph>
+            </p>
 
-            <Space direction="vertical" size="large">
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <UserOutlined style={{ fontSize: "24px", color: "rgba(255,255,255,0.8)" }} />
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px" }}>
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <User className="w-6 h-6 text-white/80" />
+                <span className="text-white/80 text-base">
                   Candidate Management
-                </Text>
+                </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <SafetyCertificateOutlined
-                  style={{ fontSize: "24px", color: "rgba(255,255,255,0.8)" }}
-                />
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px" }}>
+              <div className="flex items-center gap-4">
+                <Shield className="w-6 h-6 text-white/80" />
+                <span className="text-white/80 text-base">
                   Secure Microsoft Authentication
-                </Text>
+                </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <TeamOutlined style={{ fontSize: "24px", color: "rgba(255,255,255,0.8)" }} />
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px" }}>
+              <div className="flex items-center gap-4">
+                <Users className="w-6 h-6 text-white/80" />
+                <span className="text-white/80 text-base">
                   Team Collaboration
-                </Text>
+                </span>
               </div>
-            </Space>
+            </div>
           </div>
-        </Col>
+        </div>
 
-        <Col
-          xs={24}
-          lg={12}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "40px",
-          }}
-        >
-          <Card
-            style={{
-              maxWidth: "450px",
-              width: "100%",
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
-              border: "none",
-              borderRadius: "16px",
-              boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-              padding: "20px",
-            }}
-            styles={{ body: { padding: "40px" } }}
-          >
-            <Space direction="vertical" size="large" style={{ width: "100%", textAlign: "center" }}>
+        <div className="flex justify-center items-center p-10 lg:w-1/2 w-full">
+          <Card className="max-w-[450px] w-full bg-white/95 backdrop-blur-sm border-none rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
+            <CardContent className="p-10">
+            <div className="space-y-6 w-full text-center">
               <div>
-                <div
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 24px",
-                    boxShadow: "0 8px 16px rgba(102, 126, 234, 0.3)",
-                  }}
-                >
-                  <UserOutlined style={{ fontSize: "32px", color: "white" }} />
+                <div className="w-20 h-20 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_8px_16px_rgba(102,126,234,0.3)]">
+                  <User className="w-8 h-8 text-white" />
                 </div>
 
-                <Title
-                  level={2}
-                  style={{
-                    color: "#2c3e50",
-                    marginBottom: "8px",
-                    fontWeight: "600",
-                  }}
-                >
+                <h2 className="text-[#2c3e50] mb-2 font-semibold text-2xl">
                   Welcome Back
-                </Title>
-                <Paragraph
-                  style={{
-                    color: "#7f8c8d",
-                    fontSize: "16px",
-                    marginBottom: "32px",
-                  }}
-                >
+                </h2>
+                <p className="text-[#7f8c8d] text-base mb-8">
                   Sign in with your Microsoft account to access your recruitment dashboard
-                </Paragraph>
+                </p>
               </div>
 
               <LoginButton />
 
-              <div style={{ marginTop: "24px" }}>
-                <Text
-                  style={{
-                    color: "#95a5a6",
-                    fontSize: "14px",
-                  }}
-                >
+              <div className="mt-6">
+                <span className="text-[#95a5a6] text-sm">
                   Secured by Microsoft Azure Active Directory
-                </Text>
+                </span>
               </div>
-            </Space>
+            </div>
+            </CardContent>
           </Card>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </div>
   );
 }

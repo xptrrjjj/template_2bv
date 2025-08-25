@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-import { Spin } from "antd";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Home() {
   const { isAuthenticated, loading } = useAuth();
@@ -19,18 +19,9 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          flexDirection: "column",
-          gap: "16px",
-        }}
-      >
-        <Spin size="large" />
-        <div style={{ color: "#64748b" }}>Loading dashboard...</div>
+      <div className="flex items-center justify-center h-screen flex-col gap-4">
+        <Spinner size="lg" />
+        <div className="text-slate-500">Loading dashboard...</div>
       </div>
     </ProtectedRoute>
   );

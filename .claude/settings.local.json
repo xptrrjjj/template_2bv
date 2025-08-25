@@ -19,7 +19,10 @@
       "Bash(git stash:*)",
       "WebFetch(domain:localhost)",
       "Bash(node:*)",
-      "WebFetch(domain:api.testdome.com)"
+      "WebFetch(domain:api.testdome.com)",
+      "Bash(npx:*)",
+      "Bash(npm uninstall:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

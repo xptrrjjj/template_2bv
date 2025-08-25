@@ -1,19 +1,19 @@
 "use client";
 
 import React from "react";
-import { Card, Typography, Row, Col, Statistic, Space } from "antd";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import {
-  UserOutlined,
-  SafetyCertificateOutlined,
-  AppstoreOutlined,
-  KeyOutlined,
-  TrophyOutlined,
-} from "@ant-design/icons";
+  User,
+  Shield,
+  Grid3X3,
+  Key,
+  Trophy,
+} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/services/api";
 
-const { Title, Text } = Typography;
 
 interface AdminStats {
   userCount: number;
@@ -59,211 +59,167 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div style={{ padding: "32px", background: "#f8fafc", height: "100%" }}>
-      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+    <div className="p-8 bg-slate-50 min-h-full">
+      <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <Card
-          style={{
-            background: "white",
-            border: "1px solid #e2e8f0",
-            borderRadius: "16px",
-            marginBottom: "32px",
-            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-          }}
-          styles={{ body: { padding: "32px" } }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div
-              style={{
-                width: "60px",
-                height: "60px",
-                background: "linear-gradient(135deg, #722ed1 0%, #1890ff 100%)",
-                borderRadius: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 12px rgba(114, 46, 209, 0.3)",
-              }}
-            >
-              <TrophyOutlined style={{ fontSize: "28px", color: "white" }} />
+        <Card className="bg-white border-slate-200 rounded-2xl mb-8 shadow-sm">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-4">
+              <div className="w-15 h-15 bg-gradient-to-br from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(114,46,209,0.3)]">
+                <Trophy className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 m-0">
+                  System Administration
+                </h2>
+                <p className="text-base text-slate-500">
+                  Manage users, roles, permissions, and system settings
+                </p>
+              </div>
             </div>
-            <div>
-              <Title level={2} style={{ margin: 0, color: "#1a202c" }}>
-                System Administration
-              </Title>
-              <Text style={{ fontSize: "16px", color: "#64748b" }}>
-                Manage users, roles, permissions, and system settings
-              </Text>
-            </div>
-          </div>
+          </CardContent>
         </Card>
 
         {/* Statistics Cards */}
-        <Row gutter={[24, 24]} style={{ marginBottom: "32px" }}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Statistic
-                title="Total Users"
-                value={stats.userCount}
-                prefix={<UserOutlined style={{ color: "#1890ff" }} />}
-                loading={loading}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Statistic
-                title="System Roles"
-                value={stats.roleCount}
-                prefix={<SafetyCertificateOutlined style={{ color: "#52c41a" }} />}
-                loading={loading}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Statistic
-                title="Permissions"
-                value={stats.permissionCount}
-                prefix={<KeyOutlined style={{ color: "#faad14" }} />}
-                loading={loading}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <Statistic
-                title="Applications"
-                value={stats.applicationCount}
-                prefix={<AppstoreOutlined style={{ color: "#722ed1" }} />}
-                loading={loading}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white rounded-xl border-slate-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Total Users</p>
+                  {loading ? (
+                    <Skeleton className="w-16 h-8 mt-1" />
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-800">{stats.userCount}</p>
+                  )}
+                </div>
+                <User className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white rounded-xl border-slate-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">System Roles</p>
+                  {loading ? (
+                    <Skeleton className="w-16 h-8 mt-1" />
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-800">{stats.roleCount}</p>
+                  )}
+                </div>
+                <Shield className="w-8 h-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white rounded-xl border-slate-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Permissions</p>
+                  {loading ? (
+                    <Skeleton className="w-16 h-8 mt-1" />
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-800">{stats.permissionCount}</p>
+                  )}
+                </div>
+                <Key className="w-8 h-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white rounded-xl border-slate-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Applications</p>
+                  {loading ? (
+                    <Skeleton className="w-16 h-8 mt-1" />
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-800">{stats.applicationCount}</p>
+                  )}
+                </div>
+                <Grid3X3 className="w-8 h-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Quick Actions */}
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={12} xl={6}>
-            <Card
-              title={
-                <Space>
-                  <UserOutlined style={{ color: "#1890ff" }} />
-                  <Text strong>User Management</Text>
-                </Space>
-              }
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-              hoverable
-              onClick={() => router.push("/admin/users")}
-            >
-              <Text type="secondary">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+          <Card 
+            className="bg-white rounded-xl border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => router.push("/admin/users")}
+          >
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5 text-blue-500" />
+                <span className="font-semibold">User Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-slate-600">
                 Manage user accounts, assign roles, and control access permissions across
                 applications.
-              </Text>
-            </Card>
-          </Col>
-          <Col xs={24} lg={12} xl={6}>
-            <Card
-              title={
-                <Space>
-                  <SafetyCertificateOutlined style={{ color: "#52c41a" }} />
-                  <Text strong>Role Management</Text>
-                </Space>
-              }
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-              hoverable
-              onClick={() => router.push("/admin/roles")}
-            >
-              <Text type="secondary">
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-white rounded-xl border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => router.push("/admin/roles")}
+          >
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-green-500" />
+                <span className="font-semibold">Role Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-slate-600">
                 Create and manage roles, assign permissions, and define access levels for different
                 user types.
-              </Text>
-            </Card>
-          </Col>
-          <Col xs={24} lg={12} xl={6}>
-            <Card
-              title={
-                <Space>
-                  <KeyOutlined style={{ color: "#faad14" }} />
-                  <Text strong>Permission Management</Text>
-                </Space>
-              }
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-              hoverable
-              onClick={() => router.push("/admin/permissions")}
-            >
-              <Text type="secondary">
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-white rounded-xl border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => router.push("/admin/permissions")}
+          >
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Key className="w-5 h-5 text-yellow-500" />
+                <span className="font-semibold">Permission Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-slate-600">
                 Create custom permissions, manage system permissions, and control granular access
                 rights.
-              </Text>
-            </Card>
-          </Col>
-          <Col xs={24} lg={12} xl={6}>
-            <Card
-              title={
-                <Space>
-                  <AppstoreOutlined style={{ color: "#722ed1" }} />
-                  <Text strong>System Settings</Text>
-                </Space>
-              }
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-              }}
-              hoverable
-              onClick={() => router.push("/admin/system")}
-            >
-              <Text type="secondary">
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="bg-white rounded-xl border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => router.push("/admin/system")}
+          >
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <Grid3X3 className="w-5 h-5 text-purple-500" />
+                <span className="font-semibold">System Settings</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-slate-600">
                 Configure system-wide settings, manage applications, and monitor system health.
-              </Text>
-            </Card>
-          </Col>
-        </Row>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

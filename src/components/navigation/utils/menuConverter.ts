@@ -1,9 +1,13 @@
 import { NavigationItem } from "@/types/rbac";
-import type { MenuProps } from "antd";
 
-export type AntdMenuItem = NonNullable<MenuProps["items"]>[0];
+export interface NavigationMenuItem {
+  key: string;
+  icon?: React.ReactNode;
+  label: string;
+  children?: NavigationMenuItem[];
+}
 
-export const convertToMenuItems = (items: NavigationItem[]): AntdMenuItem[] => {
+export const convertToMenuItems = (items: NavigationItem[]): NavigationMenuItem[] => {
   return items.map((item) => ({
     key: item.key,
     icon: item.icon,

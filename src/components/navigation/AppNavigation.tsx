@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Layout } from "antd";
 import { User } from "@/types/auth";
 import { useNavigationState } from "./hooks/useNavigationState";
 import { AppSidebar as AppSidebarComponent } from "./components/AppSidebar";
@@ -26,7 +25,7 @@ const AppNavigationComponent: React.FC<AppNavigationProps> = ({ user, onLogout, 
   } = useNavigationState({ onLogout });
 
   return (
-    <Layout style={{ height: "100vh", overflow: "hidden" }}>
+    <div className="h-screen overflow-hidden flex">
       <AppSidebarComponent
         user={user}
         collapsed={collapsed}
@@ -38,29 +37,13 @@ const AppNavigationComponent: React.FC<AppNavigationProps> = ({ user, onLogout, 
         onLogout={handleLogout}
       />
 
-      <Layout
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-          overflow: "hidden",
-        }}
-      >
+      <div className="flex flex-col h-screen overflow-hidden flex-1">
         <AppHeader pathname={pathname} />
-        <div
-          style={{
-            flex: 1,
-            overflow: "auto",
-            background: "#f5f5f5",
-            height: "calc(100vh - 64px)", // Subtract header height
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <div className="flex-1 overflow-auto bg-gray-100 h-[calc(100vh-64px)] flex flex-col">
           {children}
         </div>
-      </Layout>
-    </Layout>
+      </div>
+    </div>
   );
 };
 

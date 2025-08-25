@@ -1,8 +1,4 @@
 import React from "react";
-import { Layout, Typography } from "antd";
-
-const { Header } = Layout;
-const { Text } = Typography;
 
 interface AppHeaderProps {
   pathname: string;
@@ -20,20 +16,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ pathname }) => {
   };
 
   return (
-    <Header
-      style={{
-        background: "#fff",
-        padding: "0 24px",
-        borderBottom: "1px solid #f0f0f0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "64px",
-      }}
-    >
-      <Text style={{ fontSize: "18px", fontWeight: "600", color: "#1a202c" }}>
+    <header className="bg-white px-6 border-b border-gray-200 flex items-center justify-center h-16">
+      <h1 className="text-lg font-semibold text-gray-900">
         {getPageTitle(pathname)}
-      </Text>
-    </Header>
+      </h1>
+    </header>
   );
 };

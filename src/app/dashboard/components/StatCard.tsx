@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { Card, Statistic, Typography } from "antd";
-import { RiseOutlined } from "@ant-design/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
 
-const { Text } = Typography;
 
 interface StatCardProps {
   title: string;
@@ -16,55 +15,32 @@ interface StatCardProps {
 
 export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, trend }) => {
   return (
-    <Card
-      style={{
-        background: "white",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        position: "relative",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      }}
-      styles={{ body: { padding: "24px" } }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "16px",
-        }}
-      >
+    <Card className="bg-white border-slate-200 rounded-xl relative shadow-sm">
+      <CardContent className="p-6">
+      <div className="flex items-center justify-between mb-4">
         <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
           style={{
-            width: "48px",
-            height: "48px",
-            background: `${color}15`,
-            borderRadius: "12px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            backgroundColor: `${color}15`,
             color: color,
-            fontSize: "24px",
           }}
         >
           {icon}
         </div>
       </div>
-      <Statistic
-        title={
-          <Text style={{ color: "#64748b", fontSize: "14px", fontWeight: "500" }}>{title}</Text>
-        }
-        value={value}
-        valueStyle={{ color: "#1a202c", fontSize: "28px", fontWeight: "700" }}
-      />
+      <div>
+        <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
+        <p className="text-slate-800 text-[28px] font-bold">{value.toLocaleString()}</p>
+      </div>
       {trend && (
-        <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
-          <RiseOutlined style={{ color: "#10b981", fontSize: "14px" }} />
-          <Text style={{ color: "#10b981", fontSize: "13px", fontWeight: "500" }}>
+        <div className="mt-3 flex items-center gap-1">
+          <TrendingUp className="text-emerald-500 w-3.5 h-3.5" />
+          <span className="text-emerald-500 text-xs font-medium">
             +{trend}% from last week
-          </Text>
+          </span>
         </div>
       )}
+      </CardContent>
     </Card>
   );
 };

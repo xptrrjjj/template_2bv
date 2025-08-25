@@ -1,168 +1,120 @@
 "use client";
 
 import React from "react";
-import { Card, Skeleton, Row, Col, Space } from "antd";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const DashboardSkeleton: React.FC = () => {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-      }}
-    >
+    <div className="min-h-screen bg-slate-50">
       {/* Header Skeleton */}
-      <div
-        style={{
-          background: "white",
-          borderBottom: "1px solid #e2e8f0",
-          padding: "20px 32px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-        }}
-      >
+      <div className="bg-white border-b border-slate-200 p-5 px-8 flex justify-between items-center shadow-sm">
         <div>
-          <Skeleton.Input style={{ width: 200, height: 24 }} active />
-          <div style={{ marginTop: "8px" }}>
-            <Skeleton.Input style={{ width: 300, height: 14 }} active />
+          <Skeleton className="w-[200px] h-6" />
+          <div className="mt-2">
+            <Skeleton className="w-[300px] h-3.5" />
           </div>
         </div>
-        <div style={{ display: "flex", gap: "16px" }}>
-          <Skeleton.Avatar size={40} active />
-          <Skeleton.Button style={{ width: 80, height: 40 }} active />
+        <div className="flex gap-4">
+          <Skeleton className="w-10 h-10 rounded-full" />
+          <Skeleton className="w-20 h-10 rounded" />
         </div>
       </div>
 
       {/* Content Skeleton */}
-      <div style={{ padding: "32px" }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+      <div className="p-8">
+        <div className="max-w-[1400px] mx-auto">
           {/* Welcome Card Skeleton */}
-          <Card
-            style={{
-              background: "white",
-              border: "1px solid #e2e8f0",
-              borderRadius: "16px",
-              marginBottom: "32px",
-              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-            }}
-            styles={{ body: { padding: "40px" } }}
-          >
-            <Row align="middle">
-              <Col flex="1">
-                <Skeleton.Input style={{ width: 400, height: 32 }} active />
-                <div style={{ marginTop: "16px" }}>
-                  <Skeleton.Input style={{ width: 500, height: 16 }} active />
+          <Card className="bg-white border-slate-200 rounded-2xl mb-8 shadow-sm">
+            <CardContent className="p-10">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <Skeleton className="w-[400px] h-8" />
+                  <div className="mt-4">
+                    <Skeleton className="w-[500px] h-4" />
+                  </div>
                 </div>
-              </Col>
-              <Col>
-                <Skeleton.Avatar size={100} shape="square" active />
-              </Col>
-            </Row>
+                <div>
+                  <Skeleton className="w-[100px] h-[100px] rounded" />
+                </div>
+              </div>
+            </CardContent>
           </Card>
 
           {/* Stats Cards Skeleton */}
-          <Row gutter={[24, 24]} style={{ marginBottom: "32px" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4].map((i) => (
-              <Col xs={24} sm={12} lg={6} key={i}>
-                <Card
-                  style={{
-                    background: "white",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                  }}
-                  styles={{ body: { padding: "24px" } }}
-                >
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <Skeleton.Avatar size={48} shape="square" active />
-                    <Skeleton.Input style={{ width: 120, height: 14 }} active />
-                    <Skeleton.Input style={{ width: 80, height: 28 }} active />
-                    <Skeleton.Input style={{ width: 100, height: 13 }} active />
-                  </Space>
-                </Card>
-              </Col>
+              <Card key={i} className="bg-white border-slate-200 rounded-xl shadow-sm">
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <Skeleton className="w-12 h-12 rounded" />
+                    <Skeleton className="w-[120px] h-3.5" />
+                    <Skeleton className="w-20 h-7" />
+                    <Skeleton className="w-[100px] h-3" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
-          </Row>
+          </div>
 
           {/* Main Content Skeleton */}
-          <Row gutter={[24, 24]}>
-            <Col xs={24} lg={16}>
-              <Card
-                style={{
-                  background: "white",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "12px",
-                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                }}
-                styles={{ body: { padding: "24px" } }}
-              >
-                <Skeleton.Input style={{ width: 200, height: 16 }} active />
-                <div style={{ marginTop: "24px" }}>
-                  <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        style={{
-                          padding: "16px",
-                          background: "#f8fafc",
-                          borderRadius: "8px",
-                          border: "1px solid #e2e8f0",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <div style={{ display: "flex", gap: "16px" }}>
-                            <Skeleton.Avatar size={8} active />
-                            <div>
-                              <Skeleton.Input style={{ width: 200, height: 16 }} active />
-                              <div style={{ marginTop: "8px" }}>
-                                <Skeleton.Input style={{ width: 150, height: 14 }} active />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
+                <CardContent className="p-6">
+                  <Skeleton className="w-[200px] h-4" />
+                  <div className="mt-6">
+                    <div className="space-y-6">
+                      {[1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className="p-4 bg-slate-50 rounded-lg border border-slate-200"
+                        >
+                          <div className="flex justify-between">
+                            <div className="flex gap-4">
+                              <Skeleton className="w-2 h-2 rounded-full" />
+                              <div>
+                                <Skeleton className="w-[200px] h-4" />
+                                <div className="mt-2">
+                                  <Skeleton className="w-[150px] h-3.5" />
+                                </div>
                               </div>
                             </div>
+                            <Skeleton className="w-[60px] h-3" />
                           </div>
-                          <Skeleton.Input style={{ width: 60, height: 12 }} active />
                         </div>
-                      </div>
-                    ))}
-                  </Space>
-                </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
-            </Col>
+            </div>
 
-            <Col xs={24} lg={8}>
-              <Card
-                style={{
-                  background: "white",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "12px",
-                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                }}
-                styles={{ body: { padding: "24px" } }}
-              >
-                <div
-                  style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}
-                >
-                  <Skeleton.Input style={{ width: 120, height: 16 }} active />
-                  <Skeleton.Button style={{ width: 80, height: 32 }} active />
-                </div>
-                <Space direction="vertical" style={{ width: "100%" }}>
-                  <div style={{ marginBottom: "20px" }}>
-                    <Skeleton.Input style={{ width: 150, height: 14 }} active />
-                    <div style={{ marginTop: "8px" }}>
-                      <Skeleton.Input style={{ width: "100%", height: 8 }} active />
+            <div>
+              <Card className="bg-white border-slate-200 rounded-xl shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex justify-between mb-6">
+                    <Skeleton className="w-[120px] h-4" />
+                    <Skeleton className="w-20 h-8 rounded" />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="mb-5">
+                      <Skeleton className="w-[150px] h-3.5" />
+                      <div className="mt-2">
+                        <Skeleton className="w-full h-2" />
+                      </div>
+                    </div>
+                    <div className="mb-5">
+                      <Skeleton className="w-[130px] h-3.5" />
+                      <div className="mt-2">
+                        <Skeleton className="w-full h-2" />
+                      </div>
                     </div>
                   </div>
-                  <div style={{ marginBottom: "20px" }}>
-                    <Skeleton.Input style={{ width: 130, height: 14 }} active />
-                    <div style={{ marginTop: "8px" }}>
-                      <Skeleton.Input style={{ width: "100%", height: 8 }} active />
-                    </div>
-                  </div>
-                </Space>
+                </CardContent>
               </Card>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </div>
       </div>
     </div>

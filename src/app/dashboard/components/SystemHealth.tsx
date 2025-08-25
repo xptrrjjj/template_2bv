@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Card, Typography, Space, Button, Progress } from "antd";
-import { DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
-
-const { Text } = Typography;
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Database, CheckCircle } from "lucide-react";
 
 interface TestResult {
   operation: string;
@@ -24,78 +24,66 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
   onTestConnection,
 }) => {
   return (
-    <Card
-      title={
-        <Space>
-          <DatabaseOutlined style={{ color: "#667eea" }} />
-          <Text strong style={{ fontSize: "16px", color: "#1a202c" }}>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2">
+          <Database className="w-5 h-5 text-indigo-500" />
+          <span className="text-base font-semibold text-gray-900">
             System Health
-          </Text>
-        </Space>
-      }
-      extra={
+          </span>
+        </CardTitle>
         <Button
-          type="primary"
-          icon={<DatabaseOutlined />}
-          loading={loading}
           onClick={onTestConnection}
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            border: "none",
-            borderRadius: "6px",
-            fontWeight: "500",
-          }}
+          disabled={loading}
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 rounded-md font-medium flex items-center gap-2"
         >
-          Test API
+          <Database className="w-4 h-4" />
+          {loading ? 'Testing...' : 'Test API'}
         </Button>
-      }
-      style={{
-        background: "white",
-        border: "1px solid #e2e8f0",
-        borderRadius: "12px",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      }}
-      styles={{ body: { padding: "24px" } }}
-    >
-      <Space direction="vertical" style={{ width: "100%" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <Text style={{ color: "#1a202c", fontWeight: "500" }}>Database Connection</Text>
-          <Progress percent={100} status="success" showInfo={false} style={{ marginTop: "8px" }} />
-        </div>
-
-        <div style={{ marginBottom: "20px" }}>
-          <Text style={{ color: "#1a202c", fontWeight: "500" }}>API Response Time</Text>
-          <Progress percent={85} showInfo={false} style={{ marginTop: "8px" }} />
-          <Text style={{ fontSize: "12px", color: "#64748b" }}>125ms avg</Text>
-        </div>
-
-        {testResults.length > 0 && (
+      </CardHeader>
+      <CardContent className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+        <div className="space-y-5">
           <div>
-            <Text strong style={{ marginBottom: "12px", display: "block", color: "#1a202c" }}>
-              Latest Test Results:
-            </Text>
-            {testResults.map((result, index) => (
-              <div
-                key={index}
-                style={{
-                  padding: "12px",
-                  background: result.status === "success" ? "#f0fdf4" : "#fef2f2",
-                  borderRadius: "8px",
-                  marginBottom: "8px",
-                  border: `1px solid ${result.status === "success" ? "#bbf7d0" : "#fecaca"}`,
-                }}
-              >
-                <Space>
-                  <CheckCircleOutlined
-                    style={{ color: result.status === "success" ? "#16a34a" : "#dc2626" }}
-                  />
-                  <Text style={{ fontSize: "14px", color: "#1a202c" }}>{result.operation}</Text>
-                </Space>
-              </div>
-            ))}
+            <p className="text-gray-900 font-medium mb-2">Database Connection</p>
+            <Progress value={100} className="h-2" />
           </div>
-        )}
-      </Space>
+
+          <div>
+            <p className="text-gray-900 font-medium mb-2">API Response Time</p>
+            <Progress value={85} className="h-2 mb-1" />
+            <p className="text-xs text-slate-500">125ms avg</p>
+          </div>
+
+          {testResults.length > 0 && (
+            <div>
+              <p className="font-semibold mb-3 text-gray-900">
+                Latest Test Results:
+              </p>
+              <div className="space-y-2">
+                {testResults.map((result, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg border ${
+                      result.status === "success" 
+                        ? "bg-green-50 border-green-200" 
+                        : "bg-red-50 border-red-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <CheckCircle
+                        className={`w-4 h-4 ${
+                          result.status === "success" ? "text-green-600" : "text-red-600"
+                        }`}
+                      />
+                      <p className="text-sm text-gray-900">{result.operation}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 };

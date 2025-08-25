@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Result } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Result } from "@/components/ui/result";
+import { User } from "lucide-react";
 import { useHasRole } from "@/hooks/usePermissions";
 
 interface RoleGuardProps {
@@ -49,15 +49,15 @@ export const RoleGuard: React.FC<RoleGuardProps> = ({
         status="403"
         title="Access Denied"
         subTitle="You need the required role to access this content."
-        icon={<UserOutlined style={{ color: "#ff4d4f" }} />}
+        icon={<User className="w-16 h-16 text-red-500" />}
         extra={
-          <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
-              Required role: <code>{firstRole}</code>
+          <div className="text-center mt-4">
+            <p className="text-gray-500 text-sm">
+              Required role: <code className="bg-gray-100 px-1 py-0.5 rounded">{firstRole}</code>
               {appId && (
                 <>
                   <br />
-                  Application: <code>{appId}</code>
+                  Application: <code className="bg-gray-100 px-1 py-0.5 rounded">{appId}</code>
                 </>
               )}
             </p>

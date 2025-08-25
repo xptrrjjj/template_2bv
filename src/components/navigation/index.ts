@@ -13,4 +13,4 @@ export { useNavigationState } from "./hooks/useNavigationState";
 
 // Utils
 export { convertToMenuItems } from "./utils/menuConverter";
-export type { AntdMenuItem } from "./utils/menuConverter";
+export type { NavigationMenuItem } from "./utils/menuConverter";

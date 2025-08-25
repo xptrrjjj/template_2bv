@@ -1,8 +1,17 @@
 import React from "react";
-import { Card, Typography, Space, Spin } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const { Title, Paragraph } = Typography;
+// Simple spinner component
+const Spinner = ({ className }: { className?: string }) => (
+  <div
+    className={cn(
+      "animate-spin rounded-full border-2 border-gray-300 border-t-blue-600",
+      className
+    )}
+  />
+);
 
 interface AuthLoadingScreenProps {
   message?: string;
@@ -14,63 +23,22 @@ export const AuthLoadingScreen: React.FC<AuthLoadingScreenProps> = ({
   description = "Checking authentication status"
 }) => {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px",
-      }}
-    >
-      <Card
-        style={{
-          maxWidth: "450px",
-          width: "100%",
-          background: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(10px)",
-          border: "none",
-          borderRadius: "16px",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-          padding: "20px",
-          textAlign: "center",
-        }}
-      >
-        <Space direction="vertical" size="large" style={{ width: "100%" }}>
-          <div
-            style={{
-              width: "80px",
-              height: "80px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto",
-              boxShadow: "0 8px 16px rgba(102, 126, 234, 0.3)",
-              position: "relative",
-            }}
-          >
-            <UserOutlined style={{ fontSize: "32px", color: "white" }} />
-            <Spin
-              size="large"
-              style={{
-                position: "absolute",
-                top: "-10px",
-                left: "-10px",
-                right: "-10px",
-                bottom: "-10px",
-              }}
-            />
+    <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] flex items-center justify-center p-5">
+      <Card className="max-w-[450px] w-full bg-white/95 backdrop-blur-sm border-none rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
+        <CardContent className="p-8 text-center">
+        <div className="space-y-6 w-full">
+          <div className="relative w-20 h-20 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-full flex items-center justify-center mx-auto shadow-[0_8px_16px_rgba(102,126,234,0.3)]">
+            <User className="w-8 h-8 text-white" />
+            <Spinner className="absolute -inset-2.5 w-[100px] h-[100px]" />
           </div>
-          <Title level={3} style={{ color: "#2c3e50", margin: 0 }}>
+          <h3 className="text-[#2c3e50] text-xl font-semibold m-0">
             {message}
-          </Title>
-          <Paragraph style={{ color: "#7f8c8d", margin: 0 }}>
+          </h3>
+          <p className="text-[#7f8c8d] m-0">
             {description}
-          </Paragraph>
-        </Space>
+          </p>
+        </div>
+        </CardContent>
       </Card>
     </div>
   );

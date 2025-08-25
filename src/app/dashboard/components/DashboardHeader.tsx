@@ -1,11 +1,10 @@
 "use client";
 
 import React from "react";
-import { Typography, Space, Avatar, Button } from "antd";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { User as UserIcon, LogOut } from "lucide-react";
 import { User } from "@/types/auth";
-
-const { Title, Text } = Typography;
 
 interface DashboardHeaderProps {
   user: User | null;
@@ -14,65 +13,41 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, onLogout }) => {
   return (
-    <div
-      style={{
-        background: "white",
-        borderBottom: "1px solid #e2e8f0",
-        padding: "20px 32px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      }}
-    >
+    <div className="bg-white border-b border-slate-200 py-5 px-8 flex justify-between items-center shadow-sm">
       <div>
-        <Title level={3} style={{ margin: 0, color: "#1a202c", fontWeight: "700" }}>
+        <h3 className="text-xl font-bold text-slate-800 m-0">
           Recruitment Dashboard
-        </Title>
-        <Text style={{ fontSize: "14px", color: "#64748b" }}>
+        </h3>
+        <p className="text-sm text-slate-500">
           Manage your recruitment process efficiently
-        </Text>
+        </p>
       </div>
 
-      <Space size="large">
-        <Space
-          align="center"
-          style={{
-            padding: "12px 16px",
-            background: "#f1f5f9",
-            borderRadius: "12px",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <Avatar
-            size={40}
-            src={user?.profilePicture}
-            icon={<UserOutlined />}
-            style={{ border: "2px solid #667eea" }}
-          />
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 p-3 px-4 bg-slate-100 rounded-xl border border-slate-200">
+          <Avatar className="w-10 h-10 border-2 border-[#667eea]">
+            <AvatarImage src={user?.profilePicture} />
+            <AvatarFallback>
+              <UserIcon className="w-5 h-5" />
+            </AvatarFallback>
+          </Avatar>
           <div>
-            <Text strong style={{ display: "block", fontSize: "14px", color: "#1a202c" }}>
+            <p className="font-semibold text-sm text-slate-800 block">
               {user?.name}
-            </Text>
-            <Text style={{ fontSize: "12px", color: "#64748b" }}>{user?.email}</Text>
+            </p>
+            <p className="text-xs text-slate-500">{user?.email}</p>
           </div>
-        </Space>
+        </div>
 
         <Button
           onClick={onLogout}
-          style={{
-            background: "white",
-            border: "1px solid #ef4444",
-            borderRadius: "8px",
-            color: "#ef4444",
-            fontWeight: "500",
-            height: "40px",
-            paddingInline: "20px",
-          }}
+          variant="outline"
+          className="bg-white border-red-500 text-red-500 font-medium h-10 px-5 hover:bg-red-50"
         >
-          <LogoutOutlined /> Logout
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
         </Button>
-      </Space>
+      </div>
     </div>
   );
 };

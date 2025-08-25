@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { Result, Spin } from "antd";
-import { LockOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Result } from "@/components/ui/result";
+import { Lock, Loader } from "lucide-react";
 import { useHasPermission } from "@/hooks/usePermissions";
 
 interface PermissionGuardProps {
@@ -29,15 +29,8 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "20px",
-        }}
-      >
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+      <div className="flex justify-center items-center p-5">
+        <Loader className="h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -56,18 +49,18 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
         status="403"
         title="Access Denied"
         subTitle={`You don't have permission to ${action} ${resource}.`}
-        icon={<LockOutlined style={{ color: "#ff4d4f" }} />}
+        icon={<Lock className="h-16 w-16 text-red-500" />}
         extra={
-          <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
+          <div className="text-center mt-4">
+            <p className="text-slate-500 text-sm">
               Required permission:{" "}
-              <code>
+              <code className="bg-slate-100 px-1 rounded">
                 {resource}.{action}
               </code>
               {appId && (
                 <>
                   <br />
-                  Application: <code>{appId}</code>
+                  Application: <code className="bg-slate-100 px-1 rounded">{appId}</code>
                 </>
               )}
             </p>
@@ -109,15 +102,8 @@ export const MultiPermissionGuard: React.FC<MultiPermissionGuardProps> = ({
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "20px",
-        }}
-      >
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
+      <div className="flex justify-center items-center p-5">
+        <Loader className="h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -142,14 +128,14 @@ export const MultiPermissionGuard: React.FC<MultiPermissionGuardProps> = ({
         status="403"
         title="Access Denied"
         subTitle={`You need ${operator === "AND" ? "all" : "one"} of the required permissions.`}
-        icon={<LockOutlined style={{ color: "#ff4d4f" }} />}
+        icon={<Lock className="h-16 w-16 text-red-500" />}
         extra={
-          <div style={{ textAlign: "center", marginTop: "16px" }}>
-            <p style={{ color: "#8c8c8c", fontSize: "14px" }}>
+          <div className="text-center mt-4">
+            <p className="text-slate-500 text-sm">
               Required permissions:{" "}
               {permissions
                 .map((perm) => (
-                  <code key={`${perm.resource}.${perm.action}`}>
+                  <code key={`${perm.resource}.${perm.action}`} className="bg-slate-100 px-1 rounded">
                     {perm.resource}.{perm.action}
                   </code>
                 ))
